@@ -1,0 +1,112 @@
+{
+  "trainers": [
+    {
+      "id": "trainer-69ce4f05-2b14-4fdf-9469-d6c6e4c422ee",
+      "name": "jn",
+      "email": "admin@gym.pro",
+      "password": "1234",
+      "role": "trainer"
+    }
+  ],
+  "clients": [
+    {
+      "id": "client-15242474-c0f6-4b11-ac8a-4f7694fe189f",
+      "name": "a",
+      "level": "",
+      "goals": "",
+      "password": "1",
+      "trainerId": "trainer-69ce4f05-2b14-4fdf-9469-d6c6e4c422ee",
+      "role": "client",
+      "measurements": [],
+      "customRoutine": [
+        {
+          "Lunes": {
+            "title": "Día de Descanso",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1756605890617-0.13846472614147431",
+                "exerciseId": "ex-1756605706941",
+                "name": "a",
+                "description": "",
+                "sets": 0,
+                "reps": 0,
+                "time": 0,
+                "rest": 0
+              }
+            ]
+          },
+          "Martes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Miércoles": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Jueves": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Viernes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Sábado": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Domingo": {
+            "title": "Día de Descanso",
+            "exercises": []
+          }
+        }
+      ],
+      "workoutLogs": [
+        {
+          "date": "2025-08-31",
+          "duration": 0
+        }
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ex-1756605706941",
+      "name": "a",
+      "description": "",
+      "sets": 0,
+      "reps": 0,
+      "time": 0,
+      "rest": 0,
+      "imageUrl": "",
+      "videoUrl": "",
+      "category": "?.",
+      "tags": [
+        "?."
+      ]
+    }
+  ],
+  "notifications": [
+    {
+      "id": "notif-49dc33d7-90df-4767-8107-379c8a211fca",
+      "message": "Cliente a ha iniciado su rutina de hoy: Día de Descanso.",
+      "type": "info",
+      "read": false,
+      "date": "2025-08-31T02:05:34.548Z"
+    },
+    {
+      "id": "notif-07174f14-459a-485f-b934-77b6ec55d98d",
+      "message": "Cliente a ha completado el ejercicio: a.",
+      "type": "info",
+      "read": false,
+      "date": "2025-08-31T02:05:38.513Z"
+    },
+    {
+      "id": "notif-fd7d1bf2-800b-480e-854d-547390ba403b",
+      "message": "¡Felicidades! a ha completado toda la rutina de hoy.",
+      "type": "info",
+      "read": false,
+      "date": "2025-08-31T02:05:38.516Z"
+    }
+  ]
+}

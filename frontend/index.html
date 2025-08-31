@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GymPro Manager</title>
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      body {
+        background-color: #111827; /* bg-gray-900 */
+        font-family: 'Inter', sans-serif;
+      }
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #1f2937; /* bg-gray-800 */
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #4f46e5; /* bg-indigo-600 */
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #6366f1; /* bg-indigo-500 */
+      }
+      details > summary {
+        list-style: none;
+      }
+      details > summary::-webkit-details-marker {
+        display: none;
+      }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // --- DEFINICIÓN DE TIPOS ---
+        const Role = {
+            Trainer: 'trainer',
+            Client: 'client',
+        };
+
+        // --- SERVICIO DE GEMINI (SIMULADO) ---
+        const getExerciseTip = async (exerciseName) => {
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            const tips = {
+                'Press de Banca': 'Asegúrate de mantener los omóplatos retraídos y pegados al banco para proteger tus hombros y maximizar la activación del pecho.',
+                'Sentadilla con Barra': 'Mantén el pecho erguido y la mirada al frente. Rompe la paralela, es decir, que tu cadera baje más allá de la altura de tus rodillas para un rango de movimiento completo.',
+                'Plancha': 'Aprieta los glúteos y el abdomen para mantener la espalda completamente recta. Evita que tu cadera se caiga o se eleve demasiado.',
+                'Dominadas': 'Inicia el movimiento retrayendo las escápulas, como si quisieras juntarlas. Esto activará tu espalda correctamente antes de empezar a flexionar los brazos.',
+                'Zancadas con Mancuernas': 'Da un paso lo suficientemente largo para que ambas rodillas formen un ángulo de 90 grados. El torso debe permanecer vertical durante todo el movimiento.',
+                'Curl de Bíceps': 'Evita balancear el cuerpo. Mantén los codos fijos a los costados y concéntrate en contraer el bíceps para levantar el peso.',
+            };
+            return tips[exerciseName] || `Consejo para ${exerciseName}: Mantén siempre una buena forma y controla el peso en todo el rango de movimiento.`;
+        };
+
+        const API_URL = 'http://localhost:3001/api';
+        const DAYS_OF_WEEK = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+        // --- API REAL CON FETCH ---
+        const api = {
+            _subscribers: [],
+            subscribe(callback) {
+                this._subscribers.push(callback);
+                return () => {
+                    this._subscribers = this._subscribers.filter(cb => cb !== callback);
+                };
+            },
+            notify() {
+                this._subscribers.forEach(callback => callback());
+            },
+            clientLogin: (credentials) => fetch(`${API_URL}/auth/client/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json()) ),
+            trainerLogin: (credentials) => fetch(`${API_URL}/auth/trainer/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
+            trainerRegister: (data) => fetch(`${API_URL}/auth/trainer/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
+            getClients: (trainerId) => fetch(`${API_URL}/clients?trainerId=${trainerId}`).then(res => res.json()),
+            addClient(clientData, trainerId) {
+                return fetch(`${API_URL}/clients`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientData, trainerId }) }).then(res => res.json()).then(data => { this.notify(); return data; });
+            },
+            updateClient(updatedClient) {
+                return fetch(`${API_URL}/clients/${updatedClient.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updatedClient) }).then(res => res.json()).then(data => { this.notify(); return data; });
+            },
+            deleteClient(clientId) {
+                return fetch(`${API_URL}/clients/${clientId}`, { method: 'DELETE' }).then(() => this.notify());
+            },
+            getExercises: () => fetch(`${API_URL}/exercises`).then(res => res.json()),
+            setExercises(newExercises) {
+                return fetch(`${API_URL}/exercises`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newExercises) }).then(res => res.json()).then(data => { this.notify(); return data; });
+            },
+            getNotifications: () => fetch(`${API_URL}/notifications`).then(res => res.json()),
+            addNotification(message, type = 'info') {
+                 return fetch(`${API_URL}/notifications`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message, type }) }).then(res => res.json()).then(data => { this.notify(); return data; });
+            },
+            clearNotifications() {
+                return fetch(`${API_URL}/notifications/clear`, { method: 'POST' }).then(() => this.notify());
+            },
+            logWorkout(clientId, durationSeconds) {
+                return fetch(`${API_URL}/clients/${clientId}/log-workout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ durationSeconds }) }).then(res => res.json()).then(data => { this.notify(); return data; });
+            },
+        };
+
+        // --- ICONOS ---
+        const DumbbellIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.57 14.86L22 13.43L20.57 12L17 15.57L8.43 7L12 3.43L10.57 2L9.14 3.43L7.71 2L5.57 4.14L4.14 2.71L2.71 4.14L4.14 5.57L2 7.71L3.43 9.14L2 10.57L3.43 12L7 8.43L15.57 17L12 20.57L13.43 22L14.86 20.57L16.29 22L18.43 19.86L19.86 21.29L21.29 19.86L19.86 18.43L22 16.29L20.57 14.86Z" /></svg>);
+        const UsersIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 17V19H2V17S2 13 9 13S16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 7.5A3.5 3.5 0 1 0 11.5 11A3.5 3.5 0 0 0 15 7.5Z" /></svg>);
+        const CalendarIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V8H19M16 1V3H8V1H6V3H5C3.89 3 3 3.89 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.89 20.1 3 19 3H18V1M17 10H12V15H17V10Z" /></svg>);
+        const LogoutIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17,17.25V14H10V10H17V6.75L22.25,12L17,17.25M13,2A2,2 0 0,1 15,4V8H13V4H4V20H13V16H15V20A2,2 0 0,1 13,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2H13Z" /></svg>);
+        const PlusIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>);
+        const EditIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" /></svg>);
+        const TrashIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>);
+        const XIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg>);
+        const SparklesIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="m19.33 11.2l-3.56.89l-.89 3.56l-1.78-2.67l-2.67-1.78l3.56-.89l.89-3.56l1.78 2.67l2.67 1.78M12 2l-1.92 4.61L5.5 8.5l4.61 1.92L12 15l1.92-4.61l4.61-1.92l-4.61-1.92L12 2m8 10l-.89 3.56l-3.56.89l2.67 1.78l1.78 2.67l.89-3.56l3.56-.89l-2.67-1.78l-1.78-2.67Z" /></svg>);
+        const LoadingSpinner = () => (<div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>);
+        const ArrowLeftIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>);
+        const ChartBarIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M22,21H2V3H4V19H6V10H10V19H12V6H16V19H18V14H22V21Z" /></svg>);
+        const BellIcon = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 21h4v-2h-4v2zm-2-4h8v-2h-8v2zm-2-4h12v-2H6v2zm14-4.5c0-3.07-1.63-5.64-4-6.93V4c0-1.1-.9-2-2-2s-2 .9-2 2v.57c-2.37 1.29-4 3.86-4 6.93V17l-2 2v1h16v-1l-2-2v-5.5z" /></svg>;
+        const HistoryIcon = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.75-1.23-3.5-2.07V8H12z" /></svg>;
+        const CheckCircleIcon = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>;
+        const SkipNextIcon = ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16,18H18V6H16M6,18L14.5,12L6,6V18Z" /></svg>;
+
+
+        // --- COMPONENTES REUTILIZABLES ---
+        const Modal = ({ isOpen, onClose, title, children, className = 'max-w-lg' }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 transition-opacity" onClick={onClose}>
+                    <div className={`bg-gray-800 border border-indigo-700 rounded-xl shadow-2xl w-full m-4 transform transition-all ${className}`} onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-center p-4 border-b border-gray-700">
+                            <h3 className="text-xl font-bold text-white">{title}</h3>
+                            <button onClick={onClose} className="text-gray-400 hover:text-white"><XIcon className="w-6 h-6" /></button>
+                        </div>
+                        <div className="p-6">{children}</div>
+                    </div>
+                </div>
+            );
+        };
+        const FormInput = ({ label, ...props }) => (
+            <div className="mb-4">
+                <label className="block text-indigo-300 text-sm font-bold mb-2">{label}</label>
+                <input className="w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" {...props} />
+            </div>
+        );
+        const FormTextarea = ({ label, ...props }) => (
+            <div className="mb-4">
+                <label className="block text-indigo-300 text-sm font-bold mb-2">{label}</label>
+                <textarea className="w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" {...props}></textarea>
+            </div>
+        );
+
+        // --- COMPONENTE DE CONSEJOS CON IA ---
+        const GeminiTip = ({ exerciseName }) => {
+            const [tip, setTip] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const fetchTip = async () => {
+                setIsLoading(true);
+                const fetchedTip = await getExerciseTip(exerciseName);
+                setTip(fetchedTip);
+                setIsLoading(false);
+            };
+            if (tip) {
+                return (
+                    <div className="mt-2 p-3 bg-indigo-900/50 border-l-4 border-indigo-400 rounded-r-lg">
+                        <p className="text-sm text-indigo-200">{tip}</p>
+                    </div>
+                );
+            }
+            return (
+                <button onClick={fetchTip} disabled={isLoading} className="mt-2 flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300 transition">
+                    {isLoading ? (
+                        <><LoadingSpinner /><span>Generando consejo...</span></>
+                    ) : (
+                        <><SparklesIcon className="w-4 h-4" /><span>Obtener consejo de IA</span></>
+                    )}
+                </button>
+            );
+        };
+        
+        // --- COMPONENTES DE UI PRINCIPALES ---
+        const Header = ({ user, onLogout, notifications = [], onClearNotifications }) => {
+            const [showNotifications, setShowNotifications] = useState(false);
+            const unreadCount = notifications.filter(n => !n.read).length;
+
+            const handleBellClick = () => {
+                setShowNotifications(!showNotifications);
+                if (!showNotifications && unreadCount > 0) {
+                    onClearNotifications?.();
+                }
+            };
+            return (
+                <header className="bg-gray-900/50 backdrop-blur-sm p-4 flex justify-between items-center border-b border-indigo-800/50 sticky top-0 z-30">
+                    <div className="flex items-center gap-3">
+                        <DumbbellIcon className="w-8 h-8 text-indigo-500" />
+                        <h1 className="text-2xl font-bold text-white">GymPro</h1>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <span className="text-gray-300">Hola, {user.name}</span>
+                        {user.role === Role.Trainer && (
+                            <div className="relative">
+                                <button onClick={handleBellClick} title="Notificaciones" className="text-gray-400 hover:text-white transition relative">
+                                    <BellIcon className="w-6 h-6" />
+                                    {unreadCount > 0 && <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-gray-900"></span>}
+                                </button>
+                                {showNotifications && (
+                                    <div className="absolute right-0 mt-2 w-80 bg-gray-800 border border-indigo-700 rounded-lg shadow-xl z-50">
+                                        <div className="p-3 font-bold border-b border-gray-700">Notificaciones</div>
+                                        <div className="max-h-96 overflow-y-auto">
+                                            {notifications.length > 0 ? [...notifications].reverse().map(n => (
+                                                <div key={n.id} className={`p-3 border-b border-gray-700/50 text-sm ${n.type === 'warning' ? 'bg-red-900/20' : ''}`}>
+                                                    <p className={n.type === 'warning' ? 'text-red-400 font-semibold' : 'text-white'}>{n.message}</p>
+                                                    <p className="text-gray-400 text-xs mt-1">{new Date(n.date).toLocaleString()}</p>
+                                                </div>
+                                            )) : <p className="p-4 text-gray-400">No hay notificaciones.</p>}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        <button onClick={onLogout} title="Cerrar sesión" className="text-gray-400 hover:text-white transition">
+                            <LogoutIcon className="w-6 h-6" />
+                        </button>
+                    </div>
+                </header>
+            );
+        };
+
+        const WorkoutTracker = ({ exercise, onFinish, onSkipExercise, onNotify, startWithRest = false }) => {
+            const { sets = 1, reps = 0, time = 0, rest } = exercise;
+            const [currentSet, setCurrentSet] = useState(1);
+            const [isResting, setIsResting] = useState(startWithRest);
+            const [timerValue, setTimerValue] = useState(rest);
+            const [startTime] = useState(Date.now());
+
+            useEffect(() => {
+                if (!isResting) return;
+                setTimerValue(rest);
+                const interval = setInterval(() => {
+                    setTimerValue(prev => {
+                        if (prev <= 1) {
+                            clearInterval(interval);
+                            setIsResting(false);
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
+                return () => clearInterval(interval);
+            }, [isResting, rest]);
+            
+            const handleSetComplete = () => {
+                if (currentSet < sets) {
+                    setCurrentSet(s => s + 1);
+                    setIsResting(true);
+                } else {
+                    handleFinish();
+                }
+            };
+
+            const handleSkipSet = () => {
+                onNotify(`Saltaste un set de ${exercise.name}.`, 'warning');
+                handleSetComplete();
+            }
+
+            const handleFinish = () => {
+                const durationSeconds = Math.round((Date.now() - startTime) / 1000);
+                onFinish(durationSeconds);
+            };
+
+            const formatTime = (seconds) => `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
+
+            return (
+                <div className="p-4 bg-gray-900 text-white flex flex-col items-center justify-center h-full">
+                    <div className="text-center w-full max-w-md mx-auto">
+                        <h3 className="text-3xl font-bold text-indigo-400">{exercise.name}</h3>
+                        {isResting ? (
+                            <div className="my-8">
+                                <p className="text-4xl font-bold text-gray-300">Descanso</p>
+                                <p className="text-8xl font-mono text-indigo-300 my-4">{formatTime(timerValue)}</p>
+                                <p className="text-xl text-gray-400">Próxima serie: {currentSet} / {sets}</p>
+                                <button onClick={() => setIsResting(false)} className="mt-4 text-red-500 hover:text-red-400 font-semibold underline">Saltar Descanso</button>
+                            </div>
+                        ) : (
+                            <div className="my-8">
+                                <p className="text-4xl font-bold text-gray-300">Serie {currentSet} / {sets}</p>
+                                <p className="text-8xl font-mono text-white my-4">{reps > 0 ? reps : time > 0 ? formatTime(time) : 'N/A'}</p>
+                                <p className="text-xl text-gray-400">{reps > 0 ? 'repeticiones' : 'segundos'}</p>
+                            </div>
+                        )}
+                        <button onClick={handleSetComplete} disabled={isResting} className="w-full text-2xl font-bold bg-indigo-600 text-white py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition disabled:bg-gray-600 disabled:cursor-not-allowed">
+                            {currentSet < sets ? 'Set Completado' : 'Finalizar Ejercicio'}
+                        </button>
+                        <div className="flex justify-center gap-6 mt-4">
+                            <button onClick={handleSkipSet} className="text-sm text-gray-400 hover:text-white font-semibold">Saltar Set</button>
+                            <button onClick={onSkipExercise} className="text-sm text-red-500 hover:text-red-400 font-semibold">Saltar Ejercicio</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const DayViewClient = ({ client, dailyRoutine, allExercises, onNotify, onLogWorkout }) => {
+            const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+            const [isSessionActive, setIsSessionActive] = useState(false);
+            const [completedExercises, setCompletedExercises] = useState(new Set());
+            const [skippedExercises, setSkippedExercises] = useState(new Set());
+            const [startNextWithRest, setStartNextWithRest] = useState(false);
+            
+            const exercisesForToday = dailyRoutine?.exercises || [];
+            const activeExercise = isSessionActive ? exercisesForToday[currentExerciseIndex] : null;
+
+            useEffect(() => {
+                if (startNextWithRest) {
+                    setStartNextWithRest(false);
+                }
+            }, [currentExerciseIndex]);
+
+            const handleStartSession = () => {
+                setIsSessionActive(true);
+                setCurrentExerciseIndex(0);
+                setCompletedExercises(new Set());
+                setSkippedExercises(new Set());
+                setStartNextWithRest(false);
+                onNotify(`Cliente ${client.name} ha iniciado su rutina de hoy: ${dailyRoutine.title}.`);
+            };
+
+            const advanceToNext = () => {
+                if (currentExerciseIndex < exercisesForToday.length - 1) {
+                    setCurrentExerciseIndex(prev => prev + 1);
+                    setStartNextWithRest(true);
+                } else {
+                    onNotify(`¡Felicidades! ${client.name} ha completado toda la rutina de hoy.`);
+                    setIsSessionActive(false);
+                }
+            }
+
+            const handleFinishOrGoToNext = (durationSeconds) => {
+                if (!activeExercise) return;
+                const newCompleted = new Set(completedExercises);
+                newCompleted.add(activeExercise.instanceId);
+                setCompletedExercises(newCompleted);
+                onLogWorkout(client.id, durationSeconds);
+                onNotify(`Cliente ${client.name} ha completado el ejercicio: ${activeExercise.name}.`);
+                advanceToNext();
+            };
+
+            const handleSkipExercise = () => {
+                if (!activeExercise) return;
+                const newSkipped = new Set(skippedExercises);
+                newSkipped.add(activeExercise.instanceId);
+                setSkippedExercises(newSkipped);
+                onNotify(`Cliente ${client.name} se saltó el ejercicio: ${activeExercise.name}.`, 'warning');
+                advanceToNext();
+            }
+            
+            const renderMedia = (exercise) => {
+                const baseExercise = allExercises.find(e => e.id === exercise.exerciseId);
+                const imageUrl = exercise.customImageUrl || baseExercise?.imageUrl;
+                if (imageUrl) {
+                    return <img src={imageUrl} alt={exercise.name} className="w-full h-40 object-cover rounded-lg mt-2" onError={(e) => e.target.style.display='none'} />;
+                }
+                return null;
+            };
+
+            if (isSessionActive && activeExercise) {
+                return <WorkoutTracker 
+                    key={activeExercise.instanceId}
+                    exercise={activeExercise} 
+                    onFinish={handleFinishOrGoToNext} 
+                    onSkipExercise={handleSkipExercise} 
+                    onNotify={onNotify}
+                    startWithRest={startNextWithRest}
+                />;
+            }
+            
+            if (exercisesForToday.length === 0) {
+                return <div className="p-6 text-center text-gray-400">{dailyRoutine?.title || 'Día de descanso'}. ¡Disfruta!</div>;
+            }
+            
+            return (
+                <div className="p-4 space-y-4">
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-xl font-bold text-white">
+                            Ejercicios de Hoy <span className="text-indigo-400">({completedExercises.size + skippedExercises.size}/{exercisesForToday.length})</span>
+                        </h3>
+                        <button onClick={handleStartSession} className="font-bold bg-green-600 text-white py-2 px-4 rounded-xl shadow-lg hover:bg-green-700 transition">
+                            ¡Empezar!
+                        </button>
+                    </div>
+                    {exercisesForToday.map(ex => {
+                        const isCompleted = completedExercises.has(ex.instanceId);
+                        const isSkipped = skippedExercises.has(ex.instanceId);
+                        return (
+                            <div key={ex.instanceId} className={`bg-black bg-opacity-40 rounded-lg overflow-hidden border border-indigo-900/50 shadow-lg transition-all ${(isCompleted || isSkipped) ? 'opacity-50' : ''}`}>
+                                <div className="p-4">
+                                    <h4 className="font-bold text-lg text-white flex items-center">
+                                        {isCompleted && <CheckCircleIcon className="w-5 h-5 mr-2 text-green-500"/>}
+                                        {isSkipped && <SkipNextIcon className="w-5 h-5 mr-2 text-yellow-500"/>}
+                                        {ex.name}
+                                    </h4>
+                                    <div className="text-indigo-400 text-sm font-semibold">
+                                        {ex.sets && <span>{ex.sets} sets</span>}
+                                        {ex.reps && <span> x {ex.reps} reps</span>}
+                                        {ex.time && <span>{ex.time} seg</span>}
+                                        <span className="mx-2">|</span>
+                                        <span>{ex.rest} seg descanso</span>
+                                    </div>
+                                    {renderMedia(ex)}
+                                    <p className="text-gray-300 mt-2 text-sm">{ex.description}</p>
+                                    <GeminiTip exerciseName={ex.name} />
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            );
+        };
+
+        const ClientDashboard = ({ user, allExercises, onLogout, onNotify, onLogWorkout }) => {
+            const [selectedDay, setSelectedDay] = useState(new Date().toLocaleDateString('es-ES', { weekday: 'long' }).replace(/^\w/, c => c.toUpperCase()));
+            const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+            
+            const routineForDay = useMemo(() => {
+                if (!user.customRoutine || user.customRoutine.length === 0) return null;
+                const firstWeek = user.customRoutine[0];
+                return firstWeek[selectedDay];
+            }, [user.customRoutine, selectedDay]);
+
+            return (
+                <div className="min-h-screen bg-gray-900 text-gray-100">
+                    <Header user={user} onLogout={onLogout} />
+                    <div className="flex">
+                        <aside className="w-64 bg-gray-800/50 p-4 border-r border-indigo-800/50 h-[calc(100vh-68px)] sticky top-[68px]">
+                            <h2 className="text-xl font-bold text-white mb-4">Semana</h2>
+                            <nav className="space-y-2">
+                                {DAYS_OF_WEEK.map(day => (
+                                    <button key={day} onClick={() => setSelectedDay(day)} className={`w-full text-left p-3 rounded-lg transition ${selectedDay === day ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-gray-700 text-gray-300'}`}>
+                                        {day}
+                                    </button>
+                                ))}
+                            </nav>
+                            <button onClick={() => setIsHistoryModalOpen(true)} className="w-full mt-6 flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">
+                                <ChartBarIcon className="w-5 h-5"/> Ver Progreso
+                            </button>
+                        </aside>
+                        <main className="flex-1 p-6">
+                            {user.customRoutine && user.customRoutine.length > 0 ? (
+                                <div className="bg-gray-800/50 rounded-lg">
+                                    <h3 className="text-2xl font-bold text-white p-4 border-b border-indigo-800/50">
+                                        Rutina para el {selectedDay}: <span className="text-indigo-400">{routineForDay?.title || 'Día de descanso'}</span>
+                                    </h3>
+                                    <DayViewClient client={user} dailyRoutine={routineForDay} allExercises={allExercises} onNotify={onNotify} onLogWorkout={onLogWorkout} />
+                                </div>
+                            ) : (
+                                <div className="text-gray-400 text-center p-8 bg-gray-800/50 rounded-lg">
+                                    No tienes una rutina asignada. Contacta a tu entrenador.
+                                </div>
+                            )}
+                        </main>
+                    </div>
+                    <ClientProgressModal isOpen={isHistoryModalOpen} onClose={() => setIsHistoryModalOpen(false)} client={user} />
+                </div>
+            );
+        };
+
+        // --- COMPONENTES DEL PANEL DE ENTRENADOR ---
+        const ClientsView = ({ clients, onSaveClient, onViewClient }) => {
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            return (
+                <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-bold">Gestión de Clientes</h2>
+                        <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">
+                            <PlusIcon className="w-5 h-5"/>Crear Cliente
+                        </button>
+                    </div>
+                    <div className="bg-gray-800/50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {clients.map(client => (
+                            <div key={client.id} className="bg-black/40 p-4 rounded-lg border border-indigo-900/50 cursor-pointer transition-all hover:border-indigo-500 hover:shadow-indigo-500/20 hover:shadow-lg" onClick={() => onViewClient(client)}>
+                                <h3 className="text-lg font-bold text-white">{client.name}</h3>
+                                <p className="text-gray-400">Nivel: {client.level}</p>
+                                <p className="text-gray-400 text-sm truncate">Objetivos: {client.goals}</p>
+                                <div className="mt-3 pt-3 border-t border-gray-700">
+                                    <p className="text-sm font-semibold text-indigo-400">Ver Progreso y Calendario →</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <ClientFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} client={null} onSave={(clientData) => { onSaveClient(clientData); setIsModalOpen(false); }} />
+                </div>
+            );
+        };
+
+        const ClientFormModal = ({ isOpen, onClose, client, onSave }) => {
+            const [formData, setFormData] = useState({ name: '', level: '', goals: '', password: '' });
+            useEffect(() => {
+                if(client) {
+                    setFormData({ name: client.name, level: client.level, goals: client.goals, password: '' });
+                } else {
+                    setFormData({ name: '', level: '', goals: '', password: '' });
+                }
+            }, [client, isOpen]);
+            const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onSave(formData);
+            };
+            return (
+                <Modal isOpen={isOpen} onClose={onClose} title={client ? 'Editar Cliente' : 'Crear Cliente'}>
+                    <form onSubmit={handleSubmit}>
+                        <FormInput label="Nombre" name="name" value={formData.name} onChange={handleChange} required />
+                        <FormInput label="Contraseña" name="password" type="password" value={formData.password || ''} onChange={handleChange} required={!client} placeholder={client ? "Dejar en blanco para no cambiar" : ""} />
+                        <FormInput label="Nivel" name="level" value={formData.level} onChange={handleChange} />
+                        <FormTextarea label="Objetivos" name="goals" value={formData.goals} onChange={handleChange} />
+                        <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar</button>
+                    </form>
+                </Modal>
+            );
+        };
+        
+        const ExerciseCard = ({ exercise, onEdit, onDelete }) => (
+            <div className="bg-black bg-opacity-40 rounded-lg overflow-hidden border border-indigo-900/50 shadow-lg flex flex-col justify-between">
+                <div className="p-4">
+                    <h4 className="font-bold text-lg text-white">{exercise.name}</h4>
+                    <div className="text-indigo-400 text-sm font-semibold">
+                        {exercise.sets && <span>{exercise.sets} sets</span>}
+                        {exercise.reps && <span> x {exercise.reps} reps</span>}
+                        {exercise.time && <span>{exercise.time} seg</span>}
+                        <span className="mx-2">|</span>
+                        <span>{exercise.rest} seg descanso</span>
+                    </div>
+                    <p className="text-gray-300 mt-2 text-sm h-20 overflow-auto">{exercise.description}</p>
+                </div>
+                <div className="p-4 bg-gray-900/50 flex justify-end gap-2 border-t border-indigo-900/50">
+                    <button onClick={onEdit} className="p-2 text-gray-400 hover:text-white"><EditIcon className="w-5 h-5"/></button>
+                    <button onClick={onDelete} className="p-2 text-gray-400 hover:text-red-500"><TrashIcon className="w-5 h-5"/></button>
+                </div>
+            </div>
+        );
+        
+        const ExercisesView = ({ exercises, setExercises }) => {
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [editingExercise, setEditingExercise] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const handleSaveExercise = (exerciseData) => {
+                let newExercises;
+                if (editingExercise) {
+                    newExercises = exercises.map(e => e.id === exerciseData.id ? exerciseData : e);
+                } else {
+                    newExercises = [...exercises, { ...exerciseData, id: `ex-${Date.now()}`, tags: (exerciseData.category || '').split(' ') }];
+                }
+                setExercises(newExercises);
+                setIsModalOpen(false); 
+                setEditingExercise(null);
+            };
+
+            const handleDeleteExercise = (id) => {
+                if (window.confirm("¿Estás seguro de que quieres eliminar este ejercicio?")) {
+                    setExercises(exercises.filter(e => e.id !== id));
+                }
+            };
+
+            const filteredExercises = useMemo(() => {
+                return exercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()));
+            }, [exercises, searchTerm]);
+
+            const groupedExercises = useMemo(() => {
+                return filteredExercises.reduce((acc, ex) => {
+                    const category = ex.category || 'Sin Categoría';
+                    if (!acc[category]) {
+                        acc[category] = [];
+                    }
+                    acc[category].push(ex);
+                    return acc;
+                }, {});
+            }, [filteredExercises]);
+
+            const categories = Object.keys(groupedExercises).sort();
+
+            return (
+                <div>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-2xl font-bold">Biblioteca de Ejercicios</h2>
+                        <div className="flex items-center gap-4">
+                            <input 
+                                type="text"
+                                placeholder="Buscar ejercicio..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="bg-gray-700 text-white rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                            <button onClick={() => { setEditingExercise(null); setIsModalOpen(true); }} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">
+                                <PlusIcon className="w-5 h-5"/>Añadir Ejercicio
+                            </button>
+                        </div>
+                    </div>
+                    <div className="space-y-6">
+                        {categories.map(category => (
+                            <details key={category} className="bg-gray-800/50 rounded-lg" open>
+                                <summary className="text-xl font-bold text-white p-4 cursor-pointer flex justify-between items-center">
+                                    <span>{category} <span className="text-base font-normal text-gray-400">({groupedExercises[category].length} Ejercicios)</span></span>
+                                    <span className="transform transition-transform duration-200">▼</span>
+                                </summary>
+                                <div className="p-4 border-t border-indigo-800/50 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                    {groupedExercises[category].map(ex => (
+                                        <ExerciseCard key={ex.id} exercise={ex} onEdit={() => { setEditingExercise(ex); setIsModalOpen(true); }} onDelete={() => handleDeleteExercise(ex.id)} />
+                                    ))}
+                                </div>
+                            </details>
+                        ))}
+                    </div>
+                    <ExerciseFormModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setEditingExercise(null); }} exercise={editingExercise} onSave={handleSaveExercise} />
+                </div>
+            );
+        };
+        
+        const ExerciseFormModal = ({ isOpen, onClose, exercise, onSave }) => {
+            const [formData, setFormData] = useState(exercise || { id: '', name: '', description: '', sets: 0, reps: 0, time: 0, rest: 0, imageUrl: '', videoUrl: '', category: '' });
+            useEffect(() => {
+                setFormData(exercise || { id: '', name: '', description: '', sets: 0, reps: 0, time: 0, rest: 0, imageUrl: '', videoUrl: '', category: '' });
+            }, [exercise, isOpen]);
+            const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value });
+            
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onSave(formData);
+            };
+            return (
+                <Modal isOpen={isOpen} onClose={onClose} title={exercise ? 'Editar Ejercicio' : 'Crear Ejercicio'}>
+                    <form onSubmit={handleSubmit}>
+                        <FormInput label="Nombre del Ejercicio" name="name" value={formData.name} onChange={handleChange} required />
+                        <FormInput label="Categoría" name="category" value={formData.category} onChange={handleChange} placeholder="Ej: Pecho, Espalda..." />
+                        <FormTextarea label="Descripción" name="description" value={formData.description} onChange={handleChange} />
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormInput label="Series" name="sets" type="number" value={formData.sets} onChange={handleChange} />
+                            <FormInput label="Reps" name="reps" type="text" value={formData.reps} onChange={handleChange} />
+                            <FormInput label="Tiempo (seg)" name="time" type="number" value={formData.time} onChange={handleChange} />
+                            <FormInput label="Descanso (seg)" name="rest" type="number" value={formData.rest} onChange={handleChange} required />
+                        </div>
+                        <FormInput label="URL de Imagen" name="imageUrl" value={formData.imageUrl} onChange={handleChange} />
+                        {formData.imageUrl && <img src={formData.imageUrl} className="mt-2 rounded-lg max-h-40 w-auto"/>}
+                        <button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar</button>
+                    </form>
+                </Modal>
+            );
+        };
+
+        const TrainerCalendarView = ({ clients }) => {
+            const [selectedWeekIndex, setSelectedWeekIndex] = useState(0);
+            const [selectedDay, setSelectedDay] = useState(null);
+
+            const clientsForDay = useMemo(() => {
+                if (!selectedDay) return [];
+                return clients.filter(c => 
+                    c.customRoutine &&
+                    c.customRoutine.length > selectedWeekIndex &&
+                    c.customRoutine[selectedWeekIndex][selectedDay] &&
+                    c.customRoutine[selectedWeekIndex][selectedDay].exercises.length > 0
+                );
+            }, [clients, selectedDay, selectedWeekIndex]);
+            
+            const maxWeeks = useMemo(() => Math.max(1, ...clients.map(c => c.customRoutine?.length || 0)), [clients]);
+
+            return (
+                <div>
+                    <div className="p-4 bg-gray-800/50 rounded-lg">
+                        <h2 className="text-2xl font-bold text-white mb-4">Calendario Semanal General</h2>
+                        <div className="flex space-x-2 mb-4 overflow-x-auto pb-2">
+                            {Array.from({ length: maxWeeks }, (_, i) => i).map(weekIndex => (
+                                <button key={weekIndex} onClick={() => setSelectedWeekIndex(weekIndex)} className={`px-4 py-2 rounded-md font-semibold whitespace-nowrap ${selectedWeekIndex === weekIndex ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
+                                    Semana {weekIndex + 1}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="grid grid-cols-3 md:grid-cols-7 gap-2">
+                            {DAYS_OF_WEEK.map(day => (
+                                <button key={day} onClick={() => setSelectedDay(day)} className={`p-3 rounded-lg transition ${selectedDay === day ? 'bg-indigo-800 text-white shadow-lg' : 'bg-gray-800 hover:bg-gray-700 text-gray-300'}`}>
+                                    {day}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    {selectedDay && (
+                        <div className="mt-4 space-y-4">
+                            <h3 className="text-xl font-bold text-white">Clientes entrenando el {selectedDay} (Semana {selectedWeekIndex + 1})</h3>
+                            {clientsForDay.length > 0 ? clientsForDay.map(client => (
+                                <div key={client.id} className="bg-gray-800/50 rounded-lg p-4">
+                                    <h4 className="text-lg font-bold text-indigo-400">{client.name} - {client.customRoutine?.[selectedWeekIndex]?.[selectedDay]?.title}</h4>
+                                    <div className="mt-2 space-y-2">
+                                        {client.customRoutine?.[selectedWeekIndex]?.[selectedDay].exercises.map(ex => (
+                                            <div key={ex.instanceId} className="p-2 bg-black/30 rounded">
+                                                <p className="font-semibold text-white">{ex.name}</p>
+                                                <p className="text-sm text-gray-300">{ex.sets}x{ex.reps || `${ex.time}s`}, {ex.rest}s descanso</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )) : <p className="text-gray-400 p-4">Ningún cliente tiene rutina para este día.</p>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const TrainerDashboard = ({ user, onLogout, onViewClient, allExercises, notifications }) => {
+            const [activeTab, setActiveTab] = useState('clients');
+            const [clients, setClients] = useState([]);
+
+            useEffect(() => {
+                api.getClients(user.id).then(setClients);
+
+                const unsubscribe = api.subscribe(() => {
+                    api.getClients(user.id).then(setClients);
+                });
+                return unsubscribe;
+            }, [user.id]);
+
+            const handleSaveClient = (clientData) => {
+                api.addClient(clientData, user.id);
+            };
+
+            const handleSetExercises = (newExercises) => {
+                api.setExercises(newExercises);
+            };
+            
+            const handleClearNotifications = () => {
+                api.clearNotifications();
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-900 text-gray-100">
+                    <Header user={user} onLogout={onLogout} notifications={notifications} onClearNotifications={handleClearNotifications}/>
+                    <div className="p-4 border-b border-indigo-800/50">
+                        <div className="flex space-x-2 bg-gray-800 rounded-lg p-1">
+                            <button onClick={() => setActiveTab('clients')} className={`w-full flex justify-center items-center gap-2 p-2 rounded-md transition ${activeTab === 'clients' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}>
+                                <UsersIcon className="w-5 h-5"/> Clientes
+                            </button>
+                            <button onClick={() => setActiveTab('calendar')} className={`w-full flex justify-center items-center gap-2 p-2 rounded-md transition ${activeTab === 'calendar' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}>
+                                <CalendarIcon className="w-5 h-5"/> Calendario
+                            </button>
+                            <button onClick={() => setActiveTab('exercises')} className={`w-full flex justify-center items-center gap-2 p-2 rounded-md transition ${activeTab === 'exercises' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}>
+                                <DumbbellIcon className="w-5 h-5"/> Ejercicios
+                            </button>
+                        </div>
+                    </div>
+                    <main className="p-4">
+                        {activeTab === 'calendar' && <TrainerCalendarView clients={clients} />}
+                        {activeTab === 'clients' && <ClientsView clients={clients} onSaveClient={handleSaveClient} onViewClient={onViewClient} />}
+                        {activeTab === 'exercises' && <ExercisesView exercises={allExercises} setExercises={handleSetExercises} />}
+                    </main>
+                </div>
+            );
+        };
+
+        // --- FLUJO DE AUTENTICACIÓN ---
+        const AuthFlow = ({ onLogin }) => {
+            const [screen, setScreen] = useState('initial');
+            const [isRegisterMode, setIsRegisterMode] = useState(false);
+            const [error, setError] = useState('');
+            const [clientUsername, setClientUsername] = useState('');
+            const [clientPassword, setClientPassword] = useState('');
+            const [trainerName, setTrainerName] = useState('');
+            const [trainerEmail, setTrainerEmail] = useState('');
+            const [trainerPassword, setTrainerPassword] = useState('');
+            const [trainerConfirmPassword, setTrainerConfirmPassword] = useState('');
+            
+            const resetForms = () => { setError(''); setClientUsername(''); setClientPassword(''); setTrainerName(''); setTrainerEmail(''); setTrainerPassword(''); setTrainerConfirmPassword(''); }
+            
+            const handleClientLogin = (e) => {
+                e.preventDefault();
+                setError('');
+                api.clientLogin({ name: clientUsername, password: clientPassword })
+                    .then(onLogin)
+                    .catch(async err => {
+                        const errorData = await err;
+                        setError(errorData.message || 'Error al iniciar sesión.');
+                    });
+            };
+
+            const handleTrainerLogin = (e) => {
+                e.preventDefault();
+                setError('');
+                api.trainerLogin({ email: trainerEmail, password: trainerPassword })
+                    .then(onLogin)
+                    .catch(async err => {
+                        const errorData = await err;
+                        setError(errorData.message || 'Error al iniciar sesión.');
+                    });
+            };
+
+            const handleTrainerRegister = (e) => {
+                e.preventDefault();
+                if (trainerPassword !== trainerConfirmPassword) {
+                    setError('Las contraseñas no coinciden.');
+                    return;
+                }
+                setError('');
+                api.trainerRegister({ name: trainerName, email: trainerEmail, password: trainerPassword })
+                    .then(onLogin)
+                    .catch(async err => {
+                        const errorData = await err;
+                        setError(errorData.message || 'Error al registrar.');
+                    });
+            };
+
+            const goBack = () => { setScreen('initial'); resetForms(); }
+
+            if (screen === 'initial') { 
+                return (
+                    <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center p-4">
+                        <div className="text-center">
+                            <DumbbellIcon className="w-20 h-20 text-indigo-500 mx-auto" />
+                            <h1 className="text-5xl font-extrabold text-white mt-4">GymPro Manager</h1>
+                            <p className="text-gray-400 mt-2 text-lg">Tu asistente de gimnasio personal.</p>
+                        </div>
+                        <div className="mt-12 w-full max-w-sm space-y-4">
+                            <button onClick={() => setScreen('trainer')} className="w-full text-lg font-bold bg-indigo-600 text-white py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105">
+                                Soy Entrenador
+                            </button>
+                            <button onClick={() => setScreen('client')} className="w-full text-lg font-bold bg-gray-700 text-white py-4 rounded-xl shadow-lg hover:bg-gray-600 transition-transform transform hover:scale-105">
+                                Soy Cliente
+                            </button>
+                        </div>
+                    </div>
+                ); 
+            }
+            
+            return (
+                <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center p-4">
+                    <div className="w-full max-w-sm">
+                        <button onClick={goBack} className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-6 font-semibold">
+                            <ArrowLeftIcon className="w-5 h-5" /> Volver
+                        </button>
+                        
+                        {screen === 'client' && (
+                            <form onSubmit={handleClientLogin} className="bg-gray-800 p-8 rounded-xl space-y-4 shadow-2xl">
+                                <h2 className="text-center text-white text-2xl font-bold">Acceso Cliente</h2>
+                                <FormInput label="Nombre de Usuario" type="text" value={clientUsername} onChange={(e) => setClientUsername(e.target.value)} required />
+                                <FormInput label="Contraseña" type="password" value={clientPassword} onChange={(e) => setClientPassword(e.target.value)} required />
+                                {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+                                <button type="submit" className="w-full text-lg font-bold bg-indigo-600 text-white py-3 rounded-xl shadow-lg hover:bg-indigo-700 transition">
+                                    Entrar
+                                </button>
+                            </form>
+                        )}
+
+                        {screen === 'trainer' && (
+                            <div className="bg-gray-800 p-8 rounded-xl space-y-4 shadow-2xl">
+                                <h2 className="text-center text-white text-2xl font-bold">
+                                    {isRegisterMode ? 'Crear Cuenta de Entrenador' : 'Acceso Entrenador'}
+                                </h2>
+                                <form onSubmit={isRegisterMode ? handleTrainerRegister : handleTrainerLogin}>
+                                    {isRegisterMode && <FormInput label="Nombre Completo" type="text" value={trainerName} onChange={(e) => setTrainerName(e.target.value)} required />}
+                                    <FormInput label="Correo Electrónico" type="email" value={trainerEmail} onChange={(e) => setTrainerEmail(e.target.value)} required />
+                                    <FormInput label="Contraseña" type="password" value={trainerPassword} onChange={(e) => setTrainerPassword(e.target.value)} required />
+                                    {isRegisterMode && <FormInput label="Confirmar Contraseña" type="password" value={trainerConfirmPassword} onChange={(e) => setTrainerConfirmPassword(e.target.value)} required />}
+                                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+                                    <button type="submit" className="w-full mt-4 text-lg font-bold bg-indigo-600 text-white py-3 rounded-xl shadow-lg hover:bg-indigo-700 transition">
+                                        {isRegisterMode ? 'Crear Cuenta' : 'Entrar'}
+                                    </button>
+                                </form>
+                                <button onClick={() => setIsRegisterMode(!isRegisterMode)} className="w-full text-center text-indigo-400 hover:underline mt-4">
+                                    {isRegisterMode ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- VISTA DE DETALLE DEL CLIENTE ---
+        const BodyHologram = ({ measurements = [] }) => {
+            const diffs = useMemo(() => {
+                if (measurements.length < 2) return null;
+                const last = measurements[measurements.length - 1];
+                const prev = measurements[measurements.length - 2];
+                return {
+                    waist: last.waist - prev.waist,
+                    bicepsR: last.bicepsR - prev.bicepsR,
+                    bicepsL: last.bicepsL - prev.bicepsL,
+                    thighsR: last.thighsR - prev.thighsR,
+                    thighsL: last.thighsL - prev.thighsL,
+                    calvesR: last.calvesR - prev.calvesR,
+                    calvesL: last.calvesL - prev.calvesL,
+                };
+            }, [measurements]);
+
+            const getFillColor = (diffValue, lowerIsBetter = false) => {
+                if (diffValue === undefined || diffValue === null) return 'rgba(79, 70, 229, 0.2)';
+                if ((diffValue > 0 && !lowerIsBetter) || (diffValue < 0 && lowerIsBetter)) return 'rgba(74, 222, 128, 0.5)';
+                if ((diffValue < 0 && !lowerIsBetter) || (diffValue > 0 && lowerIsBetter)) return 'rgba(248, 113, 113, 0.5)';
+                return 'rgba(79, 70, 229, 0.2)';
+            };
+            
+            const getStrokeColor = (diffValue, lowerIsBetter = false) => {
+                 if (diffValue === undefined || diffValue === null) return '#6366f1';
+                 if ((diffValue > 0 && !lowerIsBetter) || (diffValue < 0 && lowerIsBetter)) return '#4ade80';
+                 if ((diffValue < 0 && !lowerIsBetter) || (diffValue > 0 && lowerIsBetter)) return '#f87171';
+                 return '#6366f1';
+            }
+
+            const baseClass = "transition-all duration-500";
+
+            return (
+                <svg viewBox="0 0 200 500" className="w-full h-auto max-w-xs mx-auto">
+                    <g fillRule="nonzero" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2">
+                        <circle cx="100" cy="50" r="25" stroke="#6366f1" fill="rgba(99, 102, 241, 0.1)" className={baseClass} />
+                        <path d="M100,75 C 80,85 70,110 70,140 L 70,210 L 130,210 L 130,140 C 130,110 120,85 100,75 Z" stroke={getStrokeColor(diffs?.waist, true)} fill={getFillColor(diffs?.waist, true)} className={baseClass} />
+                        <path d="M70,145 C 60,155 55,170 55,190 L 55,230 L 85,230 L 85,190 C 85,170 80,155 70,145 Z" stroke={getStrokeColor(diffs?.bicepsL)} fill={getFillColor(diffs?.bicepsL)} className={baseClass} />
+                        <path d="M130,145 C 140,155 145,170 145,190 L 145,230 L 115,230 L 115,190 C 115,170 120,155 130,145 Z" stroke={getStrokeColor(diffs?.bicepsR)} fill={getFillColor(diffs?.bicepsR)} className={baseClass} />
+                        <g>
+                            <path d="M85,210 L 85,320 L 70,320 L 70,210 Z" stroke={getStrokeColor(diffs?.thighsL)} fill={getFillColor(diffs?.thighsL)} className={baseClass} />
+                            <path d="M85,320 L 85,420 L 70,420 L 70,320 Z" stroke={getStrokeColor(diffs?.calvesL)} fill={getFillColor(diffs?.calvesL)} className={baseClass} />
+                        </g>
+                        <g>
+                            <path d="M115,210 L 115,320 L 130,320 L 130,210 Z" stroke={getStrokeColor(diffs?.thighsR)} fill={getFillColor(diffs?.thighsR)} className={baseClass} />
+                            <path d="M115,320 L 115,420 L 130,420 L 130,320 Z" stroke={getStrokeColor(diffs?.calvesR)} fill={getFillColor(diffs?.calvesR)} className={baseClass} />
+                        </g>
+                    </g>
+                </svg>
+            );
+        };
+
+        const ChangeIndicator = ({ currentValue, previousValue, lowerIsBetter = false }) => {
+            if (previousValue === undefined || previousValue === null || currentValue === previousValue || !currentValue) {
+                return <span>{currentValue || '-'}</span>;
+            }
+            const diff = currentValue - previousValue;
+            if(diff === 0) return <span>{currentValue}</span>;
+            const isBetter = lowerIsBetter ? diff < 0 : diff > 0;
+            const isWorse = lowerIsBetter ? diff > 0 : diff < 0;
+            const colorClass = isBetter ? 'text-green-400' : isWorse ? 'text-red-500' : 'text-gray-400';
+            const Arrow = isBetter ? '↑' : '↓';
+            return (
+                <span className={`font-semibold ${colorClass}`}>
+                    {currentValue}
+                    <span className="text-xs ml-1 whitespace-nowrap">{Arrow} {Math.abs(diff).toFixed(1)}</span>
+                </span>
+            );
+        };
+
+        const MeasurementHistoryTable = ({ measurements = [] }) => {
+            if (measurements.length === 0) {
+                return <p className="text-gray-400 text-center p-4">No hay mediciones registradas.</p>;
+            }
+            const sortedMeasurements = [...measurements].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const measurementKeys = [
+                { key: 'weight', label: 'Peso (lb)', lowerIsBetter: true },
+                { key: 'waist', label: 'Cintura (cm)', lowerIsBetter: true },
+                { key: 'bicepsR', label: 'Bíceps D (cm)' },
+                { key: 'bicepsL', label: 'Bíceps I (cm)' },
+                { key: 'thighsR', label: 'Muslo D (cm)' },
+                { key: 'thighsL', label: 'Muslo I (cm)' },
+                { key: 'calvesR', label: 'Gemelo D (cm)' },
+                { key: 'calvesL', label: 'Gemelo I (cm)' },
+            ];
+            return (
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className="text-xs text-indigo-300 uppercase bg-gray-700/50">
+                            <tr>
+                                <th className="px-4 py-2">Fecha</th>
+                                {measurementKeys.map(m => <th key={m.key} className="px-4 py-2 text-right">{m.label}</th>)}
+                            </tr>
+                        </thead>
+                        <tbody className="text-white">
+                            {sortedMeasurements.map((m, index) => {
+                                const previousMeasurement = sortedMeasurements[index + 1];
+                                return (
+                                    <tr key={m.id} className="border-b border-gray-700 hover:bg-gray-700/30">
+                                        <td className="px-4 py-2 font-medium">{new Date(m.date).toLocaleDateString('es-ES')}</td>
+                                        {measurementKeys.map(mk => (
+                                            <td key={mk.key} className="px-4 py-2 text-right">
+                                                <ChangeIndicator
+                                                    currentValue={m[mk.key]}
+                                                    previousValue={previousMeasurement?.[mk.key]}
+                                                    lowerIsBetter={mk.lowerIsBetter}
+                                                />
+                                            </td>
+                                        ))}
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        };
+        
+        const ClientProgressModal = ({ isOpen, onClose, client }) => {
+            return (
+                <Modal isOpen={isOpen} onClose={onClose} title={`Progreso de ${client.name}`} className="max-w-4xl">
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                        <div className="lg:col-span-3 bg-gray-800/50 rounded-lg p-4">
+                            <h3 className="text-xl font-bold mb-4">Historial de Mediciones</h3>
+                            <MeasurementHistoryTable measurements={client.measurements || []} />
+                        </div>
+                        <div className="lg:col-span-2 space-y-6">
+                            <div className="bg-gray-800/50 rounded-lg p-4">
+                                <h3 className="text-xl font-bold mb-4">Simulación Corporal</h3>
+                                <BodyHologram measurements={client.measurements || []} />
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
+            );
+        };
+
+        const ClientDetailView = ({ client, onBack, onUpdateClient, onDeleteClient, allExercises }) => {
+            const [activeTab, setActiveTab] = useState('progress');
+            const [isEditModalOpen, setEditModalOpen] = useState(false);
+            const [isAddExModalOpen, setAddExModalOpen] = useState(false);
+            const [isEditExModalOpen, setEditExModalOpen] = useState(false);
+            const [editingEx, setEditingEx] = useState(null);
+            const [addingToDay, setAddingToDay] = useState(null);
+            const [selectedWeekIndex, setSelectedWeekIndex] = useState(0);
+            const [newMeasurement, setNewMeasurement] = useState({ weight: '', waist: '', bicepsR: '', bicepsL: '', thighsR: '', thighsL: '', calvesR: '', calvesL: '' });
+
+            const handleMeasurementChange = (e) => {
+                setNewMeasurement({ ...newMeasurement, [e.target.name]: e.target.value });
+            };
+
+            const handleRoutineChange = (newRoutine) => { onUpdateClient({ ...client, customRoutine: newRoutine }); };
+            
+            const handleAddWeek = () => {
+                const newWeek = DAYS_OF_WEEK.reduce((acc, day) => ({ ...acc, [day]: { title: 'Día de Descanso', exercises: [] } }), {});
+                handleRoutineChange([...(client.customRoutine || []), newWeek]);
+                setSelectedWeekIndex((client.customRoutine || []).length);
+            };
+
+            const handleUpdateDayTitle = (weekIndex, day, title) => {
+                const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
+                newRoutine[weekIndex][day].title = title;
+                handleRoutineChange(newRoutine);
+            };
+            
+            const handleAddExercises = (exercisesToAdd) => {
+                if (!addingToDay) return;
+                const { weekIndex, day } = addingToDay;
+                const newCustomExercises = exercisesToAdd.map(ex => ({
+                    instanceId: `ex-inst-${Date.now()}-${Math.random()}`,
+                    exerciseId: ex.id,
+                    name: ex.name,
+                    description: ex.description,
+                    sets: ex.sets,
+                    reps: ex.reps,
+                    time: ex.time,
+                    rest: ex.rest,
+                }));
+
+                const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
+                newRoutine[weekIndex][day].exercises.push(...newCustomExercises);
+                handleRoutineChange(newRoutine);
+                setAddExModalOpen(false);
+            };
+            
+            const handleSaveCustomExercise = (updatedEx) => {
+                if(!editingEx) return;
+                const { weekIndex, day, instanceId } = editingEx;
+                const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
+                const exIndex = newRoutine[weekIndex][day].exercises.findIndex(e => e.instanceId === instanceId);
+                if(exIndex > -1) newRoutine[weekIndex][day].exercises[exIndex] = { ...newRoutine[weekIndex][day].exercises[exIndex], ...updatedEx };
+                handleRoutineChange(newRoutine);
+                setEditExModalOpen(false);
+            };
+            
+            const handleDeleteExercise = (weekIndex, day, instanceId) => {
+                const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
+                newRoutine[weekIndex][day].exercises = newRoutine[weekIndex][day].exercises.filter(e => e.instanceId !== instanceId);
+                handleRoutineChange(newRoutine);
+            };
+
+            const handleAddMeasurement = (e) => {
+                e.preventDefault();
+                const measurement = { 
+                    id: `m-${client.id}-${Date.now()}`,
+                    date: new Date().toISOString().split('T')[0],
+                    weight: parseFloat(newMeasurement.weight),
+                    waist: parseFloat(newMeasurement.waist),
+                    bicepsR: parseFloat(newMeasurement.bicepsR),
+                    bicepsL: parseFloat(newMeasurement.bicepsL),
+                    thighsR: parseFloat(newMeasurement.thighsR),
+                    thighsL: parseFloat(newMeasurement.thighsL),
+                    calvesR: parseFloat(newMeasurement.calvesR),
+                    calvesL: parseFloat(newMeasurement.calvesL),
+                };
+                onUpdateClient({ ...client, measurements: [...(client.measurements || []), measurement] });
+                setNewMeasurement({ weight: '', waist: '', bicepsR: '', bicepsL: '', thighsR: '', thighsL: '', calvesR: '', calvesL: '' });
+            };
+            
+            const handleSaveClientInfo = (updatedData) => {
+                onUpdateClient({...client, ...updatedData});
+                setEditModalOpen(false);
+            };
+
+            const routine = client.customRoutine || [];
+            const currentWeekRoutine = routine[selectedWeekIndex] || {};
+
+            return (<div className="min-h-screen bg-gray-900 text-gray-100 p-4"><div className="max-w-7xl mx-auto"><button onClick={onBack} className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-4 font-semibold"><ArrowLeftIcon className="w-5 h-5" /> Volver a Clientes</button><div className="bg-gray-800/50 rounded-lg p-6 mb-4"><div className="flex justify-between items-start"><h2 className="text-3xl font-bold text-white">{client.name}</h2><div><button onClick={() => setEditModalOpen(true)} className="p-2 text-gray-400 hover:text-white"><EditIcon className="w-5 h-5"/></button><button onClick={() => onDeleteClient(client.id)} className="p-2 text-gray-400 hover:text-red-500"><TrashIcon className="w-5 h-5"/></button></div></div><p className="text-gray-400">Nivel: {client.level} | Objetivos: {client.goals}</p></div><div className="flex space-x-1 bg-gray-800 rounded-lg p-1 mb-4"><button onClick={() => setActiveTab('progress')} className={`w-full flex justify-center items-center gap-2 p-2 rounded-md transition ${activeTab === 'progress' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}><ChartBarIcon className="w-5 h-5"/> Progreso</button><button onClick={() => setActiveTab('calendar')} className={`w-full flex justify-center items-center gap-2 p-2 rounded-md transition ${activeTab === 'calendar' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}><CalendarIcon className="w-5 h-5"/> Calendario</button></div>
+            
+            {activeTab === 'progress' && (
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <div className="lg:col-span-3 bg-gray-800/50 rounded-lg p-4">
+                        <h3 className="text-xl font-bold mb-4">Historial de Mediciones</h3>
+                        <MeasurementHistoryTable measurements={client.measurements || []} />
+                    </div>
+                    <div className="lg:col-span-2 space-y-6">
+                        <div className="bg-gray-800/50 rounded-lg p-4">
+                            <h3 className="text-xl font-bold mb-4">Simulación Corporal</h3>
+                            <BodyHologram measurements={client.measurements || []} />
+                        </div>
+                        <div className="bg-gray-800/50 rounded-lg p-4">
+                             <form onSubmit={handleAddMeasurement}>
+                                <h3 className="text-xl font-bold mb-2">Añadir Medición</h3>
+                                <div className="grid grid-cols-2 gap-x-4">
+                                    <FormInput label="Peso (lb)" name="weight" type="number" step="0.1" value={newMeasurement.weight} onChange={handleMeasurementChange} />
+                                    <FormInput label="Cintura (cm)" name="waist" type="number" step="0.1" value={newMeasurement.waist} onChange={handleMeasurementChange} />
+                                    <FormInput label="Bíceps D (cm)" name="bicepsR" type="number" step="0.1" value={newMeasurement.bicepsR} onChange={handleMeasurementChange} />
+                                    <FormInput label="Bíceps I (cm)" name="bicepsL" type="number" step="0.1" value={newMeasurement.bicepsL} onChange={handleMeasurementChange} />
+                                    <FormInput label="Muslo D (cm)" name="thighsR" type="number" step="0.1" value={newMeasurement.thighsR} onChange={handleMeasurementChange} />
+                                    <FormInput label="Muslo I (cm)" name="thighsL" type="number" step="0.1" value={newMeasurement.thighsL} onChange={handleMeasurementChange} />
+                                    <FormInput label="Gemelo D (cm)" name="calvesR" type="number" step="0.1" value={newMeasurement.calvesR} onChange={handleMeasurementChange} />
+                                    <FormInput label="Gemelo I (cm)" name="calvesL" type="number" step="0.1" value={newMeasurement.calvesL} onChange={handleMeasurementChange} />
+                                </div>
+                                <button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Medición</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'calendar' && (
+                <div>
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="flex space-x-1 bg-gray-800 rounded-lg p-1">
+                            {routine.map((_, index) => (
+                                <button key={index} onClick={() => setSelectedWeekIndex(index)} className={`px-4 py-2 rounded-md font-semibold whitespace-nowrap ${selectedWeekIndex === index ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}>
+                                    Semana {index + 1}
+                                </button>
+                            ))}
+                        </div>
+                        <button onClick={handleAddWeek} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-lg"><PlusIcon className="w-5 h-5"/>Añadir Semana</button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {DAYS_OF_WEEK.map(day => (
+                            <div key={day} className="bg-gray-800/50 rounded-lg p-4 space-y-3">
+                                <input 
+                                    type="text" 
+                                    value={currentWeekRoutine[day]?.title || ''} 
+                                    onChange={(e) => handleUpdateDayTitle(selectedWeekIndex, day, e.target.value)}
+                                    placeholder="Título del día" 
+                                    className="w-full bg-gray-900 text-white text-lg font-bold p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                />
+                                <div className="space-y-2 min-h-[100px]">
+                                    {(currentWeekRoutine[day]?.exercises || []).map(ex => (
+                                        <div key={ex.instanceId} className="bg-black/40 p-2 rounded-md flex justify-between items-center">
+                                            <div>
+                                                <p className="font-semibold text-sm">{ex.name}</p>
+                                                <p className="text-xs text-gray-400">{ex.sets}x{ex.reps || `${ex.time}s`}, {ex.rest}s</p>
+                                            </div>
+                                            <div>
+                                                <button onClick={() => { setEditingEx({ ...ex, weekIndex: selectedWeekIndex, day }); setEditExModalOpen(true); }} className="p-1 text-gray-400 hover:text-white"><EditIcon className="w-4 h-4"/></button>
+                                                <button onClick={() => handleDeleteExercise(selectedWeekIndex, day, ex.instanceId)} className="p-1 text-gray-400 hover:text-red-500"><TrashIcon className="w-4 h-4"/></button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button onClick={() => { setAddingToDay({ weekIndex: selectedWeekIndex, day }); setAddExModalOpen(true); }} className="w-full flex items-center justify-center gap-2 bg-indigo-600/50 hover:bg-indigo-600 text-white font-bold py-2 px-3 rounded-lg"><PlusIcon className="w-5 h-5"/>Añadir Ejercicio</button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <ClientFormModal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)} client={client} onSave={handleSaveClientInfo} />
+            <AddExerciseToRoutineModal isOpen={isAddExModalOpen} onClose={() => setAddExModalOpen(false)} allExercises={allExercises} onAdd={handleAddExercises} />
+            <EditCustomExerciseModal isOpen={isEditExModalOpen} onClose={() => setEditExModalOpen(false)} customExercise={editingEx} onSave={handleSaveCustomExercise} />
+            </div></div>);
+        };
+        
+        const AddExerciseToRoutineModal = ({isOpen, onClose, allExercises, onAdd}) => {
+            const [selectedIds, setSelectedIds] = useState(new Set());
+            const handleToggle = (id) => { const newSet = new Set(selectedIds); if(newSet.has(id)) newSet.delete(id); else newSet.add(id); setSelectedIds(newSet); }
+            const handleSubmit = () => { const selected = allExercises.filter(ex => selectedIds.has(ex.id)); onAdd(selected); onClose(); setSelectedIds(new Set()); };
+            return <Modal isOpen={isOpen} onClose={onClose} title="Añadir Ejercicios a la Rutina" className="max-w-2xl"><div className="max-h-[60vh] overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-2 pr-2">{allExercises.map(ex => (<div key={ex.id} onClick={() => handleToggle(ex.id)} className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedIds.has(ex.id) ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}><h4 className="font-bold">{ex.name}</h4><p className="text-xs text-gray-300">{ex.tags.join(', ')}</p></div>))}</div><div className="mt-4 pt-4 border-t border-gray-700"><button onClick={handleSubmit} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Añadir Seleccionados</button></div></Modal>
+        }
+        
+        const EditCustomExerciseModal = ({isOpen, onClose, customExercise, onSave}) => {
+            const [formData, setFormData] = useState(null);
+            useEffect(() => { setFormData(customExercise ? { ...customExercise } : null); }, [customExercise, isOpen]);
+            if(!formData) return null;
+            const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value }); };
+            const handleSubmit = (e) => { e.preventDefault(); onSave(formData); };
+            return (<Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${formData.name}`}><form onSubmit={handleSubmit}><div className="grid grid-cols-2 gap-4"><FormInput label="Series" name="sets" type="number" value={formData.sets || ''} onChange={handleChange} /><FormInput label="Reps" name="reps" type="number" value={formData.reps || ''} onChange={handleChange} /><FormInput label="Tiempo (seg)" name="time" type="number" value={formData.time || ''} onChange={handleChange} /><FormInput label="Descanso (seg)" name="rest" type="number" value={formData.rest} onChange={handleChange} required /></div><FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} /><button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button></form></Modal>);
+        }
+        
+        const WorkoutHistoryModal = ({ isOpen, onClose, logs }) => {
+            return (<Modal isOpen={isOpen} onClose={onClose} title="Historial de Actividad"><div className="max-h-[60vh] overflow-y-auto"><table className="w-full text-sm text-left table-auto"><thead className="text-xs text-indigo-300 uppercase bg-gray-700/50"><tr><th className="px-4 py-2">Fecha</th><th className="px-4 py-2 text-right">Tiempo de Entrenamiento</th></tr></thead><tbody>{[...logs].reverse().map(log => (<tr key={log.date} className="border-b border-gray-700"><td className="px-4 py-2">{new Date(log.date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</td><td className="px-4 py-2 text-right font-semibold">{log.duration} minutos</td></tr>))}</tbody></table>{logs.length === 0 && <p className="text-center text-gray-400 p-4">Aún no has registrado ningún entrenamiento.</p>}</div></Modal>)
+        }
+
+        // --- COMPONENTE PRINCIPAL DE LA APP ---
+        const App = () => {
+            const [currentUser, setCurrentUser] = useState(null);
+            const [viewingClient, setViewingClient] = useState(null);
+            const [allExercises, setAllExercises] = useState([]);
+            const [notifications, setNotifications] = useState([]);
+
+            useEffect(() => {
+                if (currentUser) {
+                    api.getExercises().then(setAllExercises);
+                    api.getNotifications().then(setNotifications);
+                }
+            }, [currentUser]);
+
+            useEffect(() => {
+                if (!currentUser) return;
+                const unsubscribe = api.subscribe(() => {
+                    console.log('API change detected, refreshing data...');
+                    api.getExercises().then(setAllExercises);
+                    api.getNotifications().then(setNotifications);
+                    if (currentUser.role === Role.Client) {
+                        api.clientLogin({ name: currentUser.name, password: currentUser.password })
+                            .then(setCurrentUser)
+                            .catch(() => {
+                                console.error('Session expired, logging out.');
+                                handleLogout();
+                            });
+                    }
+                });
+                return unsubscribe;
+            }, [currentUser]);
+
+            const handleLogin = (user) => setCurrentUser(user);
+            const handleLogout = () => { setCurrentUser(null); setViewingClient(null); };
+            
+            const handleUpdateClient = (updatedClient) => {
+                api.updateClient(updatedClient).then(newClientData => {
+                    if (currentUser && currentUser.id === newClientData.id) {
+                        setCurrentUser(newClientData);
+                    }
+                    if (viewingClient && viewingClient.id === newClientData.id) {
+                        setViewingClient(newClientData);
+                    }
+                });
+            };
+            
+            const handleDeleteClient = (clientId) => {
+                if(window.confirm("¿Estás seguro de que quieres eliminar a este cliente? Esta acción es irreversible.")){
+                    api.deleteClient(clientId).then(() => {
+                        setViewingClient(null);
+                    });
+                }
+            };
+
+            if (!currentUser) {
+                return <AuthFlow onLogin={handleLogin} />;
+            }
+
+            if (currentUser.role === Role.Trainer) {
+                if (viewingClient) {
+                    return <ClientDetailView 
+                                client={viewingClient} 
+                                onBack={() => setViewingClient(null)} 
+                                onUpdateClient={handleUpdateClient} 
+                                onDeleteClient={handleDeleteClient} 
+                                allExercises={allExercises} 
+                            />;
+                }
+                return <TrainerDashboard 
+                            user={currentUser} 
+                            onLogout={handleLogout} 
+                            onViewClient={setViewingClient}
+                            allExercises={allExercises}
+                            notifications={notifications}
+                        />;
+            }
+
+            if (currentUser.role === Role.Client) {
+                return <ClientDashboard 
+                            user={currentUser} 
+                            allExercises={allExercises} 
+                            onLogout={handleLogout} 
+                            onNotify={api.addNotification} 
+                            onLogWorkout={api.logWorkout}
+                        />;
+            }
+
+            return <AuthFlow onLogin={handleLogin} />;
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./service-worker.js').then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
+</body>
+</html>
