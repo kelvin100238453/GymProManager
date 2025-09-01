@@ -156,7 +156,7 @@ app.post('/api/clients', asyncHandler(async (req, res) => {
 
 app.put('/api/clients/:id', asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { password, ...restOfBody } = req.body;
+    const { password, _id, ...restOfBody } = req.body;
     
     const updateData = { ...restOfBody };
     
