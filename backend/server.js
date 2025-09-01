@@ -46,6 +46,85 @@ const asyncHandler = fn => (req, res, next) => {
     });
 };
 
+// --- LÓGICA DE SEEDING DE LA BASE DE DATOS ---
+const seedDatabase = async () => {
+    const defaultExercises = [
+        // Glúteos
+        { id: 'ex-glute-01', name: 'Hip Thrust con Barra', category: 'Glúteos', description: 'Ejercicio clave para la fuerza y el tamaño de los glúteos.', sets: 4, reps: 12, rest: 60 },
+        { id: 'ex-glute-02', name: 'Sentadilla Búlgara con Mancuernas', category: 'Glúteos', description: 'Excelente para el glúteo y cuádriceps, trabaja de forma unilateral.', sets: 3, reps: 10, rest: 60 },
+        { id: 'ex-glute-03', name: 'Patada de Glúteo en Polea', category: 'Glúteos', description: 'Aísla el glúteo mayor para una máxima contracción.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-glute-04', name: 'Abducción de Cadera en Máquina', category: 'Glúteos', description: 'Fortalece el glúteo medio y menor, mejorando la estabilidad de la cadera.', sets: 3, reps: 20, rest: 45 },
+        { id: 'ex-glute-05', name: 'Peso Muerto Rumano con Mancuernas', category: 'Glúteos', description: 'Enfatiza el trabajo en los isquiotibiales y glúteos.', sets: 4, reps: 12, rest: 60 },
+        { id: 'ex-glute-06', name: 'Puente de Glúteo con Banda', category: 'Glúteos', description: 'Ejercicio de activación que se puede usar para calentar o como finisher.', sets: 3, reps: 20, rest: 30 },
+
+        // Piernas (Cuádriceps y Femorales)
+        { id: 'ex-legs-01', name: 'Sentadilla Goblet', category: 'Piernas', description: 'Variación de sentadilla que ayuda a mantener una postura correcta.', sets: 4, reps: 12, rest: 60 },
+        { id: 'ex-legs-02', name: 'Prensa de Piernas', category: 'Piernas', description: 'Permite mover cargas pesadas con gran seguridad para las piernas.', sets: 4, reps: 15, rest: 75 },
+        { id: 'ex-legs-03', name: 'Extensiones de Cuádriceps', category: 'Piernas', description: 'Aísla los cuádriceps para definirlos y fortalecerlos.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-legs-04', name: 'Curl Femoral Tumbado', category: 'Piernas', description: 'Aísla los isquiotibiales.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-legs-05', name: 'Zancadas Caminando', category: 'Piernas', description: 'Ejercicio funcional que trabaja piernas y glúteos de forma dinámica.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-legs-06', name: 'Sentadilla Sumo con Pesa Rusa', category: 'Piernas', description: 'Enfatiza el trabajo en los aductores y glúteos.', sets: 3, reps: 12, rest: 60 },
+
+        // Espalda
+        { id: 'ex-back-01', name: 'Jalón al Pecho (Polea Alta)', category: 'Espalda', description: 'Desarrolla la amplitud de la espalda (dorsales).', sets: 4, reps: 12, rest: 60 },
+        { id: 'ex-back-02', name: 'Remo Sentado en Polea', category: 'Espalda', description: 'Trabaja la densidad y grosor de la espalda media.', sets: 4, reps: 12, rest: 60 },
+        { id: 'ex-back-03', name: 'Dominadas Asistidas', category: 'Espalda', description: 'Versión accesible de las dominadas para construir fuerza.', sets: 3, reps: 8, rest: 75 },
+        { id: 'ex-back-04', name: 'Pull-over con Mancuerna', category: 'Espalda', description: 'Trabaja el dorsal y el serrato, expandiendo la caja torácica.', sets: 3, reps: 15, rest: 60 },
+
+        // Hombros
+        { id: 'ex-shoulders-01', name: 'Press Militar con Mancuernas', category: 'Hombros', description: 'Ejercicio fundamental para la fuerza y tamaño de los hombros.', sets: 4, reps: 10, rest: 75 },
+        { id: 'ex-shoulders-02', name: 'Elevaciones Laterales con Mancuernas', category: 'Hombros', description: 'Aísla la cabeza media del deltoides, dando amplitud a los hombros.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-shoulders-03', name: 'Pájaros (Elevaciones Posteriores)', category: 'Hombros', description: 'Enfocado en el deltoides posterior, clave para una buena postura.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-shoulders-04', name: 'Face Pulls en Polea', category: 'Hombros', description: 'Mejora la salud del hombro y la postura, trabajando el deltoides posterior y manguito rotador.', sets: 3, reps: 20, rest: 45 },
+
+        // Pecho
+        { id: 'ex-chest-01', name: 'Press de Banca con Mancuernas', category: 'Pecho', description: 'Permite un mayor rango de movimiento que la barra, beneficiando el desarrollo pectoral.', sets: 4, reps: 12, rest: 60 },
+        { id: 'ex-chest-02', name: 'Aperturas con Mancuernas (Banco Inclinado)', category: 'Pecho', description: 'Enfocado en la parte superior del pectoral.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-chest-03', name: 'Flexiones (Push-ups)', category: 'Pecho', description: 'Ejercicio de peso corporal fundamental para el tren superior.', sets: 3, reps: 15, rest: 60 },
+
+        // Brazos (Bíceps y Tríceps)
+        { id: 'ex-arms-01', name: 'Curl de Bíceps con Barra Z', category: 'Brazos', description: 'Reduce la tensión en las muñecas mientras se trabaja el bíceps.', sets: 3, reps: 12, rest: 45 },
+        { id: 'ex-arms-02', name: 'Extensiones de Tríceps en Polea Alta', category: 'Brazos', description: 'Aísla el tríceps para un desarrollo completo.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-arms-03', name: 'Fondos en Banco', category: 'Brazos', description: 'Excelente ejercicio de peso corporal para tríceps.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-arms-04', name: 'Curl Martillo con Mancuernas', category: 'Brazos', description: 'Trabaja el braquial y el antebrazo además del bíceps.', sets: 3, reps: 12, rest: 45 },
+
+        // Abdomen y Core
+        { id: 'ex-core-01', name: 'Plancha (Plank)', category: 'Abdomen y Core', description: 'Ejercicio isométrico para la estabilidad de todo el core.', sets: 3, time: 60, rest: 30 },
+        { id: 'ex-core-02', name: 'Elevación de Piernas Colgado', category: 'Abdomen y Core', description: 'Intenso ejercicio para la parte inferior del abdomen.', sets: 3, reps: 15, rest: 60 },
+        { id: 'ex-core-03', name: 'Crunch Abdominal en Polea Alta', category: 'Abdomen y Core', description: 'Permite añadir resistencia al crunch para mayor hipertrofia.', sets: 3, reps: 20, rest: 45 },
+        { id: 'ex-core-04', name: 'Rueda Abdominal (Ab Wheel)', category: 'Abdomen y Core', description: 'Ejercicio avanzado para una fuerza abdominal y de core superior.', sets: 3, reps: 12, rest: 60 },
+    ];
+
+    try {
+        const collection = db.collection('system');
+        const exerciseDoc = await collection.findOne({ _id: 'exercises' });
+
+        if (!exerciseDoc || !exerciseDoc.data) {
+            // Si no hay documento o no hay datos, se insertan todos los ejercicios por defecto
+            await collection.updateOne(
+                { _id: 'exercises' },
+                { $set: { data: defaultExercises } },
+                { upsert: true }
+            );
+            console.log('Base de datos de ejercicios sembrada con éxito.');
+        } else {
+            // Si ya existen ejercicios, añadir solo los que no están
+            const existingNames = new Set(exerciseDoc.data.map(e => e.name));
+            const newExercises = defaultExercises.filter(e => !existingNames.has(e.name));
+
+            if (newExercises.length > 0) {
+                await collection.updateOne(
+                    { _id: 'exercises' },
+                    { $push: { data: { $each: newExercises } } }
+                );
+                console.log(`${newExercises.length} nuevos ejercicios añadidos a la biblioteca.`);
+            }
+        }
+    } catch (error) {
+        console.error('Error al sembrar la base de datos de ejercicios:', error);
+    }
+};
+
 // --- API ENDPOINTS ---
 
 // --- Auth ---
@@ -267,6 +346,7 @@ app.get(/^(?!\/api).*/, (req, res) => {
 // --- INICIAR SERVIDOR ---
 const startServer = async () => {
     await connectDb(); // Conecta a la base de datos primero
+    await seedDatabase(); // Puebla la base de datos con ejercicios
     app.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
         console.log('Conectado a la base de datos MongoDB.');
