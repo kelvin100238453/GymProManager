@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
@@ -201,9 +202,14 @@ app.post('/api/auth/trainer/register', asyncHandler(async (req, res) => {
     
     await db.collection('trainers').insertOne(newTrainer);
     
+    // Después de registrar, también iniciamos sesión generando un token
+    const token = jwt.sign({ trainerId: newTrainer.id, role: 'trainer' }, JWT_SECRET);
+
     // No enviar la contraseña hasheada al cliente
-    const { password: _, ...responseData } = newTrainer;
-    res.status(201).json(responseData);
+    const { password: _, ...trainerData } = newTrainer;
+    
+    // Enviar el token y los datos del usuario, igual que en el login
+    res.status(201).json({ token, user: trainerData });
 }));
 
 // --- Clients ---
