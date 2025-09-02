@@ -1213,6 +1213,20 @@
             const [viewingClient, setViewingClient] = useState(null);
             const [allExercises, setAllExercises] = useState([]);
             const [notifications, setNotifications] = useState([]);
+            const [authReady, setAuthReady] = useState(false);
+
+            useEffect(() => {
+                try {
+                    const storedUser = localStorage.getItem('currentUser');
+                    if (storedUser) {
+                        setCurrentUser(JSON.parse(storedUser));
+                    }
+                } catch (e) {
+                    console.error("Failed to parse user from localStorage", e);
+                    localStorage.removeItem('currentUser');
+                }
+                setAuthReady(true);
+            }, []);
 
             useEffect(() => {
                 if (currentUser) {
@@ -1227,24 +1241,26 @@
                     console.log('API change detected, refreshing data...');
                     api.getExercises().then(setAllExercises);
                     api.getNotifications().then(setNotifications);
-                    if (currentUser.role === Role.Client) {
-                        api.clientLogin({ name: currentUser.name, password: currentUser.password })
-                            .then(setCurrentUser)
-                            .catch(() => {
-                                console.error('Session expired, logging out.');
-                                handleLogout();
-                            });
-                    }
                 });
                 return unsubscribe;
             }, [currentUser]);
 
-            const handleLogin = (user) => setCurrentUser(user);
-            const handleLogout = () => { setCurrentUser(null); setViewingClient(null); };
+            const handleLogin = (data) => {
+                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                localStorage.setItem('token', data.token);
+                setCurrentUser(data.user);
+            };
+            const handleLogout = () => { 
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('token');
+                setCurrentUser(null); 
+                setViewingClient(null); 
+            };
             
             const handleUpdateClient = (updatedClient) => {
                 api.updateClient(updatedClient).then(newClientData => {
                     if (currentUser && currentUser.id === newClientData.id) {
+                        localStorage.setItem('currentUser', JSON.stringify(newClientData));
                         setCurrentUser(newClientData);
                     }
                     if (viewingClient && viewingClient.id === newClientData.id) {
@@ -1260,6 +1276,10 @@
                     });
                 }
             };
+
+            if (!authReady) {
+                return <div className="min-h-screen bg-gray-900 flex justify-center items-center"><LoadingSpinner /></div>;
+            }
 
             if (!currentUser) {
                 return <AuthFlow onLogin={handleLogin} />;
