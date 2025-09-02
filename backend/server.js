@@ -252,7 +252,7 @@ app.put('/api/clients/:id', asyncHandler(async (req, res) => {
     const updateData = { ...restOfBody };
     
     // Si se está actualizando la contraseña, hashearla
-    if (password) {
+    if (password && typeof password === 'string' && password.trim() !== '') {
         const salt = await bcrypt.genSalt(10);
         updateData.password = await bcrypt.hash(password, salt);
     }
