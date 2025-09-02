@@ -218,6 +218,12 @@ app.get('/api/clients', asyncHandler(async (req, res) => {
 
 app.post('/api/clients', asyncHandler(async (req, res) => {
     const { clientData, trainerId } = req.body;
+
+    // --- Validación de Contraseña ---
+    // Se asegura de que la contraseña exista y no esté vacía al crear un cliente.
+    if (!clientData.password || clientData.password.trim() === '') {
+        return res.status(400).json({ message: 'La contraseña es un campo obligatorio para crear un cliente.' });
+    }
     
     const newClient = {
         id: `client-${crypto.randomUUID()}`,
@@ -229,11 +235,9 @@ app.post('/api/clients', asyncHandler(async (req, res) => {
         workoutLogs: []
     };
 
-    // Hashear contraseña si se proporciona al crear
-    if (clientData.password) {
-        const salt = await bcrypt.genSalt(10);
-        newClient.password = await bcrypt.hash(clientData.password, salt);
-    }
+    // Hashear la contraseña proporcionada
+    const salt = await bcrypt.genSalt(10);
+    newClient.password = await bcrypt.hash(clientData.password, salt);
 
     await db.collection('clients').insertOne(newClient);
     
