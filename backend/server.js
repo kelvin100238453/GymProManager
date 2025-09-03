@@ -32,7 +32,7 @@ const connectDb = async () => {
         process.exit(1);
     }
     try {
-        const client = new MongoClient(MONGO_URL, { useUnifiedTopology: true });
+        const client = new MongoClient(MONGO_URL);
         await client.connect();
         // La base de datos se especifica en la URL de conexión de Atlas
         db = client.db(); 
@@ -47,6 +47,7 @@ const connectDb = async () => {
 const asyncHandler = fn => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(err => {
         console.error('Error en el manejador de la ruta:', err);
+        console.error('Stack trace:', err.stack);
         res.status(500).json({ message: 'Ocurrió un error interno en el servidor.', error: err.message });
     });
 };
