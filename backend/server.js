@@ -140,11 +140,11 @@ const generateTokens = (payload) => {
     return { accessToken, refreshToken };
 };
 app.post('/api/auth/client/login', asyncHandler(async (req, res) => {
-    const { name, password } = req.body;
-    const client = await db.collection('clients').findOne({ name });
+    const { username, password } = req.body;
+    const client = await db.collection('clients').findOne({ username });
 
     if (!client) {
-        return res.status(401).json({ message: 'Nombre de usuario o contraseña de cliente incorrectos.' });
+        return res.status(401).json({ message: 'Nombre de usuario o contraseña incorrectos.' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, client.password);
@@ -158,7 +158,7 @@ app.post('/api/auth/client/login', asyncHandler(async (req, res) => {
         const { password, ...clientData } = client;
         res.json({ accessToken, refreshToken, user: clientData });
     } else {
-        res.status(401).json({ message: 'Nombre de usuario o contraseña de cliente incorrectos.' });
+        res.status(401).json({ message: 'Nombre de usuario o contraseña incorrectos.' });
     }
 }));
 
@@ -258,10 +258,15 @@ app.get('/api/clients', asyncHandler(async (req, res) => {
 app.post('/api/clients', asyncHandler(async (req, res) => {
     const { clientData, trainerId } = req.body;
 
+    // Verificar si ya existe un cliente con el mismo nombre de usuario
+    const existingClient = await db.collection('clients').findOne({ username: clientData.username });
+    if (existingClient) {
+        return res.status(400).json({ message: 'Este nombre de usuario ya está en uso. Por favor, elige otro.' });
+    }
+
     // --- Validación de Contraseña ---
-    // Se asegura de que la contraseña exista y no esté vacía al crear un cliente.
     if (!clientData.password || clientData.password.trim() === '') {
-        return res.status(400).json({ message: 'La contraseña es un campo obligatorio para crear un cliente.' });
+        return res.status(400).json({ message: 'La contraseña es un campo obligatorio.' });
     }
     
     const newClient = {

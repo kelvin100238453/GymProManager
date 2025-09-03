@@ -575,12 +575,12 @@
         };
 
         const ClientFormModal = ({ isOpen, onClose, client, onSave }) => {
-            const [formData, setFormData] = useState({ name: '', level: '', goals: '', password: '' });
+            const [formData, setFormData] = useState({ name: '', username: '', level: '', goals: '', password: '' });
             useEffect(() => {
                 if(client) {
-                    setFormData({ name: client.name, level: client.level, goals: client.goals, password: '' });
+                    setFormData({ name: client.name, username: client.username, level: client.level, goals: client.goals, password: '' });
                 } else {
-                    setFormData({ name: '', level: '', goals: '', password: '' });
+                    setFormData({ name: '', username: '', level: '', goals: '', password: '' });
                 }
             }, [client, isOpen]);
             const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -591,7 +591,8 @@
             return (
                 <Modal isOpen={isOpen} onClose={onClose} title={client ? 'Editar Cliente' : 'Crear Cliente'}>
                     <form onSubmit={handleSubmit}>
-                        <FormInput label="Nombre" name="name" value={formData.name} onChange={handleChange} required />
+                        <FormInput label="Nombre Completo" name="name" value={formData.name} onChange={handleChange} required />
+                        <FormInput label="Nombre de Usuario" name="username" value={formData.username} onChange={handleChange} required />
                         <FormInput label="Contraseña" name="password" type="password" value={formData.password || ''} onChange={handleChange} required={!client} placeholder={client ? "Dejar en blanco para no cambiar" : ""} />
                         <FormInput label="Nivel" name="level" value={formData.level} onChange={handleChange} />
                         <FormTextarea label="Objetivos" name="goals" value={formData.goals} onChange={handleChange} />
@@ -853,7 +854,7 @@
             const handleClientLogin = (e) => {
                 e.preventDefault();
                 setError('');
-                api.clientLogin({ name: clientUsername, password: clientPassword })
+                api.clientLogin({ username: clientUsername, password: clientPassword })
                     .then(onLogin)
                     .catch(async err => {
                         const errorData = await err;
