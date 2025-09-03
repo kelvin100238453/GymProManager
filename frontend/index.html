@@ -151,37 +151,37 @@
                 this._subscribers.forEach(callback => callback());
             },
             // --- Métodos públicos que no requieren autenticación ---
-            clientLogin: (credentials) => fetch(`${API_URL}/auth/client/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
-            trainerLogin: (credentials) => fetch(`${API_URL}/auth/trainer/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
-            trainerRegister: (data) => fetch(`${API_URL}/auth/trainer/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
+            clientLogin: (credentials) => fetch(`${API_URL}/api/auth/client/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
+            trainerLogin: (credentials) => fetch(`${API_URL}/api/auth/trainer/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
+            trainerRegister: (data) => fetch(`${API_URL}/api/auth/trainer/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
             
             // --- Métodos que requieren autenticación ---
             _fetch: (url, options) => authProvider.fetchWithAuth(url, options).then(res => res.ok ? res.json() : Promise.reject(res.json())),
             _fetch_no_content: (url, options) => authProvider.fetchWithAuth(url, options).then(res => res.ok ? res : Promise.reject(res.json())),
 
-            getClients: (trainerId) => api._fetch(`${API_URL}/clients?trainerId=${trainerId}`),
+            getClients: (trainerId) => api._fetch(`${API_URL}/api/clients?trainerId=${trainerId}`),
             addClient(clientData, trainerId) {
-                return api._fetch(`${API_URL}/clients`, { method: 'POST', body: JSON.stringify({ clientData, trainerId }) }).then(data => { this.notify(); return data; });
+                return api._fetch(`${API_URL}/api/clients`, { method: 'POST', body: JSON.stringify({ clientData, trainerId }) }).then(data => { this.notify(); return data; });
             },
             updateClient(updatedClient) {
-                return api._fetch(`${API_URL}/clients/${updatedClient.id}`, { method: 'PUT', body: JSON.stringify(updatedClient) }).then(data => { this.notify(); return data; });
+                return api._fetch(`${API_URL}/api/clients/${updatedClient.id}`, { method: 'PUT', body: JSON.stringify(updatedClient) }).then(data => { this.notify(); return data; });
             },
             deleteClient(clientId) {
-                return authProvider.fetchWithAuth(`${API_URL}/clients/${clientId}`, { method: 'DELETE' }).then(() => this.notify());
+                return authProvider.fetchWithAuth(`${API_URL}/api/clients/${clientId}`, { method: 'DELETE' }).then(() => this.notify());
             },
-            getExercises: () => api._fetch(`${API_URL}/exercises`),
+            getExercises: () => api._fetch(`${API_URL}/api/exercises`),
             setExercises(newExercises) {
-                return api._fetch(`${API_URL}/exercises`, { method: 'PUT', body: JSON.stringify(newExercises) }).then(data => { this.notify(); return data; });
+                return api._fetch(`${API_URL}/api/exercises`, { method: 'PUT', body: JSON.stringify(newExercises) }).then(data => { this.notify(); return data; });
             },
-            getNotifications: () => api._fetch(`${API_URL}/notifications`),
+            getNotifications: () => api._fetch(`${API_URL}/api/notifications`),
             addNotification(message, type = 'info') {
-                 return api._fetch(`${API_URL}/notifications`, { method: 'POST', body: JSON.stringify({ message, type }) }).then(data => { this.notify(); return data; });
+                 return api._fetch(`${API_URL}/api/notifications`, { method: 'POST', body: JSON.stringify({ message, type }) }).then(data => { this.notify(); return data; });
             },
             clearNotifications() {
-                return authProvider.fetchWithAuth(`${API_URL}/notifications/clear`, { method: 'POST' }).then(() => this.notify());
+                return authProvider.fetchWithAuth(`${API_URL}/api/notifications/clear`, { method: 'POST' }).then(() => this.notify());
             },
             logWorkout(clientId, durationSeconds) {
-                return api._fetch(`${API_URL}/clients/${clientId}/log-workout`, { method: 'POST', body: JSON.stringify({ durationSeconds }) }).then(data => { this.notify(); return data; });
+                return api._fetch(`${API_URL}/api/clients/${clientId}/log-workout`, { method: 'POST', body: JSON.stringify({ durationSeconds }) }).then(data => { this.notify(); return data; });
             },
         };
 
