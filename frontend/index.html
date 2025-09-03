@@ -68,7 +68,77 @@
         const API_URL = '/api';
         const DAYS_OF_WEEK = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-        // --- API REAL CON FETCH ---
+        // --- GESTIÓN DE AUTENTICACIÓN Y API ---
+        const authProvider = {
+            getAccessToken: () => localStorage.getItem('accessToken'),
+            getRefreshToken: () => localStorage.getItem('refreshToken'),
+            setTokens: (accessToken, refreshToken) => {
+                localStorage.setItem('accessToken', accessToken);
+                if (refreshToken) {
+                    localStorage.setItem('refreshToken', refreshToken);
+                }
+            },
+            clearTokens: () => {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('currentUser');
+            },
+            logout: () => {
+                authProvider.clearTokens();
+                window.location.reload();
+            },
+            refreshToken: async () => {
+                const currentRefreshToken = authProvider.getRefreshToken();
+                if (!currentRefreshToken) {
+                    return null;
+                }
+                try {
+                    const response = await fetch(`${API_URL}/auth/client/refresh-token`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ refreshToken: currentRefreshToken }),
+                    });
+                    if (!response.ok) {
+                        throw new Error('Failed to refresh token');
+                    }
+                    const { accessToken } = await response.json();
+                    authProvider.setTokens(accessToken);
+                    return accessToken;
+                } catch (error) {
+                    console.error('Error refreshing token:', error);
+                    authProvider.logout();
+                    return null;
+                }
+            },
+            fetchWithAuth: async (url, options = {}) => {
+                let accessToken = authProvider.getAccessToken();
+                if (!accessToken) {
+                    authProvider.logout();
+                    return Promise.reject(new Error('No access token'));
+                }
+
+                options.headers = {
+                    ...options.headers,
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                };
+
+                let response = await fetch(url, options);
+
+                if (response.status === 401) {
+                    const newAccessToken = await authProvider.refreshToken();
+                    if (newAccessToken) {
+                        options.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                        response = await fetch(url, options);
+                    } else {
+                        return Promise.reject(new Error('Unable to refresh token'));
+                    }
+                }
+                return response;
+            }
+        };
+
+        // --- API REAL CON FETCH USANDO EL WRAPPER DE AUTENTICACIÓN ---
         const api = {
             _subscribers: [],
             subscribe(callback) {
@@ -80,32 +150,38 @@
             notify() {
                 this._subscribers.forEach(callback => callback());
             },
-            clientLogin: (credentials) => fetch(`${API_URL}/auth/client/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json()) ),
+            // --- Métodos públicos que no requieren autenticación ---
+            clientLogin: (credentials) => fetch(`${API_URL}/auth/client/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
             trainerLogin: (credentials) => fetch(`${API_URL}/auth/trainer/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
             trainerRegister: (data) => fetch(`${API_URL}/auth/trainer/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
-            getClients: (trainerId) => fetch(`${API_URL}/clients?trainerId=${trainerId}`).then(res => res.json()),
+            
+            // --- Métodos que requieren autenticación ---
+            _fetch: (url, options) => authProvider.fetchWithAuth(url, options).then(res => res.ok ? res.json() : Promise.reject(res.json())),
+            _fetch_no_content: (url, options) => authProvider.fetchWithAuth(url, options).then(res => res.ok ? res : Promise.reject(res.json())),
+
+            getClients: (trainerId) => api._fetch(`${API_URL}/clients?trainerId=${trainerId}`),
             addClient(clientData, trainerId) {
-                return fetch(`${API_URL}/clients`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientData, trainerId }) }).then(res => res.json()).then(data => { this.notify(); return data; });
+                return api._fetch(`${API_URL}/clients`, { method: 'POST', body: JSON.stringify({ clientData, trainerId }) }).then(data => { this.notify(); return data; });
             },
             updateClient(updatedClient) {
-                return fetch(`${API_URL}/clients/${updatedClient.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updatedClient) }).then(res => res.json()).then(data => { this.notify(); return data; });
+                return api._fetch(`${API_URL}/clients/${updatedClient.id}`, { method: 'PUT', body: JSON.stringify(updatedClient) }).then(data => { this.notify(); return data; });
             },
             deleteClient(clientId) {
-                return fetch(`${API_URL}/clients/${clientId}`, { method: 'DELETE' }).then(() => this.notify());
+                return authProvider.fetchWithAuth(`${API_URL}/clients/${clientId}`, { method: 'DELETE' }).then(() => this.notify());
             },
-            getExercises: () => fetch(`${API_URL}/exercises`).then(res => res.json()),
+            getExercises: () => api._fetch(`${API_URL}/exercises`),
             setExercises(newExercises) {
-                return fetch(`${API_URL}/exercises`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newExercises) }).then(res => res.json()).then(data => { this.notify(); return data; });
+                return api._fetch(`${API_URL}/exercises`, { method: 'PUT', body: JSON.stringify(newExercises) }).then(data => { this.notify(); return data; });
             },
-            getNotifications: () => fetch(`${API_URL}/notifications`).then(res => res.json()),
+            getNotifications: () => api._fetch(`${API_URL}/notifications`),
             addNotification(message, type = 'info') {
-                 return fetch(`${API_URL}/notifications`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message, type }) }).then(res => res.json()).then(data => { this.notify(); return data; });
+                 return api._fetch(`${API_URL}/notifications`, { method: 'POST', body: JSON.stringify({ message, type }) }).then(data => { this.notify(); return data; });
             },
             clearNotifications() {
-                return fetch(`${API_URL}/notifications/clear`, { method: 'POST' }).then(() => this.notify());
+                return authProvider.fetchWithAuth(`${API_URL}/notifications/clear`, { method: 'POST' }).then(() => this.notify());
             },
             logWorkout(clientId, durationSeconds) {
-                return fetch(`${API_URL}/clients/${clientId}/log-workout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ durationSeconds }) }).then(res => res.json()).then(data => { this.notify(); return data; });
+                return api._fetch(`${API_URL}/clients/${clientId}/log-workout`, { method: 'POST', body: JSON.stringify({ durationSeconds }) }).then(data => { this.notify(); return data; });
             },
         };
 
@@ -1181,7 +1257,7 @@
         
         const AddExerciseToRoutineModal = ({isOpen, onClose, allExercises, onAdd}) => {
             const [selectedIds, setSelectedIds] = useState(new Set());
-            const handleToggle = (id) => { const newSet = new Set(selectedIds); if(newSet.has(id)) newSet.delete(id); else newSet.add(id); setSelectedIds(newSet); }
+            const handleToggle = (id) => { const newSet = new Set(selectedIds); if(newSet.has(id))newSet.delete(id); else newSet.add(id); setSelectedIds(newSet); }
             const handleSubmit = () => { const selected = allExercises.filter(ex => selectedIds.has(ex.id)); onAdd(selected); onClose(); setSelectedIds(new Set()); };
             return <Modal isOpen={isOpen} onClose={onClose} title="Añadir Ejercicios a la Rutina" className="max-w-2xl"><div className="max-h-[60vh] overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-2 pr-2">{allExercises.map(ex => (<div key={ex.id} onClick={() => handleToggle(ex.id)} className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedIds.has(ex.id) ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}><h4 className="font-bold">{ex.name}</h4><p className="text-xs text-gray-300">{(ex.tags || []).join(', ')}</p></div>))}</div><div className="mt-4 pt-4 border-t border-gray-700"><button onClick={handleSubmit} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Añadir Seleccionados</button></div></Modal>
         }
@@ -1210,20 +1286,23 @@
             useEffect(() => {
                 try {
                     const storedUser = localStorage.getItem('currentUser');
-                    if (storedUser) {
+                    const token = authProvider.getAccessToken();
+                    if (storedUser && token) {
                         setCurrentUser(JSON.parse(storedUser));
                     }
                 } catch (e) {
                     console.error("Failed to parse user from localStorage", e);
-                    localStorage.removeItem('currentUser');
+                    authProvider.clearTokens();
                 }
                 setAuthReady(true);
             }, []);
 
             useEffect(() => {
                 if (currentUser) {
-                    api.getExercises().then(setAllExercises);
-                    api.getNotifications().then(setNotifications);
+                    api.getExercises().then(setAllExercises).catch(console.error);
+                    if (currentUser.role === Role.Trainer) {
+                        api.getNotifications().then(setNotifications).catch(console.error);
+                    }
                 }
             }, [currentUser]);
 
@@ -1231,22 +1310,27 @@
                 if (!currentUser) return;
                 const unsubscribe = api.subscribe(() => {
                     console.log('API change detected, refreshing data...');
-                    api.getExercises().then(setAllExercises);
-                    api.getNotifications().then(setNotifications);
+                    api.getExercises().then(setAllExercises).catch(console.error);
+                    if (currentUser.role === Role.Trainer) {
+                        api.getNotifications().then(setNotifications).catch(console.error);
+                    }
                 });
                 return unsubscribe;
             }, [currentUser]);
 
             const handleLogin = (data) => {
-                localStorage.setItem('currentUser', JSON.stringify(data.user));
-                localStorage.setItem('token', data.token);
-                setCurrentUser(data.user);
+                const { user, accessToken, refreshToken, token } = data;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                if (user.role === Role.Client) {
+                    authProvider.setTokens(accessToken, refreshToken);
+                } else {
+                    authProvider.setTokens(token); // Trainer uses a single token
+                }
+                setCurrentUser(user);
             };
+            
             const handleLogout = () => { 
-                localStorage.removeItem('currentUser');
-                localStorage.removeItem('token');
-                setCurrentUser(null); 
-                setViewingClient(null); 
+                authProvider.logout();
             };
             
             const handleUpdateClient = (updatedClient) => {

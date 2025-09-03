@@ -133,6 +133,11 @@ const seedDatabase = async () => {
 // --- API ENDPOINTS ---
 
 // --- Auth ---
+const generateTokens = (payload) => {
+    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+    const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+    return { accessToken, refreshToken };
+};
 app.post('/api/auth/client/login', asyncHandler(async (req, res) => {
     const { name, password } = req.body;
     const client = await db.collection('clients').findOne({ name });
@@ -144,13 +149,40 @@ app.post('/api/auth/client/login', asyncHandler(async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, client.password);
 
     if (isPasswordValid) {
-        // Generar un token que no expira, según lo solicitado.
-        const token = jwt.sign({ clientId: client.id, role: 'client' }, JWT_SECRET);
-        
+        const payload = { userId: client.id, role: 'client' };
+        const { accessToken, refreshToken } = generateTokens(payload);
+
+        await db.collection('clients').updateOne({ _id: client._id }, { $set: { refreshToken } });
+
         const { password, ...clientData } = client;
-        res.json({ token, user: clientData });
+        res.json({ accessToken, refreshToken, user: clientData });
     } else {
         res.status(401).json({ message: 'Nombre de usuario o contraseña de cliente incorrectos.' });
+    }
+}));
+
+app.post('/api/auth/client/refresh-token', asyncHandler(async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(401).json({ message: 'Refresh token no proporcionado.' });
+    }
+
+    try {
+        const payload = jwt.verify(refreshToken, JWT_SECRET);
+        const client = await db.collection('clients').findOne({ id: payload.userId });
+
+        if (!client || client.refreshToken !== refreshToken) {
+            return res.status(403).json({ message: 'Refresh token inválido o revocado.' });
+        }
+
+        // Generar un nuevo access token
+        const newPayload = { userId: client.id, role: 'client' };
+        const { accessToken } = generateTokens(newPayload);
+
+        res.json({ accessToken });
+    } catch (error) {
+        return res.status(403).json({ message: 'Refresh token inválido o expirado.' });
     }
 }));
 
