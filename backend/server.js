@@ -142,6 +142,40 @@ const generateTokens = (payload) => {
     const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
     return { accessToken, refreshToken };
 };
+
+// --- Middleware de Autenticación ---
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+    if (!token) {
+        return res.status(401).json({ message: 'Token de acceso requerido.' });
+    }
+
+    jwt.verify(token, JWT_SECRET, async (err, payload) => {
+        if (err) {
+            console.error('Error verificando token:', err.message);
+            return res.status(403).json({ message: 'Token inválido o expirado.' });
+        }
+
+        req.user = payload;
+
+        // Verificar que el usuario existe en la base de datos
+        if (payload.role === 'client') {
+            const client = await db.collection('clients').findOne({ id: payload.userId });
+            if (!client) {
+                return res.status(403).json({ message: 'Usuario no encontrado.' });
+            }
+        } else if (payload.role === 'trainer') {
+            const trainer = await db.collection('trainers').findOne({ id: payload.trainerId });
+            if (!trainer) {
+                return res.status(403).json({ message: 'Entrenador no encontrado.' });
+            }
+        }
+
+        next();
+    });
+};
 app.post('/api/auth/client/login', asyncHandler(async (req, res) => {
     const { username, password } = req.body;
     const client = await db.collection('clients').findOne({ username });
@@ -249,7 +283,7 @@ app.post('/api/auth/trainer/register', asyncHandler(async (req, res) => {
 }));
 
 // --- Clients ---
-app.get('/api/clients', asyncHandler(async (req, res) => {
+app.get('/api/clients', authenticateToken, asyncHandler(async (req, res) => {
     const { trainerId } = req.query;
     if (!trainerId) {
         return res.status(400).json({ message: 'trainerId es requerido' });
@@ -258,7 +292,7 @@ app.get('/api/clients', asyncHandler(async (req, res) => {
     res.json(clients);
 }));
 
-app.post('/api/clients', asyncHandler(async (req, res) => {
+app.post('/api/clients', authenticateToken, asyncHandler(async (req, res) => {
     const { clientData, trainerId } = req.body;
 
     // Verificar si ya existe un cliente con el mismo nombre de usuario
@@ -292,7 +326,7 @@ app.post('/api/clients', asyncHandler(async (req, res) => {
     res.status(201).json(responseData);
 }));
 
-app.put('/api/clients/:id', asyncHandler(async (req, res) => {
+app.put('/api/clients/:id', authenticateToken, asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { password, _id, ...restOfBody } = req.body;
     
@@ -318,7 +352,7 @@ app.put('/api/clients/:id', asyncHandler(async (req, res) => {
     res.json(responseData);
 }));
 
-app.delete('/api/clients/:id', asyncHandler(async (req, res) => {
+app.delete('/api/clients/:id', authenticateToken, asyncHandler(async (req, res) => {
     const { id } = req.params;
     const result = await db.collection('clients').deleteOne({ id: id });
     if (result.deletedCount > 0) {
@@ -334,7 +368,7 @@ app.get('/api/exercises', asyncHandler(async (req, res) => {
     res.json(exerciseDoc ? exerciseDoc.data : []);
 }));
 
-app.put('/api/exercises', asyncHandler(async (req, res) => {
+app.put('/api/exercises', authenticateToken, asyncHandler(async (req, res) => {
     await db.collection('system').updateOne(
         { _id: 'exercises' },
         { $set: { data: req.body } },
@@ -344,12 +378,12 @@ app.put('/api/exercises', asyncHandler(async (req, res) => {
 }));
 
 // --- Notifications ---
-app.get('/api/notifications', asyncHandler(async (req, res) => {
+app.get('/api/notifications', authenticateToken, asyncHandler(async (req, res) => {
     const notifications = await db.collection('notifications').find().sort({ date: -1 }).toArray();
     res.json(notifications);
 }));
 
-app.post('/api/notifications', asyncHandler(async (req, res) => {
+app.post('/api/notifications', authenticateToken, asyncHandler(async (req, res) => {
     const { message, type = 'info' } = req.body;
     const newNotification = {
         id: `notif-${crypto.randomUUID()}`,
@@ -362,13 +396,13 @@ app.post('/api/notifications', asyncHandler(async (req, res) => {
     res.status(201).json(newNotification);
 }));
 
-app.post('/api/notifications/clear', asyncHandler(async (req, res) => {
+app.post('/api/notifications/clear', authenticateToken, asyncHandler(async (req, res) => {
     await db.collection('notifications').updateMany({ read: false }, { $set: { read: true } });
     res.status(204).send();
 }));
 
 // --- Workout Logs ---
-app.post('/api/clients/:id/log-workout', asyncHandler(async (req, res) => {
+app.post('/api/clients/:id/log-workout', authenticateToken, asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { durationSeconds } = req.body;
     
