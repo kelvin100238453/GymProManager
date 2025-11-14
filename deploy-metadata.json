@@ -1,0 +1,12 @@
+{
+  "deployTrigger": true,
+  "timestamp": "2025-11-15T06:50:00Z",
+  "reason": "Critical JWT middleware + frontend optimizations",
+  "changes": [
+    "JWT authentication middleware for protected routes",
+    "Auto-generate day titles based on muscle groups",
+    "MM:SS time mask for rest periods",
+    "Timer correction (minutes to seconds)"
+  ],
+  "buildNumber": 15
+}
