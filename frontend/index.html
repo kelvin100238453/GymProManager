@@ -812,8 +812,8 @@
                         <div className="grid grid-cols-2 gap-4">
                             <FormInput label="Series" name="sets" type="number" value={formData.sets} onChange={handleChange} />
                             <FormInput label="Reps" name="reps" type="text" value={formData.reps} onChange={handleChange} />
-                            <FormInput label="Tiempo (min)" name="time" type="number" step="0.1" value={formData.time} onChange={handleChange} />
-                            <FormInput label="Descanso (min)" name="rest" type="number" step="0.1" value={formData.rest} onChange={handleChange} required />
+                            <FormInput label="Tiempo (min)" name="time" type="text" value={formData.time} onChange={handleChange} placeholder="Ej: 5" />
+                            <FormInput label="Descanso (min)" name="rest" type="text" value={formData.rest} onChange={handleChange} required placeholder="Ej: 2" />
                         </div>
                         <FormInput label="URL de Imagen" name="imageUrl" value={formData.imageUrl} onChange={handleChange} />
                         {formData.imageUrl && <img src={formData.imageUrl} className="mt-2 rounded-lg max-h-40 w-auto"/>}
@@ -1190,6 +1190,13 @@
             const [selectedWeekIndex, setSelectedWeekIndex] = useState(0);
             const [newMeasurement, setNewMeasurement] = useState({ weight: '', waist: '', bicepsR: '', bicepsL: '', thighsR: '', thighsL: '', calvesR: '', calvesL: '' });
 
+            // Agregar automáticamente la Semana 1 si no existe
+            useEffect(() => {
+                if (activeTab === 'calendar' && (!client.customRoutine || client.customRoutine.length === 0)) {
+                    handleAddWeek();
+                }
+            }, [activeTab]);
+
             const handleMeasurementChange = (e) => {
                 setNewMeasurement({ ...newMeasurement, [e.target.name]: e.target.value });
             };
@@ -1315,19 +1322,25 @@
                         </div>
                         <button onClick={handleAddWeek} className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-lg whitespace-nowrap text-sm sm:text-base">
                             <PlusIcon className="w-5 h-5"/>
-                            <span className="hidden sm:inline">Añadir Semana</span>
-                            <span className="sm:hidden">Nueva</span>
+                            <span>Agregar Semana {routine.length + 1}</span>
                         </button>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-                        {DAYS_OF_WEEK.map(day => (
+                        {DAYS_OF_WEEK.map(day => {
+                            const dayExercises = currentWeekRoutine[day]?.exercises || [];
+                            const isRestDay = dayExercises.length === 0;
+                            return (
                             <div key={day} className="bg-gray-800/50 rounded-lg p-3 sm:p-4 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-base sm:text-lg font-bold text-white">{day}</h3>
+                                    {isRestDay && <span className="text-sm text-gray-400 italic">Día de Descanso</span>}
+                                </div>
                                 <input 
                                     type="text" 
                                     value={currentWeekRoutine[day]?.title || ''} 
                                     onChange={(e) => handleUpdateDayTitle(selectedWeekIndex, day, e.target.value)}
                                     placeholder="Título del día" 
-                                    className="w-full bg-gray-900 text-white text-base sm:text-lg font-bold p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full bg-gray-900 text-white text-sm sm:text-base font-semibold p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                                 <div className="space-y-2 min-h-[80px] sm:min-h-[100px]">
                                     {(currentWeekRoutine[day]?.exercises || []).map(ex => (
@@ -1352,7 +1365,7 @@
                                     <span>Añadir Ejercicio</span>
                                 </button>
                             </div>
-                        ))}
+                        );})}
                     </div>
                 </div>
             )}
@@ -1425,9 +1438,18 @@
             const [formData, setFormData] = useState(null);
             useEffect(() => { setFormData(customExercise ? { ...customExercise } : null); }, [customExercise, isOpen]);
             if(!formData) return null;
-            const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value }); };
+            const handleChange = (e) => { 
+                const value = e.target.value;
+                if (e.target.name === 'sets' || e.target.name === 'reps') {
+                    setFormData({ ...formData, [e.target.name]: value === '' ? 0 : parseInt(value) || 0 });
+                } else if (e.target.name === 'time' || e.target.name === 'rest') {
+                    setFormData({ ...formData, [e.target.name]: value === '' ? 0 : parseFloat(value) || 0 });
+                } else {
+                    setFormData({ ...formData, [e.target.name]: value });
+                }
+            };
             const handleSubmit = (e) => { e.preventDefault(); onSave(formData); };
-            return (<Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${formData.name}`}><form onSubmit={handleSubmit}><div className="grid grid-cols-2 gap-4"><FormInput label="Series" name="sets" type="number" value={formData.sets || ''} onChange={handleChange} /><FormInput label="Reps" name="reps" type="number" value={formData.reps || ''} onChange={handleChange} /><FormInput label="Tiempo (min)" name="time" type="number" step="0.1" value={formData.time || ''} onChange={handleChange} /><FormInput label="Descanso (min)" name="rest" type="number" step="0.1" value={formData.rest} onChange={handleChange} required /></div><FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} /><button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button></form></Modal>);
+            return (<Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${formData.name}`}><form onSubmit={handleSubmit}><div className="grid grid-cols-2 gap-4"><FormInput label="Series" name="sets" type="text" value={formData.sets || ''} onChange={handleChange} placeholder="Ej: 4" /><FormInput label="Reps" name="reps" type="text" value={formData.reps || ''} onChange={handleChange} placeholder="Ej: 12" /><FormInput label="Tiempo (min)" name="time" type="text" value={formData.time || ''} onChange={handleChange} placeholder="Ej: 5" /><FormInput label="Descanso (min)" name="rest" type="text" value={formData.rest || ''} onChange={handleChange} required placeholder="Ej: 2" /></div><FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} /><button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button></form></Modal>);
         }
         
         const WorkoutHistoryModal = ({ isOpen, onClose, logs }) => {
