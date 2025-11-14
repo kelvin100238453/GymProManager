@@ -1,0 +1,1611 @@
+{
+  "system": [
+    {
+      "_id": "exercises",
+      "data": [
+        {
+          "id": "ex-glute-01",
+          "name": "Hip Thrust con Barra",
+          "category": "Glúteos",
+          "tags": [
+            "Glúteos"
+          ],
+          "description": "Ejercicio clave para la fuerza y el tamaño de los glúteos.",
+          "sets": 4,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "ex-glute-02",
+          "name": "Sentadilla Búlgara con Mancuernas",
+          "category": "Glúteos",
+          "tags": [
+            "Glúteos",
+            "Piernas"
+          ],
+          "description": "Excelente para el glúteo y cuádriceps, trabaja de forma unilateral.",
+          "sets": 3,
+          "reps": 10,
+          "rest": 60
+        },
+        {
+          "id": "ex-glute-03",
+          "name": "Patada de Glúteo en Polea",
+          "category": "Glúteos",
+          "tags": [
+            "Glúteos"
+          ],
+          "description": "Aísla el glúteo mayor para una máxima contracción.",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "ex-glute-04",
+          "name": "Abducción de Cadera en Máquina",
+          "category": "Glúteos",
+          "tags": [
+            "Glúteos"
+          ],
+          "description": "Fortalece el glúteo medio y menor, mejorando la estabilidad de la cadera.",
+          "sets": 3,
+          "reps": 20,
+          "rest": 45
+        },
+        {
+          "id": "ex-glute-05",
+          "name": "Peso Muerto Rumano con Mancuernas",
+          "category": "Glúteos",
+          "tags": [
+            "Glúteos",
+            "Femorales"
+          ],
+          "description": "Enfatiza el trabajo en los isquiotibiales y glúteos.",
+          "sets": 4,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "ex-glute-06",
+          "name": "Puente de Glúteo con Banda",
+          "category": "Glúteos",
+          "tags": [
+            "Glúteos"
+          ],
+          "description": "Ejercicio de activación que se puede usar para calentar o como finisher.",
+          "sets": 3,
+          "reps": 20,
+          "rest": 30
+        },
+        {
+          "id": "ex-legs-01",
+          "name": "Sentadilla Goblet",
+          "category": "Piernas",
+          "tags": [
+            "Piernas",
+            "Cuádriceps"
+          ],
+          "description": "Variación de sentadilla que ayuda a mantener una postura correcta.",
+          "sets": 4,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "ex-legs-02",
+          "name": "Prensa de Piernas",
+          "category": "Piernas",
+          "tags": [
+            "Piernas",
+            "Cuádriceps",
+            "Glúteos"
+          ],
+          "description": "Permite mover cargas pesadas con gran seguridad para las piernas.",
+          "sets": 4,
+          "reps": 15,
+          "rest": 75
+        },
+        {
+          "id": "ex-legs-03",
+          "name": "Extensiones de Cuádriceps",
+          "category": "Piernas",
+          "tags": [
+            "Piernas",
+            "Cuádriceps"
+          ],
+          "description": "Aísla los cuádriceps para definirlos y fortalecerlos.",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "ex-legs-04",
+          "name": "Curl Femoral Tumbado",
+          "category": "Piernas",
+          "tags": [
+            "Piernas",
+            "Femorales"
+          ],
+          "description": "Aísla los isquiotibiales.",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "ex-legs-05",
+          "name": "Zancadas Caminando",
+          "category": "Piernas",
+          "tags": [
+            "Piernas",
+            "Cuádriceps",
+            "Glúteos"
+          ],
+          "description": "Ejercicio funcional que trabaja piernas y glúteos de forma dinámica.",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "ex-legs-06",
+          "name": "Sentadilla Sumo con Pesa Rusa",
+          "category": "Piernas",
+          "tags": [
+            "Piernas",
+            "Aductores",
+            "Glúteos"
+          ],
+          "description": "Enfatiza el trabajo en los aductores y glúteos.",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "ex-back-01",
+          "name": "Jalón al Pecho (Polea Alta)",
+          "category": "Espalda",
+          "tags": [
+            "Espalda",
+            "Dorsales"
+          ],
+          "description": "Desarrolla la amplitud de la espalda (dorsales).",
+          "sets": 4,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "ex-back-02",
+          "name": "Remo Sentado en Polea",
+          "category": "Espalda",
+          "tags": [
+            "Espalda"
+          ],
+          "description": "Trabaja la densidad y grosor de la espalda media.",
+          "sets": 4,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "ex-back-03",
+          "name": "Dominadas Asistidas",
+          "category": "Espalda",
+          "tags": [
+            "Espalda",
+            "Dorsales"
+          ],
+          "description": "Versión accesible de las dominadas para construir fuerza.",
+          "sets": 3,
+          "reps": 8,
+          "rest": 75
+        },
+        {
+          "id": "ex-back-04",
+          "name": "Pull-over con Mancuerna",
+          "category": "Espalda",
+          "tags": [
+            "Espalda",
+            "Dorsales",
+            "Pecho"
+          ],
+          "description": "Trabaja el dorsal y el serrato, expandiendo la caja torácica.",
+          "sets": 3,
+          "reps": 15,
+          "rest": 60
+        },
+        {
+          "id": "ex-shoulders-01",
+          "name": "Press Militar con Mancuernas",
+          "category": "Hombros",
+          "tags": [
+            "Hombros"
+          ],
+          "description": "Ejercicio fundamental para la fuerza y tamaño de los hombros.",
+          "sets": 4,
+          "reps": 10,
+          "rest": 75
+        },
+        {
+          "id": "ex-shoulders-02",
+          "name": "Elevaciones Laterales con Mancuernas",
+          "category": "Hombros",
+          "tags": [
+            "Hombros"
+          ],
+          "description": "Aísla la cabeza media del deltoides, dando amplitud a los hombros.",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "ex-shoulders-03",
+          "name": "Pájaros (Elevaciones Posteriores)",
+          "category": "Hombros",
+          "tags": [
+            "Hombros"
+          ],
+          "description": "Enfocado en el deltoides posterior, clave para una buena postura.",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "ex-shoulders-04",
+          "name": "Face Pulls en Polea",
+          "category": "Hombros",
+          "tags": [
+            "Hombros",
+            "Espalda"
+          ],
+          "description": "Mejora la salud del hombro y la postura, trabajando el deltoides posterior y manguito rotador.",
+          "sets": 3,
+          "reps": 20,
+          "rest": 45
+        },
+        {
+          "id": "ex-chest-01",
+          "name": "Press de Banca con Mancuernas",
+          "category": "Pecho",
+          "tags": [
+            "Pecho"
+          ],
+          "description": "Permite un mayor rango de movimiento que la barra, beneficiando el desarrollo pectoral.",
+          "sets": 4,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "ex-chest-02",
+          "name": "Aperturas con Mancuernas (Banco Inclinado)",
+          "category": "Pecho",
+          "tags": [
+            "Pecho"
+          ],
+          "description": "Enfocado en la parte superior del pectoral.",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "ex-chest-03",
+          "name": "Flexiones (Push-ups)",
+          "category": "Pecho",
+          "tags": [
+            "Pecho",
+            "Hombros",
+            "Tríceps"
+          ],
+          "description": "Ejercicio de peso corporal fundamental para el tren superior.",
+          "sets": 3,
+          "reps": 15,
+          "rest": 60
+        },
+        {
+          "id": "ex-arms-01",
+          "name": "Curl de Bíceps con Barra Z",
+          "category": "Brazos",
+          "tags": [
+            "Brazos",
+            "Bíceps"
+          ],
+          "description": "Reduce la tensión en las muñecas mientras se trabaja el bíceps.",
+          "sets": 3,
+          "reps": 12,
+          "rest": 45
+        },
+        {
+          "id": "ex-arms-02",
+          "name": "Extensiones de Tríceps en Polea Alta",
+          "category": "Brazos",
+          "tags": [
+            "Brazos",
+            "Tríceps"
+          ],
+          "description": "Aísla el tríceps para un desarrollo completo.",
+          "sets": 3,
+          "reps": 15,
+          "rest": 45
+        },
+        {
+          "id": "ex-arms-03",
+          "name": "Fondos en Banco",
+          "category": "Brazos",
+          "tags": [
+            "Brazos",
+            "Tríceps"
+          ],
+          "description": "Excelente ejercicio de peso corporal para tríceps.",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "ex-arms-04",
+          "name": "Curl Martillo con Mancuernas",
+          "category": "Brazos",
+          "tags": [
+            "Brazos",
+            "Bíceps",
+            "Antebrazo"
+          ],
+          "description": "Trabaja el braquial y el antebrazo además del bíceps.",
+          "sets": 3,
+          "reps": 12,
+          "rest": 45
+        },
+        {
+          "id": "ex-core-01",
+          "name": "Plancha (Plank)",
+          "category": "Abdomen y Core",
+          "tags": [
+            "Core",
+            "Abdomen"
+          ],
+          "description": "Ejercicio isométrico para la estabilidad de todo el core.",
+          "sets": 3,
+          "time": 60,
+          "rest": 30
+        },
+        {
+          "id": "ex-core-02",
+          "name": "Elevación de Piernas Colgado",
+          "category": "Abdomen y Core",
+          "tags": [
+            "Core",
+            "Abdomen"
+          ],
+          "description": "Intenso ejercicio para la parte inferior del abdomen.",
+          "sets": 3,
+          "reps": 15,
+          "rest": 60
+        },
+        {
+          "id": "ex-core-03",
+          "name": "Crunch Abdominal en Polea Alta",
+          "category": "Abdomen y Core",
+          "tags": [
+            "Core",
+            "Abdomen"
+          ],
+          "description": "Permite añadir resistencia al crunch para mayor hipertrofia.",
+          "sets": 3,
+          "reps": 20,
+          "rest": 45
+        },
+        {
+          "id": "ex-core-04",
+          "name": "Rueda Abdominal (Ab Wheel)",
+          "category": "Abdomen y Core",
+          "tags": [
+            "Core",
+            "Abdomen",
+            "Espalda"
+          ],
+          "description": "Ejercicio avanzado para una fuerza abdominal y de core superior.",
+          "sets": 3,
+          "reps": 12,
+          "rest": 60
+        },
+        {
+          "id": "ex-1762144105095",
+          "name": "caminata",
+          "description": "10 minutos",
+          "sets": 0,
+          "reps": 0,
+          "time": 0,
+          "rest": 120,
+          "imageUrl": "",
+          "videoUrl": "",
+          "category": "Cardio",
+          "tags": [
+            "Cardio"
+          ]
+        },
+        {
+          "id": "ex-1762145218059",
+          "name": "Peso muerto romno",
+          "description": "3 sets x 12-15 reps.",
+          "sets": 3,
+          "reps": "012",
+          "time": 0,
+          "rest": 180,
+          "imageUrl": "https://www.google.com/search?vsrid=CKidqaOAtZrHaRACGAEiJDA1OGQzZTdmLWE1MmYtNGQ0Mi04NDk3LTFjYTQ5OTU0MWFkODIGIgJiaSgCOMXvubeW1ZAD&vsint=CAIqDAoCCAcSAggKGAEgATojChYNAAAAPxUAAAA_HQAAgD8lAACAPzABEMAEGMQCJQAAgD8&udm=26&lns_mode=un&source=lns.web.gisivli&vsdim=576,324&gsessionid=lSFeQ9z3q8ZLvVqWFmm5wH-YbCDobL7oY5azNAZNrMXKeyVNfWiVSw&lsessionid=F3fsnCdjnngxvsok7fgezhffHdRaG4jS7jiHi3drdFKptqrZDd1leg&lns_surface=19&authuser=0&qsubts=1762145203118&biw=411&bih=805&ved=2ahUKEwj0n62nltWQAxUR78kDHaieMzsQh6cGegUIpwMQGg&tbnid=6C_-gDZ4aUJIlM&ictx=2",
+          "videoUrl": "",
+          "category": "Pierna",
+          "tags": [
+            "Pierna"
+          ]
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "_id": "68b876ab91f444c02908a972",
+      "id": "client-3d4ad74f-f044-42ed-a463-5b67827c9e9d",
+      "name": "Meri",
+      "level": "",
+      "goals": "",
+      "password": "$2b$10$O.rctWU0rQVHsPinQfNSzOoVSlnpxF29yG59lYHWW50cFDrAbNT0S",
+      "trainerId": "trainer-cba5e37f-2876-41b5-8641-6feed9b4552a",
+      "role": "client",
+      "measurements": [],
+      "customRoutine": [
+        {
+          "Lunes": {
+            "title": "Día de Descanso",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1756919482373-0.3238401665388301",
+                "exerciseId": "ex-glute-01",
+                "name": "Hip Thrust con Barra",
+                "description": "Ejercicio clave para la fuerza y el tamaño de los glúteos.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1756919482373-0.16310119034482184",
+                "exerciseId": "ex-glute-02",
+                "name": "Sentadilla Búlgara con Mancuernas",
+                "description": "Excelente para el glúteo y cuádriceps, trabaja de forma unilateral.",
+                "sets": 3,
+                "reps": 10,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1756919482373-0.7089744575071929",
+                "exerciseId": "ex-glute-03",
+                "name": "Patada de Glúteo en Polea",
+                "description": "Aísla el glúteo mayor para una máxima contracción.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1756946399138-0.2851523481807957",
+                "exerciseId": "ex-glute-03",
+                "name": "Patada de Glúteo en Polea",
+                "description": "Aísla el glúteo mayor para una máxima contracción.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1756946399138-0.3691922443916401",
+                "exerciseId": "ex-glute-04",
+                "name": "Abducción de Cadera en Máquina",
+                "description": "Fortalece el glúteo medio y menor, mejorando la estabilidad de la cadera.",
+                "sets": 3,
+                "reps": 20,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1756946399138-0.4240464544611293",
+                "exerciseId": "ex-glute-05",
+                "name": "Peso Muerto Rumano con Mancuernas",
+                "description": "Enfatiza el trabajo en los isquiotibiales y glúteos.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1756946399138-0.5855173654440664",
+                "exerciseId": "ex-glute-06",
+                "name": "Puente de Glúteo con Banda",
+                "description": "Ejercicio de activación que se puede usar para calentar o como finisher.",
+                "sets": 3,
+                "reps": 20,
+                "rest": 30
+              },
+              {
+                "instanceId": "ex-inst-1756946399138-0.6723457972777815",
+                "exerciseId": "ex-legs-01",
+                "name": "Sentadilla Goblet",
+                "description": "Variación de sentadilla que ayuda a mantener una postura correcta.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              }
+            ]
+          },
+          "Martes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Miércoles": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Jueves": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Viernes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Sábado": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Domingo": {
+            "title": "Día de Descanso",
+            "exercises": []
+          }
+        }
+      ],
+      "workoutLogs": [],
+      "username": "Me",
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbGllbnQtM2Q0YWQ3NGYtZjA0NC00MmVkLWE0NjMtNWI2NzgyN2M5ZTlkIiwicm9sZSI6ImNsaWVudCIsImlhdCI6MTc1ODY2MDE2OCwiZXhwIjoxNzU5MjY0OTY4fQ.UohAODkV5yxRxFZae3q26dalUkc1qAA_-nJQVlxPj9k"
+    },
+    {
+      "_id": "68b8802d01bf41bb9f3b4b3e",
+      "id": "client-ca6f2ab6-f9e3-4456-bc30-542aa9465bad",
+      "name": "3",
+      "username": "3",
+      "level": "",
+      "goals": "",
+      "password": "$2b$10$vL8MqTb1ZhpdIXVYWwPlIeRqBEbKvdsCOtuEOvfQDSD2qXkcxchzK",
+      "trainerId": "trainer-cba5e37f-2876-41b5-8641-6feed9b4552a",
+      "role": "client",
+      "measurements": [
+        {
+          "id": "m-client-ca6f2ab6-f9e3-4456-bc30-542aa9465bad-1760326388814",
+          "date": "2025-10-13",
+          "weight": 160.5,
+          "waist": null,
+          "bicepsR": null,
+          "bicepsL": null,
+          "thighsR": null,
+          "thighsL": null,
+          "calvesR": null,
+          "calvesL": null
+        }
+      ],
+      "customRoutine": [
+        {
+          "Lunes": {
+            "title": "Día de Descanso",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1758659749262-0.7634152726281898",
+                "exerciseId": "ex-glute-02",
+                "name": "Sentadilla Búlgara con Mancuernas",
+                "description": "Excelente para el glúteo y cuádriceps, trabaja de forma unilateral.",
+                "sets": 3,
+                "reps": 10,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1758659749262-0.7898058922529061",
+                "exerciseId": "ex-glute-03",
+                "name": "Patada de Glúteo en Polea",
+                "description": "Aísla el glúteo mayor para una máxima contracción.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              }
+            ]
+          },
+          "Martes": {
+            "title": "Día de Descanso",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1758660255803-0.12128266523078002",
+                "exerciseId": "ex-glute-02",
+                "name": "Sentadilla Búlgara con Mancuernas",
+                "description": "Excelente para el glúteo y cuádriceps, trabaja de forma unilateral.",
+                "sets": 3,
+                "reps": 10,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1758660255803-0.006640352390776871",
+                "exerciseId": "ex-glute-03",
+                "name": "Patada de Glúteo en Polea",
+                "description": "Aísla el glúteo mayor para una máxima contracción.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660255803-0.29499296342675174",
+                "exerciseId": "ex-glute-05",
+                "name": "Peso Muerto Rumano con Mancuernas",
+                "description": "Enfatiza el trabajo en los isquiotibiales y glúteos.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              }
+            ]
+          },
+          "Miércoles": {
+            "title": "Día de Descan",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1758660261211-0.1691707826565061",
+                "exerciseId": "ex-glute-02",
+                "name": "Sentadilla Búlgara con Mancuernas",
+                "description": "Excelente para el glúteo y cuádriceps, trabaja de forma unilateral.",
+                "sets": 3,
+                "reps": 10,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1758660261211-0.0867544966746785",
+                "exerciseId": "ex-glute-03",
+                "name": "Patada de Glúteo en Polea",
+                "description": "Aísla el glúteo mayor para una máxima contracción.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660261211-0.6589006883275895",
+                "exerciseId": "ex-glute-04",
+                "name": "Abducción de Cadera en Máquina",
+                "description": "Fortalece el glúteo medio y menor, mejorando la estabilidad de la cadera.",
+                "sets": 3,
+                "reps": 20,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660261211-0.24237138059913566",
+                "exerciseId": "ex-glute-05",
+                "name": "Peso Muerto Rumano con Mancuernas",
+                "description": "Enfatiza el trabajo en los isquiotibiales y glúteos.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              }
+            ]
+          },
+          "Jueves": {
+            "title": "Día de Descanso",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1758660272730-0.3024239371485944",
+                "exerciseId": "ex-glute-02",
+                "name": "Sentadilla Búlgara con Mancuernas",
+                "description": "Excelente para el glúteo y cuádriceps, trabaja de forma unilateral.",
+                "sets": 3,
+                "reps": 10,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1758660272730-0.9665238280022671",
+                "exerciseId": "ex-glute-03",
+                "name": "Patada de Glúteo en Polea",
+                "description": "Aísla el glúteo mayor para una máxima contracción.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660272730-0.6929757648090172",
+                "exerciseId": "ex-glute-04",
+                "name": "Abducción de Cadera en Máquina",
+                "description": "Fortalece el glúteo medio y menor, mejorando la estabilidad de la cadera.",
+                "sets": 3,
+                "reps": 20,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660272730-0.5308880516688795",
+                "exerciseId": "ex-glute-05",
+                "name": "Peso Muerto Rumano con Mancuernas",
+                "description": "Enfatiza el trabajo en los isquiotibiales y glúteos.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1758660272730-0.31805675098924435",
+                "exerciseId": "ex-glute-06",
+                "name": "Puente de Glúteo con Banda",
+                "description": "Ejercicio de activación que se puede usar para calentar o como finisher.",
+                "sets": 3,
+                "reps": 20,
+                "rest": 30
+              },
+              {
+                "instanceId": "ex-inst-1758660272730-0.9705665330166814",
+                "exerciseId": "ex-shoulders-02",
+                "name": "Elevaciones Laterales con Mancuernas",
+                "description": "Aísla la cabeza media del deltoides, dando amplitud a los hombros.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660272730-0.4417378716439768",
+                "exerciseId": "ex-shoulders-03",
+                "name": "Pájaros (Elevaciones Posteriores)",
+                "description": "Enfocado en el deltoides posterior, clave para una buena postura.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660272730-0.38271473748935536",
+                "exerciseId": "ex-shoulders-04",
+                "name": "Face Pulls en Polea",
+                "description": "Mejora la salud del hombro y la postura, trabajando el deltoides posterior y manguito rotador.",
+                "sets": 3,
+                "reps": 20,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660272730-0.009982594467346617",
+                "exerciseId": "ex-chest-01",
+                "name": "Press de Banca con Mancuernas",
+                "description": "Permite un mayor rango de movimiento que la barra, beneficiando el desarrollo pectoral.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1758660272730-0.2833053078232701",
+                "exerciseId": "ex-chest-02",
+                "name": "Aperturas con Mancuernas (Banco Inclinado)",
+                "description": "Enfocado en la parte superior del pectoral.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660272730-0.4323549441296505",
+                "exerciseId": "ex-arms-02",
+                "name": "Extensiones de Tríceps en Polea Alta",
+                "description": "Aísla el tríceps para un desarrollo completo.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660272730-0.09035470384888411",
+                "exerciseId": "ex-arms-03",
+                "name": "Fondos en Banco",
+                "description": "Excelente ejercicio de peso corporal para tríceps.",
+                "sets": 3,
+                "reps": 12,
+                "rest": 60
+              }
+            ]
+          },
+          "Viernes": {
+            "title": "Día de Descanso",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1758660279346-0.8095965044597585",
+                "exerciseId": "ex-glute-02",
+                "name": "Sentadilla Búlgara con Mancuernas",
+                "description": "Excelente para el glúteo y cuádriceps, trabaja de forma unilateral.",
+                "sets": 3,
+                "reps": 10,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1758660279346-0.8242030193184682",
+                "exerciseId": "ex-glute-03",
+                "name": "Patada de Glúteo en Polea",
+                "description": "Aísla el glúteo mayor para una máxima contracción.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660279346-0.42276399653385566",
+                "exerciseId": "ex-glute-04",
+                "name": "Abducción de Cadera en Máquina",
+                "description": "Fortalece el glúteo medio y menor, mejorando la estabilidad de la cadera.",
+                "sets": 3,
+                "reps": 20,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1758660279346-0.5422145370584409",
+                "exerciseId": "ex-glute-05",
+                "name": "Peso Muerto Rumano con Mancuernas",
+                "description": "Enfatiza el trabajo en los isquiotibiales y glúteos.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              }
+            ]
+          },
+          "Sábado": {
+            "title": "Día de Descanso",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1758660285474-0.11686622869150753",
+                "exerciseId": "ex-glute-05",
+                "name": "Peso Muerto Rumano con Mancuernas",
+                "description": "Enfatiza el trabajo en los isquiotibiales y glúteos.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1758660285474-0.01742274468774363",
+                "exerciseId": "ex-glute-06",
+                "name": "Puente de Glúteo con Banda",
+                "description": "Ejercicio de activación que se puede usar para calentar o como finisher.",
+                "sets": 3,
+                "reps": 20,
+                "rest": 30
+              },
+              {
+                "instanceId": "ex-inst-1758660285474-0.2594029139565255",
+                "exerciseId": "ex-legs-01",
+                "name": "Sentadilla Goblet",
+                "description": "Variación de sentadilla que ayuda a mantener una postura correcta.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1758660285474-0.5567552785401738",
+                "exerciseId": "ex-legs-02",
+                "name": "Prensa de Piernas",
+                "description": "Permite mover cargas pesadas con gran seguridad para las piernas.",
+                "sets": 4,
+                "reps": 15,
+                "rest": 75
+              }
+            ]
+          },
+          "Domingo": {
+            "title": "Día de Descanso",
+            "exercises": []
+          }
+        },
+        {
+          "Lunes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Martes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Miércoles": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Jueves": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Viernes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Sábado": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Domingo": {
+            "title": "Día de Descanso",
+            "exercises": []
+          }
+        }
+      ],
+      "workoutLogs": [],
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbGllbnQtY2E2ZjJhYjYtZjllMy00NDU2LWJjMzAtNTQyYWE5NDY1YmFkIiwicm9sZSI6ImNsaWVudCIsImlhdCI6MTc2MDMyNjI2OSwiZXhwIjoxNzYwOTMxMDY5fQ.PjhO4m45Jf4Y-zh4lIMzmx4sKcWW9S9WqQ3TfC0XpDs"
+    },
+    {
+      "_id": "68b8806901bf41bb9f3b4b3f",
+      "id": "client-32b64db6-735f-4eb4-98a2-c52eba0e89a6",
+      "name": "2",
+      "username": "2",
+      "level": "",
+      "goals": "",
+      "password": "$2b$10$8ApYERp//LGkUIWiXwN./ea8hUo7zYGzgozwOPCfQVx3eWxvPRAAu",
+      "trainerId": "trainer-cba5e37f-2876-41b5-8641-6feed9b4552a",
+      "role": "client",
+      "measurements": [],
+      "customRoutine": [
+        {
+          "Lunes": {
+            "title": "Día de Descanso",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1757095123007-0.060705065724075524",
+                "exerciseId": "ex-glute-02",
+                "name": "Sentadilla Búlgara con Mancuernas",
+                "description": "Excelente para el glúteo y cuádriceps, trabaja de forma unilateral.",
+                "sets": 3,
+                "reps": 10,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1757095123007-0.4940410456229444",
+                "exerciseId": "ex-glute-03",
+                "name": "Patada de Glúteo en Polea",
+                "description": "Aísla el glúteo mayor para una máxima contracción.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1757095123007-0.7969877387716017",
+                "exerciseId": "ex-glute-04",
+                "name": "Abducción de Cadera en Máquina",
+                "description": "Fortalece el glúteo medio y menor, mejorando la estabilidad de la cadera.",
+                "sets": 3,
+                "reps": 20,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1757095123007-0.2338875633415436",
+                "exerciseId": "ex-glute-06",
+                "name": "Puente de Glúteo con Banda",
+                "description": "Ejercicio de activación que se puede usar para calentar o como finisher.",
+                "sets": 3,
+                "reps": 20,
+                "rest": 30
+              }
+            ]
+          },
+          "Martes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Miércoles": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Jueves": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Viernes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Sábado": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Domingo": {
+            "title": "Día de Descanso",
+            "exercises": []
+          }
+        }
+      ],
+      "workoutLogs": [],
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbGllbnQtMzJiNjRkYjYtNzM1Zi00ZWI0LTk4YTItYzUyZWJhMGU4OWE2Iiwicm9sZSI6ImNsaWVudCIsImlhdCI6MTc1NzA5NTA3MiwiZXhwIjoxNzU3Njk5ODcyfQ.4zjmyB7dn5dXcWW9mWch4TSAT-uxiJ5Eg1_CCwNggew"
+    },
+    {
+      "_id": "68bb0a951d3c7ba088ac5d9e",
+      "id": "client-65a3e22b-b077-4a90-bb64-1e67765fc41b",
+      "name": "Kelvin",
+      "username": "K",
+      "level": "",
+      "goals": "",
+      "password": "$2b$10$bXRF.5PSfrcyjIqdXMrRWebooyJpCDqEbcnq89s2xWHDhGK1473w6",
+      "trainerId": "trainer-6cf72e63-4a98-4228-a7a6-d3fc93245650",
+      "role": "client",
+      "measurements": [],
+      "customRoutine": [
+        {
+          "Lunes": {
+            "title": "Día de Descans",
+            "exercises": []
+          },
+          "Martes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Miércoles": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Jueves": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Viernes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Sábado": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Domingo": {
+            "title": "Día de Descanso",
+            "exercises": []
+          }
+        }
+      ],
+      "workoutLogs": [],
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbGllbnQtNjVhM2UyMmItYjA3Ny00YTkwLWJiNjQtMWU2Nzc2NWZjNDFiIiwicm9sZSI6ImNsaWVudCIsImlhdCI6MTc1NzA5NDk5MSwiZXhwIjoxNzU3Njk5NzkxfQ.FEYyB2V4cOBM_hPm5-SJYQTZiirrZRm7021-yXdVvto"
+    },
+    {
+      "_id": "68f0d04cd8078ae90148ea7c",
+      "id": "client-033dd5d6-6134-4cc5-bca3-64469ad5a3da",
+      "name": "3",
+      "username": "cristiancnccyd@gmail.com",
+      "level": "1",
+      "goals": "Ganar masa muscular ",
+      "password": "$2b$10$el0d5oq0nQ/h4KAdYfHkO.0nbx/4E5Mlf37KcQktlehFJkH8F8QXu",
+      "trainerId": "trainer-dab39d2a-6d89-419a-acd0-5b5492d355d4",
+      "role": "client",
+      "measurements": [
+        {
+          "id": "m-client-033dd5d6-6134-4cc5-bca3-64469ad5a3da-1760613407120",
+          "date": "2025-10-16",
+          "weight": 120,
+          "waist": 35,
+          "bicepsR": 14,
+          "bicepsL": 14,
+          "thighsR": 19,
+          "thighsL": 19,
+          "calvesR": 12,
+          "calvesL": 12
+        }
+      ],
+      "customRoutine": [],
+      "workoutLogs": []
+    },
+    {
+      "_id": "69082df81f3220868c0bc9ab",
+      "id": "client-2e79f38a-738b-49a9-8da8-958d085ef7c0",
+      "name": "Meris",
+      "username": "Meris",
+      "level": "Bajo",
+      "goals": "",
+      "password": "$2b$10$PhIL.8GHLMFKCtvwk.Yqjecqs7i6OCo0yaEWSQnyf5NRp0e7ecThe",
+      "trainerId": "trainer-6cf72e63-4a98-4228-a7a6-d3fc93245650",
+      "role": "client",
+      "measurements": [],
+      "customRoutine": [
+        {
+          "Lunes": {
+            "title": "Piernas y Glúteos",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1762144305071-0.022735478287231325",
+                "exerciseId": "ex-1762144105095",
+                "name": "caminata",
+                "description": "10 minutos",
+                "sets": 0,
+                "reps": 0,
+                "time": 0,
+                "rest": 120
+              },
+              {
+                "instanceId": "ex-inst-1762144343091-0.4549978454829352",
+                "exerciseId": "ex-glute-01",
+                "name": "Hip Thrust con Barra",
+                "description": "Ejercicio clave para la fuerza y el tamaño de los glúteos.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1762144343091-0.2607983433651383",
+                "exerciseId": "ex-legs-02",
+                "name": "Prensa de Piernas",
+                "description": "Permite mover cargas pesadas con gran seguridad para las piernas.",
+                "sets": 4,
+                "reps": 15,
+                "rest": 75
+              },
+              {
+                "instanceId": "ex-inst-1762144418188-0.1729484962139296",
+                "exerciseId": "ex-legs-01",
+                "name": "Sentadilla Goblet",
+                "description": "Variación de sentadilla que ayuda a mantener una postura correcta.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1762144418188-0.487982167744492",
+                "exerciseId": "ex-legs-04",
+                "name": "Curl Femoral Tumbado",
+                "description": "Aísla los isquiotibiales.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1762144433117-0.269011149401181",
+                "exerciseId": "ex-glute-04",
+                "name": "Abducción de Cadera en Máquina",
+                "description": "Fortalece el glúteo medio y menor, mejorando la estabilidad de la cadera.",
+                "sets": 3,
+                "reps": 20,
+                "rest": 45
+              }
+            ]
+          },
+          "Martes": {
+            "title": "Tren Superior (Empuje y Tracción)",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1762144624077-0.7570096226317127",
+                "exerciseId": "ex-back-02",
+                "name": "Remo Sentado en Polea",
+                "description": "Trabaja la densidad y grosor de la espalda media.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1762144707976-0.8131782213362995",
+                "exerciseId": "ex-back-01",
+                "name": "Jalón al Pecho (Polea Alta)",
+                "description": "Desarrolla la amplitud de la espalda (dorsales).",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1762144707976-0.1464038140213969",
+                "exerciseId": "ex-back-02",
+                "name": "Remo Sentado en Polea",
+                "description": "Trabaja la densidad y grosor de la espalda media.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1762144784216-0.4564003355337105",
+                "exerciseId": "ex-back-04",
+                "name": "Pull-over con Mancuerna",
+                "description": "Trabaja el dorsal y el serrato, expandiendo la caja torácica.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1762144792599-0.5978774766595634",
+                "exerciseId": "ex-1762144105095",
+                "name": "caminata",
+                "description": "10 minutos",
+                "sets": 0,
+                "reps": 0,
+                "time": 0,
+                "rest": 120
+              }
+            ]
+          },
+          "Miércoles": {
+            "title": "Piernas y Glúteos (Énfasis en Cuádriceps)",
+            "exercises": [
+              {
+                "instanceId": "ex-inst-1762144886494-0.6090379311668151",
+                "exerciseId": "ex-legs-01",
+                "name": "Sentadilla Goblet",
+                "description": "Variación de sentadilla que ayuda a mantener una postura correcta.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1762144954216-0.8475026907735356",
+                "exerciseId": "ex-legs-05",
+                "name": "Zancadas Caminando",
+                "description": "Ejercicio funcional que trabaja piernas y glúteos de forma dinámica.",
+                "sets": 3,
+                "reps": 12,
+                "rest": 60
+              },
+              {
+                "instanceId": "ex-inst-1762144981569-0.31793762113462354",
+                "exerciseId": "ex-glute-03",
+                "name": "Patada de Glúteo en Polea",
+                "description": "Aísla el glúteo mayor para una máxima contracción.",
+                "sets": 3,
+                "reps": 15,
+                "rest": 45
+              },
+              {
+                "instanceId": "ex-inst-1762145243400-0.16990910700243134",
+                "exerciseId": "ex-glute-05",
+                "name": "Peso Muerto Rumano con Mancuernas",
+                "description": "Enfatiza el trabajo en los isquiotibiales y glúteos.",
+                "sets": 4,
+                "reps": 12,
+                "rest": 60
+              }
+            ]
+          },
+          "Jueves": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Viernes": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Sábado": {
+            "title": "Día de Descanso",
+            "exercises": []
+          },
+          "Domingo": {
+            "title": "Día de Descanso",
+            "exercises": []
+          }
+        }
+      ],
+      "workoutLogs": [
+        {
+          "date": "2025-11-03",
+          "duration": 7
+        }
+      ],
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbGllbnQtMmU3OWYzOGEtNzM4Yi00OWE5LThkYTgtOTU4ZDA4NWVmN2MwIiwicm9sZSI6ImNsaWVudCIsImlhdCI6MTc2MjE2NjgyMCwiZXhwIjoxNzYyNzcxNjIwfQ.QwoT_p99QoBNnsPKQ-KTiIO7Oqlb584jLnVcFzjIa6E"
+    }
+  ],
+  "trainers": [
+    {
+      "_id": "68b73d06ec7434d0b5f8578e",
+      "id": "trainer-6cf72e63-4a98-4228-a7a6-d3fc93245650",
+      "name": "Kelvin",
+      "email": "8092073906k@gmail.com",
+      "password": "$2b$10$neOjP1De/qLQhEMHIjqOC.zgSr8bpUZm4wPywBhDgw.p0ou68A8Em",
+      "role": "trainer"
+    },
+    {
+      "_id": "68b776b9acfb27122f6b08d3",
+      "id": "trainer-e9165080-0843-45c7-ad30-a699c82136c7",
+      "name": "kk",
+      "email": "k@gmail.com",
+      "password": "$2b$10$v6YBzkcnpgLU6ZQmRjpdSeOtZLYRO/bPIHjnGqtMCbDsz1YLTNm6e",
+      "role": "trainer"
+    },
+    {
+      "_id": "68b77759acfb27122f6b08d4",
+      "id": "trainer-0e8cf0b8-a7d0-412c-a84d-6ab260ecfbc0",
+      "name": "kk",
+      "email": "8k@gmail.com",
+      "password": "$2b$10$mJkLe61nK7riXq8m2E3IzuIRMClQJ4qw4kM5.TEB8wsvl9aspPxuW",
+      "role": "trainer"
+    },
+    {
+      "_id": "68b77765acfb27122f6b08d5",
+      "id": "trainer-94137a63-72fb-42be-a087-7d8575301367",
+      "name": "kk",
+      "email": "88k@gmail.com",
+      "password": "$2b$10$aJqjM.0g5KjJExVjv3snLuC2PGIJYl5UQIe8vDQOme9I8qNgL.09K",
+      "role": "trainer"
+    },
+    {
+      "_id": "68b77fd36ef5c4b446b73c9a",
+      "id": "trainer-cba5e37f-2876-41b5-8641-6feed9b4552a",
+      "name": "io",
+      "email": "3906k@gmail.com",
+      "password": "$2b$10$cz9RG3LncJ8C1ZviSNQEwemXdMMi6bwys8u5NjYztwjDMVc5GUiFy",
+      "role": "trainer"
+    },
+    {
+      "_id": "68f0cfe2d8078ae90148ea7b",
+      "id": "trainer-dab39d2a-6d89-419a-acd0-5b5492d355d4",
+      "name": "Cristiancnc",
+      "email": "cristiancnccyd@gmail.com",
+      "password": "$2b$10$I8v52Hufilfp0Mt6SI3aEu.Dm8dkLmKXwuoxZT4fqFVix2omuGWJW",
+      "role": "trainer"
+    },
+    {
+      "_id": "68f84c90bc017587a8431078",
+      "id": "trainer-bb5d4fe1-e80f-4f1f-a4aa-d20ad02bdaca",
+      "name": "Jennifer Ortega",
+      "email": "jennifer970812@gmail.com",
+      "password": "$2b$10$GeHP6js7J.KWM/wT6HNDoOtZhCeFrulotgTx5el2r4gv1mqxic1OG",
+      "role": "trainer"
+    },
+    {
+      "_id": "68fe2f40222d757c64c55c7c",
+      "id": "trainer-d38b4a58-6a1e-40bc-a7f2-86854e2da2f6",
+      "name": "Jennifer Ortega",
+      "email": "ortegajenni1012@gmail.com",
+      "password": "$2b$10$xJyrsT5JJa3ct8JWEJh0duFtuQuorsNoNuvTPcJC78sXI0Lu7OEsK",
+      "role": "trainer"
+    },
+    {
+      "_id": "68fe2f40222d757c64c55c7d",
+      "id": "trainer-a8407776-2825-4fa8-aad3-6eb948016dd8",
+      "name": "Jennifer Ortega",
+      "email": "ortegajenni1012@gmail.com",
+      "password": "$2b$10$a.0z.PJr95eeu5kB3cC4gOK83D9utHWqqj/NRmTtXf58rgpbzFlBi",
+      "role": "trainer"
+    }
+  ],
+  "notifications": [
+    {
+      "_id": "68b6299278036c0cd4adb9b8",
+      "id": "notif-93022b92-3995-4934-875e-320bb4f9f49a",
+      "message": "Cliente Meris ha iniciado su rutina de hoy: Día de Descanso.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-01T23:17:38.188Z"
+    },
+    {
+      "_id": "68b6299978036c0cd4adb9b9",
+      "id": "notif-e20ffd3f-633a-427c-ab00-34f811fbdb56",
+      "message": "Saltaste un set de Pecho.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-09-01T23:17:45.723Z"
+    },
+    {
+      "_id": "68b629a378036c0cd4adb9ba",
+      "id": "notif-104da03b-a4ff-4194-9c87-8a93ba40ae56",
+      "message": "¡Felicidades! Meris ha completado toda la rutina de hoy.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-01T23:17:55.192Z"
+    },
+    {
+      "_id": "68b629a378036c0cd4adb9bb",
+      "id": "notif-aeec244f-e49e-48d7-b5f7-f8b7a777058c",
+      "message": "Cliente Meris ha completado el ejercicio: Pecho.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-01T23:17:55.199Z"
+    },
+    {
+      "_id": "68b638282a80c7f0c3f36f9c",
+      "id": "notif-507b2096-0d5b-4239-8e0e-7be31f5c3f46",
+      "message": "Cliente Meris ha iniciado su rutina de hoy: Día de Descanso.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-02T00:19:52.789Z"
+    },
+    {
+      "_id": "68b638502a80c7f0c3f36f9d",
+      "id": "notif-4e7e076f-92d4-41e7-a191-b17c3b1be004",
+      "message": "Saltaste un set de Pecho.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-09-02T00:20:32.703Z"
+    },
+    {
+      "_id": "68b638532a80c7f0c3f36f9e",
+      "id": "notif-65a4c0b4-eb0e-4eb7-92e6-19125635c7af",
+      "message": "Saltaste un set de Pecho.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-09-02T00:20:35.769Z"
+    },
+    {
+      "_id": "68b638532a80c7f0c3f36f9f",
+      "id": "notif-2159aa93-1103-4f18-87cc-345c4ab70f06",
+      "message": "Cliente Meris ha completado el ejercicio: Pecho.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-02T00:20:35.783Z"
+    },
+    {
+      "_id": "68b638582a80c7f0c3f36fa0",
+      "id": "notif-b42c6c01-b7ef-49c5-bc59-c51599b10f23",
+      "message": "Cliente Meris se saltó el ejercicio: Sentadilla Búlgara con Mancuernas.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-09-02T00:20:40.902Z"
+    },
+    {
+      "_id": "68b638612a80c7f0c3f36fa2",
+      "id": "notif-2e4ff7dd-c360-4675-8f02-bfe6545be3a5",
+      "message": "¡Felicidades! Meris ha completado toda la rutina de hoy.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-02T00:20:49.571Z"
+    },
+    {
+      "_id": "68b638612a80c7f0c3f36fa1",
+      "id": "notif-6a5a56fb-1d9f-4eb7-b163-3b169ea91ab6",
+      "message": "Cliente Meris se saltó el ejercicio: Patada de Glúteo en Polea.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-09-02T00:20:49.570Z"
+    },
+    {
+      "_id": "68b788e4c8446c5933dd2192",
+      "id": "notif-d36715e6-bf5b-493d-a170-bc50578c0db8",
+      "message": "Cliente Meris ha iniciado su rutina de hoy: Día de Descanso.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-03T00:16:36.892Z"
+    },
+    {
+      "_id": "68b78936c8446c5933dd2193",
+      "id": "notif-80e43ff0-bea4-4d24-9194-905b2f5bba1a",
+      "message": "Cliente Meris ha iniciado su rutina de hoy: Día de Descanso.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-03T00:17:58.326Z"
+    },
+    {
+      "_id": "68b8e04fd459c4a2932f8863",
+      "id": "notif-432e1b31-9d4b-4151-877c-e3cd81b4855b",
+      "message": "Cliente Dismeris ha iniciado su rutina de hoy: Piernas.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-04T00:41:51.521Z"
+    },
+    {
+      "_id": "68b8e084d459c4a2932f8864",
+      "id": "notif-56123043-70f0-4441-a7d2-5405eed116ac",
+      "message": "Cliente Dismeris se saltó el ejercicio: Sentadilla Goblet.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-09-04T00:42:44.089Z"
+    },
+    {
+      "_id": "68b8e087d459c4a2932f8865",
+      "id": "notif-daae4f26-0fd9-451e-a52a-e2ff2562bcd6",
+      "message": "Saltaste un set de Prensa de Piernas.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-09-04T00:42:47.327Z"
+    },
+    {
+      "_id": "68bb254db243c03f7eab71e3",
+      "id": "notif-2fc43504-27d9-40d9-a35c-2c11f7c50f98",
+      "message": "Cliente Meri ha iniciado su rutina de hoy: Día de Descanso.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-05T18:00:45.005Z"
+    },
+    {
+      "_id": "68c09d80931b00686d29f45c",
+      "id": "notif-3e5d0ccf-12bd-4093-8a1e-3d2df51d5323",
+      "message": "Cliente Meri ha iniciado su rutina de hoy: Día de Descanso.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-09T21:34:56.217Z"
+    },
+    {
+      "_id": "68c3f5631be31c6221b65781",
+      "id": "notif-87aae75a-f0e1-4ceb-9dfb-b7d19c921864",
+      "message": "Cliente Dismeris ha iniciado su rutina de hoy: Piernas.",
+      "type": "info",
+      "read": true,
+      "date": "2025-09-12T10:26:43.037Z"
+    },
+    {
+      "_id": "68f83d109fb0eb89a430f24a",
+      "id": "notif-3cab8570-9119-41bc-af4d-b9f08ce3f06c",
+      "message": "Cliente Carlo mejia ha iniciado su rutina de hoy: Día de Descanso.",
+      "type": "info",
+      "read": true,
+      "date": "2025-10-22T02:10:24.817Z"
+    },
+    {
+      "_id": "68ff4b991b22ee722895d137",
+      "id": "notif-48456a34-ccbf-4ff1-8497-facc100f5f0e",
+      "message": "Cliente Carlo mejia ha iniciado su rutina de hoy: Piernas.",
+      "type": "info",
+      "read": true,
+      "date": "2025-10-27T10:38:17.961Z"
+    },
+    {
+      "_id": "68ff4c141b22ee722895d138",
+      "id": "notif-dd21ff60-78d0-45a8-a316-9ce484e620ce",
+      "message": "Cliente Carlo mejia ha iniciado su rutina de hoy: Piernas.",
+      "type": "info",
+      "read": true,
+      "date": "2025-10-27T10:40:20.309Z"
+    },
+    {
+      "_id": "6908346b1f3220868c0bc9ac",
+      "id": "notif-7e63cca7-88d3-4df6-b987-4a9345b24fc1",
+      "message": "Cliente Meris ha iniciado su rutina de hoy: Piernas y Glúteos (Énfasis en Cuádriceps).",
+      "type": "info",
+      "read": true,
+      "date": "2025-11-03T04:49:47.698Z"
+    },
+    {
+      "_id": "6908347c1f3220868c0bc9ad",
+      "id": "notif-8fd05c59-c821-40bf-a123-abedacab05f4",
+      "message": "Cliente Meris se saltó el ejercicio: Sentadilla Goblet.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-11-03T04:50:04.323Z"
+    },
+    {
+      "_id": "6908347e1f3220868c0bc9ae",
+      "id": "notif-02422879-7918-4bc6-a3a6-f88f049e82eb",
+      "message": "Cliente Meris se saltó el ejercicio: Zancadas Caminando.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-11-03T04:50:06.437Z"
+    },
+    {
+      "_id": "690834811f3220868c0bc9af",
+      "id": "notif-58df8a7a-84b9-4ea4-a440-66fe823c9560",
+      "message": "Saltaste un set de Patada de Glúteo en Polea.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-11-03T04:50:09.288Z"
+    },
+    {
+      "_id": "690834821f3220868c0bc9b0",
+      "id": "notif-c0fdd22a-3957-465d-95b3-bafe010a6677",
+      "message": "Saltaste un set de Patada de Glúteo en Polea.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-11-03T04:50:10.633Z"
+    },
+    {
+      "_id": "690834871f3220868c0bc9b1",
+      "id": "notif-bae655f3-c362-410a-ab98-6d26c68b7293",
+      "message": "Saltaste un set de Patada de Glúteo en Polea.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-11-03T04:50:15.848Z"
+    },
+    {
+      "_id": "690834881f3220868c0bc9b2",
+      "id": "notif-002c3ddc-19f7-4e1e-8d24-286fe0c3057a",
+      "message": "Cliente Meris ha completado el ejercicio: Patada de Glúteo en Polea.",
+      "type": "info",
+      "read": true,
+      "date": "2025-11-03T04:50:16.192Z"
+    },
+    {
+      "_id": "690834901f3220868c0bc9b3",
+      "id": "notif-67e96b84-7111-4a29-be73-eeb468d8ea53",
+      "message": "Saltaste un set de Peso Muerto Rumano con Mancuernas.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-11-03T04:50:24.456Z"
+    },
+    {
+      "_id": "6908349e1f3220868c0bc9b4",
+      "id": "notif-0b056fab-fd8f-4c0c-95e1-0ebcd349603e",
+      "message": "Saltaste un set de Peso Muerto Rumano con Mancuernas.",
+      "type": "warning",
+      "read": true,
+      "date": "2025-11-03T04:50:38.365Z"
+    },
+    {
+      "_id": "6908882908cb57b7ddc37a20",
+      "id": "notif-bc8409d0-d591-4689-af6c-b91d954ad888",
+      "message": "Cliente Meris ha iniciado su rutina de hoy: Piernas y Glúteos.",
+      "type": "info",
+      "read": true,
+      "date": "2025-11-03T10:47:05.299Z"
+    },
+    {
+      "_id": "6908882d08cb57b7ddc37a21",
+      "id": "notif-be582b2b-bd35-4278-bada-e3b4e73e7bc8",
+      "message": "Cliente Meris ha completado el ejercicio: caminata.",
+      "type": "info",
+      "read": true,
+      "date": "2025-11-03T10:47:09.730Z"
+    },
+    {
+      "_id": "690889f008cb57b7ddc37a22",
+      "id": "notif-8f925fde-dc7a-44d6-8207-e447822b95fd",
+      "message": "Cliente Meris ha completado el ejercicio: Zancadas Caminando.",
+      "type": "info",
+      "read": true,
+      "date": "2025-11-03T10:54:40.490Z"
+    }
+  ]
+}

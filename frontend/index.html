@@ -484,9 +484,9 @@
                                     <div className="text-indigo-400 text-sm font-semibold">
                                         {ex.sets && <span>{ex.sets} sets</span>}
                                         {ex.reps && <span> x {ex.reps} reps</span>}
-                                        {ex.time && <span>{ex.time} seg</span>}
+                                        {ex.time && <span>{Math.round(ex.time / 60)} min</span>}
                                         <span className="mx-2">|</span>
-                                        <span>{ex.rest} seg descanso</span>
+                                        <span>{ex.rest} min descanso</span>
                                     </div>
                                     {renderMedia(ex)}
                                     <p className="text-gray-300 mt-2 text-sm">{ex.description}</p>
@@ -609,9 +609,9 @@
                     <div className="text-indigo-400 text-sm font-semibold">
                         {exercise.sets && <span>{exercise.sets} sets</span>}
                         {exercise.reps && <span> x {exercise.reps} reps</span>}
-                        {exercise.time && <span>{exercise.time} seg</span>}
+                        {exercise.time && <span>{Math.round(exercise.time / 60)} min</span>}
                         <span className="mx-2">|</span>
-                        <span>{exercise.rest} seg descanso</span>
+                        <span>{exercise.rest} min descanso</span>
                     </div>
                     <p className="text-gray-300 mt-2 text-sm h-20 overflow-auto">{exercise.description}</p>
                 </div>
@@ -681,7 +681,7 @@
                     </div>
                     <div className="space-y-6">
                         {categories.map(category => (
-                            <details key={category} className="bg-gray-800/50 rounded-lg" open>
+                            <details key={category} className="bg-gray-800/50 rounded-lg">
                                 <summary className="text-xl font-bold text-white p-4 cursor-pointer flex justify-between items-center">
                                     <span>{category} <span className="text-base font-normal text-gray-400">({groupedExercises[category].length} Ejercicios)</span></span>
                                     <span className="transform transition-transform duration-200">▼</span>
@@ -719,8 +719,8 @@
                         <div className="grid grid-cols-2 gap-4">
                             <FormInput label="Series" name="sets" type="number" value={formData.sets} onChange={handleChange} />
                             <FormInput label="Reps" name="reps" type="text" value={formData.reps} onChange={handleChange} />
-                            <FormInput label="Tiempo (seg)" name="time" type="number" value={formData.time} onChange={handleChange} />
-                            <FormInput label="Descanso (seg)" name="rest" type="number" value={formData.rest} onChange={handleChange} required />
+                            <FormInput label="Tiempo (min)" name="time" type="number" step="0.1" value={formData.time} onChange={handleChange} />
+                            <FormInput label="Descanso (min)" name="rest" type="number" step="0.1" value={formData.rest} onChange={handleChange} required />
                         </div>
                         <FormInput label="URL de Imagen" name="imageUrl" value={formData.imageUrl} onChange={handleChange} />
                         {formData.imageUrl && <img src={formData.imageUrl} className="mt-2 rounded-lg max-h-40 w-auto"/>}
@@ -1258,9 +1258,56 @@
         
         const AddExerciseToRoutineModal = ({isOpen, onClose, allExercises, onAdd}) => {
             const [selectedIds, setSelectedIds] = useState(new Set());
+            const [searchTerm, setSearchTerm] = useState('');
             const handleToggle = (id) => { const newSet = new Set(selectedIds); if(newSet.has(id))newSet.delete(id); else newSet.add(id); setSelectedIds(newSet); }
-            const handleSubmit = () => { const selected = allExercises.filter(ex => selectedIds.has(ex.id)); onAdd(selected); onClose(); setSelectedIds(new Set()); };
-            return <Modal isOpen={isOpen} onClose={onClose} title="Añadir Ejercicios a la Rutina" className="max-w-2xl"><div className="max-h-[60vh] overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-2 pr-2">{allExercises.map(ex => (<div key={ex.id} onClick={() => handleToggle(ex.id)} className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedIds.has(ex.id) ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}><h4 className="font-bold">{ex.name}</h4><p className="text-xs text-gray-300">{(ex.tags || []).join(', ')}</p></div>))}</div><div className="mt-4 pt-4 border-t border-gray-700"><button onClick={handleSubmit} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Añadir Seleccionados</button></div></Modal>
+            const handleSubmit = () => { const selected = allExercises.filter(ex => selectedIds.has(ex.id)); onAdd(selected); onClose(); setSelectedIds(new Set()); setSearchTerm(''); };
+            
+            const filteredExercises = useMemo(() => {
+                return allExercises.filter(ex => ex.name.toLowerCase().includes(searchTerm.toLowerCase()));
+            }, [allExercises, searchTerm]);
+
+            const groupedExercises = useMemo(() => {
+                return filteredExercises.reduce((acc, ex) => {
+                    const category = ex.category || 'Sin Categoría';
+                    if (!acc[category]) acc[category] = [];
+                    acc[category].push(ex);
+                    return acc;
+                }, {});
+            }, [filteredExercises]);
+
+            const categories = Object.keys(groupedExercises).sort();
+
+            return <Modal isOpen={isOpen} onClose={onClose} title="Añadir Ejercicios a la Rutina" className="max-w-4xl">
+                <input 
+                    type="text"
+                    placeholder="Buscar ejercicio..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-gray-700 text-white rounded-lg py-2 px-3 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <div className="max-h-[60vh] overflow-y-auto space-y-3">
+                    {categories.map(category => (
+                        <details key={category} className="bg-gray-800/50 rounded-lg">
+                            <summary className="text-lg font-bold text-white p-3 cursor-pointer flex justify-between items-center hover:bg-gray-700/50 rounded-lg">
+                                <span>{category} <span className="text-sm font-normal text-gray-400">({groupedExercises[category].length} ejercicios, {groupedExercises[category].filter(ex => selectedIds.has(ex.id)).length} seleccionados)</span></span>
+                                <span className="transform transition-transform duration-200">▼</span>
+                            </summary>
+                            <div className="p-3 border-t border-indigo-800/50 grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {groupedExercises[category].map(ex => (
+                                    <div key={ex.id} onClick={() => handleToggle(ex.id)} className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedIds.has(ex.id) ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}>
+                                        <h4 className="font-bold">{ex.name}</h4>
+                                        <p className="text-xs text-gray-300">{(ex.tags || []).join(', ')}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </details>
+                    ))}
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-700 flex justify-between items-center">
+                    <span className="text-gray-300 font-semibold">{selectedIds.size} ejercicio(s) seleccionado(s)</span>
+                    <button onClick={handleSubmit} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg">Añadir Seleccionados</button>
+                </div>
+            </Modal>
         }
         
         const EditCustomExerciseModal = ({isOpen, onClose, customExercise, onSave}) => {
@@ -1269,7 +1316,7 @@
             if(!formData) return null;
             const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value }); };
             const handleSubmit = (e) => { e.preventDefault(); onSave(formData); };
-            return (<Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${formData.name}`}><form onSubmit={handleSubmit}><div className="grid grid-cols-2 gap-4"><FormInput label="Series" name="sets" type="number" value={formData.sets || ''} onChange={handleChange} /><FormInput label="Reps" name="reps" type="number" value={formData.reps || ''} onChange={handleChange} /><FormInput label="Tiempo (seg)" name="time" type="number" value={formData.time || ''} onChange={handleChange} /><FormInput label="Descanso (seg)" name="rest" type="number" value={formData.rest} onChange={handleChange} required /></div><FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} /><button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button></form></Modal>);
+            return (<Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${formData.name}`}><form onSubmit={handleSubmit}><div className="grid grid-cols-2 gap-4"><FormInput label="Series" name="sets" type="number" value={formData.sets || ''} onChange={handleChange} /><FormInput label="Reps" name="reps" type="number" value={formData.reps || ''} onChange={handleChange} /><FormInput label="Tiempo (min)" name="time" type="number" step="0.1" value={formData.time || ''} onChange={handleChange} /><FormInput label="Descanso (min)" name="rest" type="number" step="0.1" value={formData.rest} onChange={handleChange} required /></div><FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} /><button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button></form></Modal>);
         }
         
         const WorkoutHistoryModal = ({ isOpen, onClose, logs }) => {
