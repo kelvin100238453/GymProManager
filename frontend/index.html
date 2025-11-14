@@ -101,6 +101,66 @@
         const API_URL = 'https://gympromanager.onrender.com';
         const DAYS_OF_WEEK = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
+        // --- FUNCIONES DE UTILIDAD PARA TIEMPO ---
+        // Convierte minutos decimales a formato MM:SS string
+        const formatMinutesToMMSS = (minutes) => {
+            if (!minutes || minutes === 0) return '00:00';
+            const totalSeconds = Math.round(minutes * 60);
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        };
+
+        // Convierte string MM:SS o número simple a minutos decimales
+        const parseMMSSToMinutes = (input) => {
+            if (!input || input === '') return 0;
+            const str = input.toString().trim();
+            
+            // Si contiene ":", es formato MM:SS
+            if (str.includes(':')) {
+                const parts = str.split(':');
+                const mins = parseInt(parts[0]) || 0;
+                const secs = parseInt(parts[1]) || 0;
+                return mins + (secs / 60);
+            }
+            
+            // Si es número simple, lo tratamos como segundos y convertimos a minutos
+            const numValue = parseFloat(str);
+            if (!isNaN(numValue)) {
+                // Si es menor a 10, asumimos que son minutos
+                // Si es mayor, asumimos que son segundos
+                if (numValue <= 10) {
+                    return numValue;
+                } else {
+                    return numValue / 60;
+                }
+            }
+            
+            return 0;
+        };
+
+        // Genera título del día basado en los grupos musculares de los ejercicios
+        const generateDayTitle = (exercises, allExercises) => {
+            if (!exercises || exercises.length === 0) {
+                return 'Día de Descanso';
+            }
+
+            const muscleGroups = new Set();
+            exercises.forEach(ex => {
+                // Buscar el ejercicio en la biblioteca para obtener sus tags
+                const fullExercise = allExercises.find(e => e.id === ex.exerciseId);
+                if (fullExercise && fullExercise.tags) {
+                    fullExercise.tags.forEach(tag => muscleGroups.add(tag));
+                }
+            });
+
+            if (muscleGroups.size === 0) {
+                return 'Entrenamiento';
+            }
+
+            return Array.from(muscleGroups).join(', ');
+        };
+
         // --- GESTIÓN DE AUTENTICACIÓN Y API ---
         const authProvider = {
             getAccessToken: () => localStorage.getItem('accessToken'),
@@ -350,12 +410,14 @@
             const { sets = 1, reps = 0, time = 0, rest } = exercise;
             const [currentSet, setCurrentSet] = useState(1);
             const [isResting, setIsResting] = useState(startWithRest);
-            const [timerValue, setTimerValue] = useState(rest);
+            // CORRECCIÓN CRÍTICA: Convertir minutos a segundos para el temporizador
+            const [timerValue, setTimerValue] = useState(rest * 60);
             const [startTime] = useState(Date.now());
 
             useEffect(() => {
                 if (!isResting) return;
-                setTimerValue(rest);
+                // CORRECCIÓN CRÍTICA: Convertir minutos a segundos
+                setTimerValue(rest * 60);
                 const interval = setInterval(() => {
                     setTimerValue(prev => {
                         if (prev <= 1) {
@@ -1259,6 +1321,11 @@
                 }
                 
                 newRoutine[weekIndex][day].exercises.push(...newCustomExercises);
+                
+                // ACTUALIZACIÓN AUTOMÁTICA: Generar título basado en grupos musculares
+                const updatedExercises = newRoutine[weekIndex][day].exercises;
+                newRoutine[weekIndex][day].title = generateDayTitle(updatedExercises, allExercises);
+                
                 handleRoutineChange(newRoutine);
                 setAddExModalOpen(false);
             };
@@ -1276,6 +1343,11 @@
             const handleDeleteExercise = (weekIndex, day, instanceId) => {
                 const newRoutine = JSON.parse(JSON.stringify(localRoutine));
                 newRoutine[weekIndex][day].exercises = newRoutine[weekIndex][day].exercises.filter(e => e.instanceId !== instanceId);
+                
+                // ACTUALIZACIÓN AUTOMÁTICA: Regenerar título basado en ejercicios restantes
+                const updatedExercises = newRoutine[weekIndex][day].exercises;
+                newRoutine[weekIndex][day].title = generateDayTitle(updatedExercises, allExercises);
+                
                 handleRoutineChange(newRoutine);
             };
 
@@ -1375,7 +1447,9 @@
                                         <div key={ex.instanceId} className="bg-black/40 p-2 rounded-md flex justify-between items-center gap-2">
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-xs sm:text-sm truncate">{ex.name}</p>
-                                                <p className="text-xs text-gray-400">{ex.sets}x{ex.reps || `${ex.time}s`}, {ex.rest}s</p>
+                                                <p className="text-xs text-gray-400">
+                                                    {ex.sets}x{ex.reps || formatMinutesToMMSS(ex.time)}, Descanso: {formatMinutesToMMSS(ex.rest)}
+                                                </p>
                                             </div>
                                             <div className="flex gap-1 flex-shrink-0">
                                                 <button onClick={() => { setEditingEx({ ...ex, weekIndex: selectedWeekIndex, day }); setEditExModalOpen(true); }} className="p-1.5 text-gray-400 hover:text-white touch-manipulation">
@@ -1464,20 +1538,83 @@
         
         const EditCustomExerciseModal = ({isOpen, onClose, customExercise, onSave}) => {
             const [formData, setFormData] = useState(null);
-            useEffect(() => { setFormData(customExercise ? { ...customExercise } : null); }, [customExercise, isOpen]);
+            const [timeDisplay, setTimeDisplay] = useState('00:00');
+            const [restDisplay, setRestDisplay] = useState('00:00');
+            
+            useEffect(() => { 
+                if (customExercise) {
+                    setFormData({ ...customExercise });
+                    setTimeDisplay(formatMinutesToMMSS(customExercise.time || 0));
+                    setRestDisplay(formatMinutesToMMSS(customExercise.rest || 0));
+                } else {
+                    setFormData(null);
+                }
+            }, [customExercise, isOpen]);
+            
             if(!formData) return null;
+            
             const handleChange = (e) => { 
                 const value = e.target.value;
                 if (e.target.name === 'sets' || e.target.name === 'reps') {
                     setFormData({ ...formData, [e.target.name]: value === '' ? 0 : parseInt(value) || 0 });
-                } else if (e.target.name === 'time' || e.target.name === 'rest') {
-                    setFormData({ ...formData, [e.target.name]: value === '' ? 0 : parseFloat(value) || 0 });
+                } else if (e.target.name === 'time') {
+                    setTimeDisplay(value);
+                    const minutes = parseMMSSToMinutes(value);
+                    setFormData({ ...formData, time: minutes });
+                } else if (e.target.name === 'rest') {
+                    setRestDisplay(value);
+                    const minutes = parseMMSSToMinutes(value);
+                    setFormData({ ...formData, rest: minutes });
                 } else {
                     setFormData({ ...formData, [e.target.name]: value });
                 }
             };
-            const handleSubmit = (e) => { e.preventDefault(); onSave(formData); };
-            return (<Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${formData.name}`}><form onSubmit={handleSubmit}><div className="grid grid-cols-2 gap-4"><FormInput label="Series" name="sets" type="text" value={formData.sets || ''} onChange={handleChange} placeholder="Ej: 4" /><FormInput label="Reps" name="reps" type="text" value={formData.reps || ''} onChange={handleChange} placeholder="Ej: 12" /><FormInput label="Tiempo (min)" name="time" type="text" value={formData.time || ''} onChange={handleChange} placeholder="Ej: 5" /><FormInput label="Descanso (min)" name="rest" type="text" value={formData.rest || ''} onChange={handleChange} required placeholder="Ej: 2" /></div><FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} /><button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button></form></Modal>);
+            
+            const handleBlur = (field) => {
+                // Formatear al perder el foco
+                if (field === 'time') {
+                    const formatted = formatMinutesToMMSS(formData.time || 0);
+                    setTimeDisplay(formatted);
+                } else if (field === 'rest') {
+                    const formatted = formatMinutesToMMSS(formData.rest || 0);
+                    setRestDisplay(formatted);
+                }
+            };
+            
+            const handleSubmit = (e) => { 
+                e.preventDefault(); 
+                onSave(formData); 
+            };
+            
+            return (<Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${formData.name}`}>
+                <form onSubmit={handleSubmit}>
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormInput label="Series" name="sets" type="text" value={formData.sets || ''} onChange={handleChange} placeholder="Ej: 4" />
+                        <FormInput label="Reps" name="reps" type="text" value={formData.reps || ''} onChange={handleChange} placeholder="Ej: 12" />
+                        <FormInput 
+                            label="Tiempo (MM:SS)" 
+                            name="time" 
+                            type="text" 
+                            value={timeDisplay} 
+                            onChange={handleChange} 
+                            onBlur={() => handleBlur('time')}
+                            placeholder="Ej: 01:30" 
+                        />
+                        <FormInput 
+                            label="Descanso (MM:SS)" 
+                            name="rest" 
+                            type="text" 
+                            value={restDisplay} 
+                            onChange={handleChange} 
+                            onBlur={() => handleBlur('rest')}
+                            required 
+                            placeholder="Ej: 02:00" 
+                        />
+                    </div>
+                    <FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} />
+                    <button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button>
+                </form>
+            </Modal>);
         }
         
         const WorkoutHistoryModal = ({ isOpen, onClose, logs }) => {
