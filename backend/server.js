@@ -6,6 +6,7 @@ const path = require('path');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+// Force Render redeploy - 2025-11-15
 
 // Se recomienda guardar el secreto en una variable de entorno para mayor seguridad
 const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret';
