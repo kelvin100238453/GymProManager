@@ -1189,29 +1189,43 @@
             const [addingToDay, setAddingToDay] = useState(null);
             const [selectedWeekIndex, setSelectedWeekIndex] = useState(0);
             const [newMeasurement, setNewMeasurement] = useState({ weight: '', waist: '', bicepsR: '', bicepsL: '', thighsR: '', thighsL: '', calvesR: '', calvesL: '' });
+            const [localRoutine, setLocalRoutine] = useState(client.customRoutine || []);
+
+            // Sincronizar localRoutine con client.customRoutine cuando cambie
+            useEffect(() => {
+                if (client.customRoutine) {
+                    setLocalRoutine(client.customRoutine);
+                }
+            }, [client.customRoutine]);
 
             // Agregar automáticamente la Semana 1 si no existe
             useEffect(() => {
-                if (activeTab === 'calendar' && (!client.customRoutine || client.customRoutine.length === 0)) {
+                if (activeTab === 'calendar' && (!localRoutine || localRoutine.length === 0)) {
                     const newWeek = DAYS_OF_WEEK.reduce((acc, day) => ({ ...acc, [day]: { title: 'Día de Descanso', exercises: [] } }), {});
-                    onUpdateClient({ ...client, customRoutine: [newWeek] });
+                    const newRoutine = [newWeek];
+                    setLocalRoutine(newRoutine);
+                    onUpdateClient({ ...client, customRoutine: newRoutine });
                 }
-            }, [activeTab, client.id]);
+            }, [activeTab]);
 
             const handleMeasurementChange = (e) => {
                 setNewMeasurement({ ...newMeasurement, [e.target.name]: e.target.value });
             };
 
-            const handleRoutineChange = (newRoutine) => { onUpdateClient({ ...client, customRoutine: newRoutine }); };
+            const handleRoutineChange = (newRoutine) => { 
+                setLocalRoutine(newRoutine);
+                onUpdateClient({ ...client, customRoutine: newRoutine }); 
+            };
             
             const handleAddWeek = () => {
                 const newWeek = DAYS_OF_WEEK.reduce((acc, day) => ({ ...acc, [day]: { title: 'Día de Descanso', exercises: [] } }), {});
-                handleRoutineChange([...(client.customRoutine || []), newWeek]);
-                setSelectedWeekIndex((client.customRoutine || []).length);
+                const newRoutine = [...(localRoutine || []), newWeek];
+                handleRoutineChange(newRoutine);
+                setSelectedWeekIndex(newRoutine.length - 1);
             };
 
             const handleUpdateDayTitle = (weekIndex, day, title) => {
-                const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
+                const newRoutine = JSON.parse(JSON.stringify(localRoutine));
                 newRoutine[weekIndex][day].title = title;
                 handleRoutineChange(newRoutine);
             };
@@ -1221,8 +1235,8 @@
                 const { weekIndex, day } = addingToDay;
                 
                 // Validar que la rutina y la semana existan
-                if (!client.customRoutine || !client.customRoutine[weekIndex]) {
-                    console.error('La rutina o la semana no existen');
+                if (!localRoutine || !localRoutine[weekIndex]) {
+                    console.error('La rutina o la semana no existen', { localRoutine, weekIndex });
                     return;
                 }
                 
@@ -1237,7 +1251,7 @@
                     rest: ex.rest,
                 }));
 
-                const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
+                const newRoutine = JSON.parse(JSON.stringify(localRoutine));
                 
                 // Validar que el día exista en la semana
                 if (!newRoutine[weekIndex][day]) {
@@ -1252,7 +1266,7 @@
             const handleSaveCustomExercise = (updatedEx) => {
                 if(!editingEx) return;
                 const { weekIndex, day, instanceId } = editingEx;
-                const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
+                const newRoutine = JSON.parse(JSON.stringify(localRoutine));
                 const exIndex = newRoutine[weekIndex][day].exercises.findIndex(e => e.instanceId === instanceId);
                 if(exIndex > -1) newRoutine[weekIndex][day].exercises[exIndex] = { ...newRoutine[weekIndex][day].exercises[exIndex], ...updatedEx };
                 handleRoutineChange(newRoutine);
@@ -1260,7 +1274,7 @@
             };
             
             const handleDeleteExercise = (weekIndex, day, instanceId) => {
-                const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
+                const newRoutine = JSON.parse(JSON.stringify(localRoutine));
                 newRoutine[weekIndex][day].exercises = newRoutine[weekIndex][day].exercises.filter(e => e.instanceId !== instanceId);
                 handleRoutineChange(newRoutine);
             };
@@ -1288,7 +1302,7 @@
                 setEditModalOpen(false);
             };
 
-            const routine = client.customRoutine || [];
+            const routine = localRoutine || [];
             const currentWeekRoutine = routine[selectedWeekIndex] || {};
 
             return (<div className="min-h-screen bg-gray-900 text-gray-100 p-3 sm:p-4"><div className="max-w-7xl mx-auto"><button onClick={onBack} className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-4 font-semibold touch-manipulation"><ArrowLeftIcon className="w-5 h-5" /> Volver a Clientes</button><div className="bg-gray-800/50 rounded-lg p-4 sm:p-6 mb-4"><div className="flex flex-col sm:flex-row justify-between items-start gap-3"><h2 className="text-2xl sm:text-3xl font-bold text-white">{client.name}</h2><div className="flex gap-2"><button onClick={() => setEditModalOpen(true)} className="p-2 text-gray-400 hover:text-white touch-manipulation"><EditIcon className="w-5 h-5"/></button><button onClick={() => onDeleteClient(client.id)} className="p-2 text-gray-400 hover:text-red-500 touch-manipulation"><TrashIcon className="w-5 h-5"/></button></div></div><p className="text-sm sm:text-base text-gray-400">Nivel: {client.level} | Objetivos: {client.goals}</p></div><div className="flex space-x-1 bg-gray-800 rounded-lg p-1 mb-4 overflow-x-auto"><button onClick={() => setActiveTab('progress')} className={`flex-1 min-w-[120px] flex justify-center items-center gap-2 p-2 rounded-md transition text-sm sm:text-base ${activeTab === 'progress' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}><ChartBarIcon className="w-4 h-4 sm:w-5 sm:h-5"/> Progreso</button><button onClick={() => setActiveTab('calendar')} className={`flex-1 min-w-[120px] flex justify-center items-center gap-2 p-2 rounded-md transition text-sm sm:text-base ${activeTab === 'calendar' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}><CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5"/> Calendario</button></div>
