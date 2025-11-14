@@ -1193,9 +1193,10 @@
             // Agregar automáticamente la Semana 1 si no existe
             useEffect(() => {
                 if (activeTab === 'calendar' && (!client.customRoutine || client.customRoutine.length === 0)) {
-                    handleAddWeek();
+                    const newWeek = DAYS_OF_WEEK.reduce((acc, day) => ({ ...acc, [day]: { title: 'Día de Descanso', exercises: [] } }), {});
+                    onUpdateClient({ ...client, customRoutine: [newWeek] });
                 }
-            }, [activeTab]);
+            }, [activeTab, client.id]);
 
             const handleMeasurementChange = (e) => {
                 setNewMeasurement({ ...newMeasurement, [e.target.name]: e.target.value });
@@ -1218,6 +1219,13 @@
             const handleAddExercises = (exercisesToAdd) => {
                 if (!addingToDay) return;
                 const { weekIndex, day } = addingToDay;
+                
+                // Validar que la rutina y la semana existan
+                if (!client.customRoutine || !client.customRoutine[weekIndex]) {
+                    console.error('La rutina o la semana no existen');
+                    return;
+                }
+                
                 const newCustomExercises = exercisesToAdd.map(ex => ({
                     instanceId: `ex-inst-${Date.now()}-${Math.random()}`,
                     exerciseId: ex.id,
@@ -1230,6 +1238,12 @@
                 }));
 
                 const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
+                
+                // Validar que el día exista en la semana
+                if (!newRoutine[weekIndex][day]) {
+                    newRoutine[weekIndex][day] = { title: 'Día de Descanso', exercises: [] };
+                }
+                
                 newRoutine[weekIndex][day].exercises.push(...newCustomExercises);
                 handleRoutineChange(newRoutine);
                 setAddExModalOpen(false);
