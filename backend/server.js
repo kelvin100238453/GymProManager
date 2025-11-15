@@ -390,15 +390,47 @@ app.post('/api/notifications', authenticateToken, asyncHandler(async (req, res) 
         message,
         type,
         read: false,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        createdAt: new Date(),
+        viewedAt: null
     };
     await db.collection('notifications').insertOne(newNotification);
     res.status(201).json(newNotification);
 }));
 
 app.post('/api/notifications/clear', authenticateToken, asyncHandler(async (req, res) => {
-    await db.collection('notifications').updateMany({ read: false }, { $set: { read: true } });
+    await db.collection('notifications').updateMany(
+        { read: false }, 
+        { $set: { read: true, viewedAt: new Date() } }
+    );
     res.status(204).send();
+}));
+
+// Endpoint de limpieza automática de notificaciones
+app.delete('/api/notifications/cleanup', asyncHandler(async (req, res) => {
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+
+    // Eliminar notificaciones NO VISTAS después de 7 días
+    const unviewedResult = await db.collection('notifications').deleteMany({
+        read: false,
+        createdAt: { $lt: sevenDaysAgo }
+    });
+
+    // Eliminar notificaciones VISTAS después de 4 horas
+    const viewedResult = await db.collection('notifications').deleteMany({
+        read: true,
+        viewedAt: { $ne: null, $lt: fourHoursAgo }
+    });
+
+    console.log(`Limpieza de notificaciones: ${unviewedResult.deletedCount} no vistas (>7 días), ${viewedResult.deletedCount} vistas (>4 horas)`);
+    
+    res.json({ 
+        message: 'Limpieza completada',
+        deletedUnviewed: unviewedResult.deletedCount,
+        deletedViewed: viewedResult.deletedCount
+    });
 }));
 
 // --- Workout Logs ---
@@ -436,10 +468,42 @@ app.get(/^(?!\/api).*/, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
+// --- LIMPIEZA AUTOMÁTICA DE NOTIFICACIONES ---
+const autoCleanupNotifications = async () => {
+    try {
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+
+        // Eliminar notificaciones NO VISTAS después de 7 días
+        const unviewedResult = await db.collection('notifications').deleteMany({
+            read: false,
+            createdAt: { $lt: sevenDaysAgo }
+        });
+
+        // Eliminar notificaciones VISTAS después de 4 horas
+        const viewedResult = await db.collection('notifications').deleteMany({
+            read: true,
+            viewedAt: { $ne: null, $lt: fourHoursAgo }
+        });
+
+        if (unviewedResult.deletedCount > 0 || viewedResult.deletedCount > 0) {
+            console.log(`[${new Date().toISOString()}] Limpieza automática: ${unviewedResult.deletedCount} no vistas (>7 días), ${viewedResult.deletedCount} vistas (>4 horas)`);
+        }
+    } catch (error) {
+        console.error('Error en limpieza automática de notificaciones:', error);
+    }
+};
+
 // --- INICIAR SERVIDOR ---
 const startServer = async () => {
     await connectDb(); // Conecta a la base de datos primero
     await seedDatabase(); // Puebla la base de datos con ejercicios
+    
+    // Ejecutar limpieza automática cada hora
+    setInterval(autoCleanupNotifications, 60 * 60 * 1000); // 1 hora
+    console.log('Tarea de limpieza automática de notificaciones programada (cada 1 hora)');
+    
     app.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
         console.log('Conectado a la base de datos MongoDB.');
