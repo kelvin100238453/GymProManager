@@ -7,7 +7,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// Force rebuild: 2025-11-16 22:52
+// Force rebuild: 2025-11-16 23:10 - Fix TimeInput labels and React keys
 // Se recomienda guardar el secreto en una variable de entorno para mayor seguridad
 const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret';
 
