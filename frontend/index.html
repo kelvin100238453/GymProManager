@@ -328,6 +328,96 @@
                 <textarea className="w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" {...props}></textarea>
             </div>
         );
+        
+        // --- COMPONENTE DE CAMPOS SEPARADOS MM/SS ---
+        const TimeInputSeparated = ({ label, value, onChange, required = false }) => {
+            // Convertir minutos decimales a MM y SS
+            const getMMSSFromMinutes = (minutes) => {
+                if (!minutes || minutes === 0) return { mm: '', ss: '' };
+                const totalSeconds = Math.round(minutes * 60);
+                const mins = Math.floor(totalSeconds / 60);
+                const secs = totalSeconds % 60;
+                return { mm: mins.toString(), ss: secs.toString() };
+            };
+            
+            const initialValues = getMMSSFromMinutes(value);
+            const [mm, setMM] = useState(initialValues.mm);
+            const [ss, setSS] = useState(initialValues.ss);
+            const [error, setError] = useState('');
+            
+            // Actualizar cuando el valor externo cambie
+            useEffect(() => {
+                const newValues = getMMSSFromMinutes(value);
+                setMM(newValues.mm);
+                setSS(newValues.ss);
+            }, [value]);
+            
+            const handleMMChange = (e) => {
+                const val = e.target.value;
+                // Permitir solo números
+                if (val === '' || /^\d+$/.test(val)) {
+                    setMM(val);
+                    updateParent(val, ss);
+                    setError('');
+                }
+            };
+            
+            const handleSSChange = (e) => {
+                const val = e.target.value;
+                // Permitir solo números
+                if (val === '' || /^\d+$/.test(val)) {
+                    const numVal = parseInt(val) || 0;
+                    // Validar que los segundos estén entre 0 y 59
+                    if (numVal >= 0 && numVal <= 59) {
+                        setSS(val);
+                        updateParent(mm, val);
+                        setError('');
+                    } else if (val !== '') {
+                        setError('Los segundos deben estar entre 0 y 59');
+                    }
+                }
+            };
+            
+            const updateParent = (minutes, seconds) => {
+                const mins = parseInt(minutes) || 0;
+                const secs = parseInt(seconds) || 0;
+                const totalMinutes = mins + (secs / 60);
+                onChange(totalMinutes);
+            };
+            
+            return (
+                <div className="mb-4">
+                    <label className="block text-indigo-300 text-sm font-bold mb-2">
+                        {label}
+                        {required && <span className="text-red-400 ml-1">*</span>}
+                    </label>
+                    <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                            <input 
+                                type="text" 
+                                value={mm}
+                                onChange={handleMMChange}
+                                placeholder=""
+                                className="w-full bg-gray-700 text-white rounded py-2 px-3 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                            <div className="text-xs text-gray-400 text-center mt-1">MM</div>
+                        </div>
+                        <div className="text-white text-xl font-bold pb-5">--</div>
+                        <div className="flex-1">
+                            <input 
+                                type="text" 
+                                value={ss}
+                                onChange={handleSSChange}
+                                placeholder=""
+                                className="w-full bg-gray-700 text-white rounded py-2 px-3 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                            <div className="text-xs text-gray-400 text-center mt-1">SS</div>
+                        </div>
+                    </div>
+                    {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+                </div>
+            );
+        };
 
         // --- COMPONENTE DE CONSEJOS CON IA ---
         const GeminiTip = ({ exerciseName }) => {
@@ -859,7 +949,22 @@
             useEffect(() => {
                 setFormData(exercise || { id: '', name: '', description: '', sets: 0, reps: 0, time: 0, rest: 0, imageUrl: '', videoUrl: '', category: '' });
             }, [exercise, isOpen]);
-            const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value });
+            
+            const handleChange = (e) => {
+                if (e.target.name === 'sets' || e.target.name === 'reps') {
+                    setFormData({ ...formData, [e.target.name]: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 });
+                } else {
+                    setFormData({ ...formData, [e.target.name]: e.target.value });
+                }
+            };
+            
+            const handleTimeChange = (minutes) => {
+                setFormData({ ...formData, time: minutes });
+            };
+            
+            const handleRestChange = (minutes) => {
+                setFormData({ ...formData, rest: minutes });
+            };
             
             const handleSubmit = (e) => {
                 e.preventDefault();
@@ -872,10 +977,19 @@
                         <FormInput label="Categoría" name="category" value={formData.category} onChange={handleChange} placeholder="Ej: Pecho, Espalda..." />
                         <FormTextarea label="Descripción" name="description" value={formData.description} onChange={handleChange} />
                         <div className="grid grid-cols-2 gap-4">
-                            <FormInput label="Series" name="sets" type="number" value={formData.sets} onChange={handleChange} />
-                            <FormInput label="Reps" name="reps" type="text" value={formData.reps} onChange={handleChange} />
-                            <FormInput label="Tiempo (min)" name="time" type="text" value={formData.time} onChange={handleChange} placeholder="Ej: 5" />
-                            <FormInput label="Descanso (min)" name="rest" type="text" value={formData.rest} onChange={handleChange} required placeholder="Ej: 2" />
+                            <FormInput label="Series" name="sets" type="text" value={formData.sets || ''} onChange={handleChange} placeholder="Ej: 4" />
+                            <FormInput label="Reps" name="reps" type="text" value={formData.reps || ''} onChange={handleChange} placeholder="Ej: 12" />
+                            <TimeInputSeparated 
+                                label="Tiempo" 
+                                value={formData.time || 0}
+                                onChange={handleTimeChange}
+                            />
+                            <TimeInputSeparated 
+                                label="Descanso" 
+                                value={formData.rest || 0}
+                                onChange={handleRestChange}
+                                required
+                            />
                         </div>
                         <FormInput label="URL de Imagen" name="imageUrl" value={formData.imageUrl} onChange={handleChange} />
                         {formData.imageUrl && <img src={formData.imageUrl} className="mt-2 rounded-lg max-h-40 w-auto"/>}
@@ -1664,14 +1778,10 @@
         
         const EditCustomExerciseModal = ({isOpen, onClose, customExercise, onSave}) => {
             const [formData, setFormData] = useState(null);
-            const [timeDisplay, setTimeDisplay] = useState('00:00');
-            const [restDisplay, setRestDisplay] = useState('00:00');
             
             useEffect(() => { 
                 if (customExercise) {
                     setFormData({ ...customExercise });
-                    setTimeDisplay(formatMinutesToMMSS(customExercise.time || 0));
-                    setRestDisplay(formatMinutesToMMSS(customExercise.rest || 0));
                 } else {
                     setFormData(null);
                 }
@@ -1683,28 +1793,17 @@
                 const value = e.target.value;
                 if (e.target.name === 'sets' || e.target.name === 'reps') {
                     setFormData({ ...formData, [e.target.name]: value === '' ? 0 : parseInt(value) || 0 });
-                } else if (e.target.name === 'time') {
-                    setTimeDisplay(value);
-                    const minutes = parseMMSSToMinutes(value);
-                    setFormData({ ...formData, time: minutes });
-                } else if (e.target.name === 'rest') {
-                    setRestDisplay(value);
-                    const minutes = parseMMSSToMinutes(value);
-                    setFormData({ ...formData, rest: minutes });
                 } else {
                     setFormData({ ...formData, [e.target.name]: value });
                 }
             };
             
-            const handleBlur = (field) => {
-                // Formatear al perder el foco
-                if (field === 'time') {
-                    const formatted = formatMinutesToMMSS(formData.time || 0);
-                    setTimeDisplay(formatted);
-                } else if (field === 'rest') {
-                    const formatted = formatMinutesToMMSS(formData.rest || 0);
-                    setRestDisplay(formatted);
-                }
+            const handleTimeChange = (minutes) => {
+                setFormData({ ...formData, time: minutes });
+            };
+            
+            const handleRestChange = (minutes) => {
+                setFormData({ ...formData, rest: minutes });
             };
             
             const handleSubmit = (e) => { 
@@ -1717,24 +1816,16 @@
                     <div className="grid grid-cols-2 gap-4">
                         <FormInput label="Series" name="sets" type="text" value={formData.sets || ''} onChange={handleChange} placeholder="Ej: 4" />
                         <FormInput label="Reps" name="reps" type="text" value={formData.reps || ''} onChange={handleChange} placeholder="Ej: 12" />
-                        <FormInput 
-                            label="Tiempo (MM:SS)" 
-                            name="time" 
-                            type="text" 
-                            value={timeDisplay} 
-                            onChange={handleChange} 
-                            onBlur={() => handleBlur('time')}
-                            placeholder="Ej: 01:30" 
+                        <TimeInputSeparated 
+                            label="Tiempo" 
+                            value={formData.time || 0}
+                            onChange={handleTimeChange}
                         />
-                        <FormInput 
-                            label="Descanso (MM:SS)" 
-                            name="rest" 
-                            type="text" 
-                            value={restDisplay} 
-                            onChange={handleChange} 
-                            onBlur={() => handleBlur('rest')}
-                            required 
-                            placeholder="Ej: 02:00" 
+                        <TimeInputSeparated 
+                            label="Descanso" 
+                            value={formData.rest || 0}
+                            onChange={handleRestChange}
+                            required
                         />
                     </div>
                     <FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} />
