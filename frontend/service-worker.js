@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gympro-manager-v2'; // Cambiado a v2 para forzar la actualización
+const CACHE_NAME = 'gympro-manager-v3-20251116'; // CRITICAL FIX: TimeInput + Measurements + React Keys
 const urlsToCache = [
   '/',
   '/index.html',

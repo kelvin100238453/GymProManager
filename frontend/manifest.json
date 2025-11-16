@@ -1,6 +1,8 @@
 {
   "short_name": "GymPro",
   "name": "GymPro Manager",
+  "version": "1.0.3",
+  "build": "20251116-231700",
   "icons": [
     {
       "src": "icon.svg",
