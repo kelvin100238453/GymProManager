@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gympro-manager-v3-20251116'; // CRITICAL FIX: TimeInput + Measurements + React Keys
+const CACHE_NAME = 'gympro-manager-v5-20251117-000600'; // TIEMPO EN SEGUNDOS
 const urlsToCache = [
   '/',
   '/index.html',
