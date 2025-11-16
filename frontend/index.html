@@ -1242,6 +1242,8 @@
             const measurementKeys = [
                 { key: 'weight', label: 'Peso (lb)', lowerIsBetter: true },
                 { key: 'waist', label: 'Cintura (cm)', lowerIsBetter: true },
+                { key: 'chest', label: 'Pecho (cm)' },
+                { key: 'hips', label: 'Caderas (cm)', lowerIsBetter: true },
                 { key: 'bicepsR', label: 'Bíceps D (cm)' },
                 { key: 'bicepsL', label: 'Bíceps I (cm)' },
                 { key: 'thighsR', label: 'Muslo D (cm)' },
@@ -1308,7 +1310,7 @@
             const [editingEx, setEditingEx] = useState(null);
             const [addingToDay, setAddingToDay] = useState(null);
             const [selectedWeekIndex, setSelectedWeekIndex] = useState(0);
-            const [newMeasurement, setNewMeasurement] = useState({ weight: '', waist: '', bicepsR: '', bicepsL: '', thighsR: '', thighsL: '', calvesR: '', calvesL: '' });
+            const [newMeasurement, setNewMeasurement] = useState({ weight: '', waist: '', chest: '', hips: '', bicepsR: '', bicepsL: '', thighsR: '', thighsL: '', calvesR: '', calvesL: '' });
 
             const handleMeasurementChange = (e) => {
                 setNewMeasurement({ ...newMeasurement, [e.target.name]: e.target.value });
@@ -1371,6 +1373,8 @@
                     date: new Date().toISOString().split('T')[0],
                     weight: parseFloat(newMeasurement.weight),
                     waist: parseFloat(newMeasurement.waist),
+                    chest: parseFloat(newMeasurement.chest),
+                    hips: parseFloat(newMeasurement.hips),
                     bicepsR: parseFloat(newMeasurement.bicepsR),
                     bicepsL: parseFloat(newMeasurement.bicepsL),
                     thighsR: parseFloat(newMeasurement.thighsR),
@@ -1379,7 +1383,7 @@
                     calvesL: parseFloat(newMeasurement.calvesL),
                 };
                 onUpdateClient({ ...client, measurements: [...(client.measurements || []), measurement] });
-                setNewMeasurement({ weight: '', waist: '', bicepsR: '', bicepsL: '', thighsR: '', thighsL: '', calvesR: '', calvesL: '' });
+                setNewMeasurement({ weight: '', waist: '', chest: '', hips: '', bicepsR: '', bicepsL: '', thighsR: '', thighsL: '', calvesR: '', calvesL: '' });
             };
             
             const handleSaveClientInfo = (updatedData) => {
@@ -1409,6 +1413,8 @@
                                 <div className="grid grid-cols-2 gap-x-4">
                                     <FormInput label="Peso (lb)" name="weight" type="number" step="0.1" value={newMeasurement.weight} onChange={handleMeasurementChange} />
                                     <FormInput label="Cintura (cm)" name="waist" type="number" step="0.1" value={newMeasurement.waist} onChange={handleMeasurementChange} />
+                                    <FormInput label="Pecho (cm)" name="chest" type="number" step="0.1" value={newMeasurement.chest} onChange={handleMeasurementChange} />
+                                    <FormInput label="Caderas (cm)" name="hips" type="number" step="0.1" value={newMeasurement.hips} onChange={handleMeasurementChange} />
                                     <FormInput label="Bíceps D (cm)" name="bicepsR" type="number" step="0.1" value={newMeasurement.bicepsR} onChange={handleMeasurementChange} />
                                     <FormInput label="Bíceps I (cm)" name="bicepsL" type="number" step="0.1" value={newMeasurement.bicepsL} onChange={handleMeasurementChange} />
                                     <FormInput label="Muslo D (cm)" name="thighsR" type="number" step="0.1" value={newMeasurement.thighsR} onChange={handleMeasurementChange} />
