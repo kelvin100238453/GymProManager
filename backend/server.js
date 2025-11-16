@@ -194,7 +194,11 @@ app.post('/api/auth/client/login', asyncHandler(async (req, res) => {
         const payload = { userId: client.id, role: 'client' };
         const { accessToken, refreshToken } = generateTokens(payload);
 
-        await db.collection('clients').updateOne({ _id: client._id }, { $set: { refreshToken } });
+        // ACTUALIZAR SIEMPRE el refreshToken en la BD para clientes existentes
+        await db.collection('clients').updateOne(
+            { _id: client._id }, 
+            { $set: { refreshToken } }
+        );
 
         const { password, ...clientData } = client;
         res.json({ accessToken, refreshToken, user: clientData });
@@ -210,21 +214,56 @@ app.post('/api/auth/client/refresh-token', asyncHandler(async (req, res) => {
         return res.status(401).json({ message: 'Refresh token no proporcionado.' });
     }
 
+    let payload;
     try {
-        const payload = jwt.verify(refreshToken, JWT_SECRET);
+        // Intentar verificar el token normalmente
+        payload = jwt.verify(refreshToken, JWT_SECRET);
+    } catch (error) {
+        // Si el token expiró (solo para clientes), generar tokens nuevos
+        if (error.name === 'TokenExpiredError') {
+            console.log('Refresh token expirado para cliente, generando tokens nuevos');
+            
+            try {
+                // Decodificar el payload sin verificar la expiración
+                const decoded = jwt.decode(refreshToken);
+                if (decoded && decoded.role === 'client') {
+                    const client = await db.collection('clients').findOne({ id: decoded.userId });
+                    if (client && client.refreshToken === refreshToken) {
+                        // Cliente válido con refresh token expirado, generar nuevos tokens
+                        const newPayload = { userId: client.id, role: 'client' };
+                        const { accessToken, refreshToken: newRefreshToken } = generateTokens(newPayload);
+                        
+                        // Actualizar el refresh token en la BD
+                        await db.collection('clients').updateOne(
+                            { _id: client._id }, 
+                            { $set: { refreshToken: newRefreshToken } }
+                        );
+                        
+                        return res.json({ accessToken, refreshToken: newRefreshToken });
+                    }
+                }
+            } catch (decodeError) {
+                console.error('Error al decodificar token expirado:', decodeError);
+            }
+        }
+        
+        return res.status(403).json({ message: 'Refresh token inválido o expirado.' });
+    }
+
+    try {
         const client = await db.collection('clients').findOne({ id: payload.userId });
 
         if (!client || client.refreshToken !== refreshToken) {
             return res.status(403).json({ message: 'Refresh token inválido o revocado.' });
         }
 
-        // Generar un nuevo access token
+        // Generar un nuevo access token sin expiración para clientes
         const newPayload = { userId: client.id, role: 'client' };
         const { accessToken } = generateTokens(newPayload);
 
         res.json({ accessToken });
     } catch (error) {
-        return res.status(403).json({ message: 'Refresh token inválido o expirado.' });
+        return res.status(403).json({ message: 'Error al procesar refresh token.' });
     }
 }));
 
