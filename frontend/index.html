@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD: v1.0.5-20251117-000600 - TIEMPO EN SEGUNDOS -->
+<!-- BUILD: v1.0.6-20251117-000700 - CORRECCIONES EJERCICIOS -->
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
@@ -580,7 +580,7 @@
                                         {ex.reps && <span> x {ex.reps} reps</span>}
                                         {ex.time && <span>{Math.round(ex.time / 60)} min</span>}
                                         <span className="mx-2">|</span>
-                                        <span>{ex.rest} min descanso</span>
+                                        <span>{ex.rest} seg descanso</span>
                                     </div>
                                     {renderMedia(ex)}
                                     <p className="text-gray-300 mt-2 text-xs sm:text-sm">{ex.description}</p>
@@ -759,7 +759,7 @@
                         {exercise.reps && <span> x {exercise.reps} reps</span>}
                         {exercise.time && <span>{Math.round(exercise.time / 60)} min</span>}
                         <span className="mx-2">|</span>
-                        <span>{exercise.rest} min descanso</span>
+                        <span>{exercise.rest} seg descanso</span>
                     </div>
                     <p className="text-gray-300 mt-2 text-sm h-20 overflow-auto">{exercise.description}</p>
                 </div>
@@ -783,13 +783,18 @@
                     newExercises = [...exercises, { ...exerciseData, id: `ex-${Date.now()}`, tags: (exerciseData.category || '').split(' ') }];
                 }
                 setExercises(newExercises);
+                // Sincronizar con el backend
+                api.setExercises(newExercises);
                 setIsModalOpen(false); 
                 setEditingExercise(null);
             };
 
             const handleDeleteExercise = (id) => {
                 if (window.confirm("¿Estás seguro de que quieres eliminar este ejercicio?")) {
-                    setExercises(exercises.filter(e => e.id !== id));
+                    const newExercises = exercises.filter(e => e.id !== id);
+                    setExercises(newExercises);
+                    // Sincronizar con el backend
+                    api.setExercises(newExercises);
                 }
             };
 
