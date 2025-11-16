@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- BUILD: v1.0.6-20251117-000700 - CORRECCIONES EJERCICIOS -->
+<!-- BUILD: v1.0.7-20251117-010000 - CORRECCIONES SEGUNDOS -->
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="build-version" content="1.0.5-20251117-000600" />
+    <meta name="build-version" content="1.0.7-20251117-010000" />
     <meta name="cache-control" content="no-cache, no-store, must-revalidate" />
     <meta name="pragma" content="no-cache" />
     <meta name="expires" content="0" />
@@ -1614,7 +1614,7 @@
             if(!formData) return null;
             const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.type === 'number' ? (e.target.value === '' ? '' : parseFloat(e.target.value) || 0) : e.target.value }); };
             const handleSubmit = (e) => { e.preventDefault(); onSave(formData); };
-            return (<Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${formData.name}`}><form onSubmit={handleSubmit}><div className="grid grid-cols-2 gap-4"><FormInput label="Series" name="sets" type="number" value={formData.sets || ''} onChange={handleChange} /><FormInput label="Reps" name="reps" type="number" value={formData.reps || ''} onChange={handleChange} /><FormInput label="Tiempo (seg)" name="time" type="number" step="0.1" value={formData.time || ''} onChange={handleChange} /><FormInput label="Descanso (min)" name="rest" type="number" step="0.1" value={formData.rest || ''} onChange={handleChange} required /></div><FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} /><button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button></form></Modal>);
+            return (<Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${formData.name}`}><form onSubmit={handleSubmit}><div className="grid grid-cols-2 gap-4"><FormInput label="Series" name="sets" type="number" value={formData.sets || ''} onChange={handleChange} /><FormInput label="Reps" name="reps" type="number" value={formData.reps || ''} onChange={handleChange} /><FormInput label="Tiempo (seg)" name="time" type="number" step="0.1" value={formData.time || ''} onChange={handleChange} /><FormInput label="Descanso (seg)" name="rest" type="number" step="0.1" value={formData.rest || ''} onChange={handleChange} required /></div><FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} /><button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button></form></Modal>);
         }
         
         const WorkoutHistoryModal = ({ isOpen, onClose, logs }) => {
