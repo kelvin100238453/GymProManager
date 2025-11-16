@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- BUILD: v1.0.10-20251117-034145 - RENDER NODE.JS DEPLOYMENT FIX -->
+<!-- BUILD: v1.1.0-20251117-073416 - NUEVO FORMATO TIEMPO SEPARADO -->
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="build-version" content="1.0.10-20251117-034145" />
+    <meta name="build-version" content="1.1.0-20251117-073416" />
     <meta name="cache-control" content="no-cache, no-store, must-revalidate" />
     <meta name="pragma" content="no-cache" />
     <meta name="expires" content="0" />
@@ -267,6 +267,83 @@
                 <input className="w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" {...props} />
             </div>
         );
+        // --- COMPONENTE DE TIEMPO SEPARADO (NUEVO FORMATO) ---
+        const SeparatedTimeInput = ({ label, value, onChange, name, subtitle = '', showSpinner = false }) => {
+            // Convert decimal minutes to minutes and seconds
+            const totalSeconds = Math.round((value || 0) * 60);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
+            const handleMinutesChange = (e) => {
+                const newMinutes = parseInt(e.target.value) || 0;
+                const newTotalSeconds = newMinutes * 60 + seconds;
+                onChange({ target: { name: name, value: newTotalSeconds / 60, type: 'number' } });
+            };
+            
+            const handleSecondsChange = (e) => {
+                let newSeconds = parseInt(e.target.value) || 0;
+                // Ensure seconds are between 0-59
+                newSeconds = Math.min(Math.max(newSeconds, 0), 59);
+                const newTotalSeconds = minutes * 60 + newSeconds;
+                onChange({ target: { name: name, value: newTotalSeconds / 60, type: 'number' } });
+            };
+            
+            return (
+                <div className="mb-6">
+                    <h4 className="text-gray-900 text-lg font-bold mb-4">{label}</h4>
+                    <div className="flex flex-col sm:flex-row gap-6 sm:gap-8">
+                        {/* Campo Minutos */}
+                        <div className="flex-1">
+                            <label className="block text-gray-800 text-sm font-medium mb-2">Minutos</label>
+                            <div className="relative">
+                                <input 
+                                    type="number" 
+                                    min="0" 
+                                    value={minutes} 
+                                    onChange={handleMinutesChange}
+                                    className="w-full h-16 bg-purple-200 text-white text-2xl font-bold text-center rounded-3xl border-none outline-none transition-all duration-200 focus:ring-4 focus:ring-purple-300"
+                                    placeholder="0"
+                                />
+                                {showSpinner && (
+                                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex flex-col">
+                                        <button 
+                                            onClick={() => handleMinutesChange({ target: { value: minutes + 1 } })}
+                                            className="bg-white text-gray-700 w-6 h-4 rounded-t text-xs hover:bg-gray-100 transition-colors"
+                                        >
+                                            ▲
+                                        </button>
+                                        <button 
+                                            onClick={() => handleMinutesChange({ target: { value: Math.max(0, minutes - 1) } })}
+                                            className="bg-white text-gray-700 w-6 h-4 rounded-b text-xs hover:bg-gray-100 transition-colors"
+                                        >
+                                            ▼
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        
+                        {/* Campo Segundos */}
+                        <div className="flex-1">
+                            <label className="block text-gray-800 text-sm font-medium mb-2">Segundos</label>
+                            <input 
+                                type="number" 
+                                min="0" 
+                                max="59" 
+                                value={seconds.toString().padStart(2, '0')} 
+                                onChange={handleSecondsChange}
+                                className="w-full h-16 bg-purple-200 text-white text-2xl font-bold text-center rounded-3xl border-none outline-none transition-all duration-200 focus:ring-4 focus:ring-purple-300"
+                                placeholder="0"
+                            />
+                        </div>
+                    </div>
+                    {subtitle && (
+                        <p className="text-gray-600 text-sm mt-2 ml-1">{subtitle}</p>
+                    )}
+                </div>
+            );
+        };
+
         const TimeInput = ({ label, value, onChange, ...props }) => {
             // Convert decimal minutes to minutes and seconds
             const totalSeconds = Math.round((value || 0) * 60);
@@ -870,12 +947,36 @@
                         <FormInput label="Nombre del Ejercicio" name="name" value={formData.name} onChange={handleChange} required />
                         <FormInput label="Categoría" name="category" value={formData.category} onChange={handleChange} placeholder="Ej: Pecho, Espalda..." />
                         <FormTextarea label="Descripción" name="description" value={formData.description} onChange={handleChange} />
-                        <div className="grid grid-cols-2 gap-4">
+                        
+                        {/* Series y Reps en la misma fila */}
+                        <div className="grid grid-cols-2 gap-4 mb-6">
                             <FormInput label="Series" name="sets" type="number" value={formData.sets} onChange={handleChange} />
                             <FormInput label="Reps" name="reps" type="text" value={formData.reps} onChange={handleChange} />
-                            <FormInput label="Tiempo (seg)" name="time" type="number" step="0.1" value={formData.time} onChange={handleChange} />
-                            <FormInput label="Descanso (min)" name="rest" type="number" step="0.1" value={formData.rest} onChange={handleChange} required />
                         </div>
+
+                        {/* Tiempo de Ejercicio - Nuevo Formato Separado */}
+                        <div className="bg-purple-300 rounded-2xl p-6 mb-6">
+                            <SeparatedTimeInput 
+                                label="Tiempo de Ejercicio"
+                                value={formData.time || 0}
+                                onChange={handleChange}
+                                name="time"
+                                subtitle="Entrada numérica automática"
+                                showSpinner={true}
+                            />
+                        </div>
+
+                        {/* Tiempo de Descanso - Nuevo Formato Separado */}
+                        <div className="bg-purple-300 rounded-2xl p-6 mb-6">
+                            <SeparatedTimeInput 
+                                label="Tiempo de Descanso"
+                                value={formData.rest || 0}
+                                onChange={handleChange}
+                                name="rest"
+                                subtitle="Validación automática integrada"
+                            />
+                        </div>
+                        
                         <FormInput label="URL de Imagen" name="imageUrl" value={formData.imageUrl} onChange={handleChange} />
                         {formData.imageUrl && <img src={formData.imageUrl} className="mt-2 rounded-lg max-h-40 w-auto"/>}
                         <button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar</button>
@@ -1053,6 +1154,7 @@
                         <div className="text-center">
                             <DumbbellIcon className="w-20 h-20 text-indigo-500 mx-auto" />
                             <h1 className="text-5xl font-extrabold text-white mt-4">GymPro Manager</h1>
+            <p className="text-gray-400 mt-2 text-sm">v1.1.0 - Nuevo Formato de Tiempo</p>
                             <p className="text-gray-400 mt-2 text-lg">Tu asistente de gimnasio personal.</p>
                         </div>
                         <div className="mt-12 w-full max-w-sm space-y-4">
@@ -1614,7 +1716,43 @@
             if(!formData) return null;
             const handleChange = (e) => { setFormData({ ...formData, [e.target.name]: e.target.type === 'number' ? (e.target.value === '' ? '' : parseFloat(e.target.value) || 0) : e.target.value }); };
             const handleSubmit = (e) => { e.preventDefault(); onSave(formData); };
-            return (<Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${formData.name}`}><form onSubmit={handleSubmit}><div className="grid grid-cols-2 gap-4"><FormInput label="Series" name="sets" type="number" value={formData.sets || ''} onChange={handleChange} /><FormInput label="Reps" name="reps" type="number" value={formData.reps || ''} onChange={handleChange} /><FormInput label="Tiempo (seg)" name="time" type="number" step="0.1" value={formData.time || ''} onChange={handleChange} /><FormInput label="Descanso (seg)" name="rest" type="number" step="0.1" value={formData.rest || ''} onChange={handleChange} required /></div><FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} /><button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button></form></Modal>);
+            return (
+                <Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${formData.name}`}>
+                    <form onSubmit={handleSubmit}>
+                        {/* Series y Reps */}
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                            <FormInput label="Series" name="sets" type="number" value={formData.sets || ''} onChange={handleChange} />
+                            <FormInput label="Reps" name="reps" type="number" value={formData.reps || ''} onChange={handleChange} />
+                        </div>
+
+                        {/* Tiempo de Ejercicio - Nuevo Formato Separado */}
+                        <div className="bg-purple-300 rounded-2xl p-6 mb-6">
+                            <SeparatedTimeInput 
+                                label="Tiempo de Ejercicio"
+                                value={formData.time || 0}
+                                onChange={handleChange}
+                                name="time"
+                                subtitle="Entrada numérica automática"
+                                showSpinner={true}
+                            />
+                        </div>
+
+                        {/* Tiempo de Descanso - Nuevo Formato Separado */}
+                        <div className="bg-purple-300 rounded-2xl p-6 mb-6">
+                            <SeparatedTimeInput 
+                                label="Tiempo de Descanso"
+                                value={formData.rest || 0}
+                                onChange={handleChange}
+                                name="rest"
+                                subtitle="Validación automática integrada"
+                            />
+                        </div>
+
+                        <FormTextarea label="Descripción Personalizada" name="description" value={formData.description} onChange={handleChange} />
+                        <button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button>
+                    </form>
+                </Modal>
+            );
         }
         
         const WorkoutHistoryModal = ({ isOpen, onClose, logs }) => {
