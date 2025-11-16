@@ -468,8 +468,20 @@ app.post('/api/clients/:id/log-workout', authenticateToken, asyncHandler(async (
 }));
 
 // --- SERVIR ARCHIVOS ESTÁTICOS DEL FRONTEND ---
-app.use(express.static(path.join(__dirname, '..', 'frontend')));
+// Deshabilitar cache para index.html
+app.use(express.static(path.join(__dirname, '..', 'frontend'), {
+    setHeaders: (res, filepath) => {
+        if (filepath.endsWith('index.html')) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+        }
+    }
+}));
 app.get(/^(?!\/api).*/, (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
