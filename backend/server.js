@@ -168,9 +168,17 @@ const seedDatabase = async () => {
 
 // --- Auth ---
 const generateTokens = (payload) => {
-    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
-    const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
-    return { accessToken, refreshToken };
+    // Para clientes: Tokens sin expiración (acceso permanente)
+    if (payload.role === 'client') {
+        const accessToken = jwt.sign(payload, JWT_SECRET); // Sin expiresIn para acceso permanente
+        const refreshToken = jwt.sign(payload, JWT_SECRET); // Sin expiresIn para acceso permanente
+        return { accessToken, refreshToken };
+    } else {
+        // Para entrenadores: Tokens con expiración por seguridad
+        const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+        const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+        return { accessToken, refreshToken };
+    }
 };
 app.post('/api/auth/client/login', asyncHandler(async (req, res) => {
     const { username, password } = req.body;
