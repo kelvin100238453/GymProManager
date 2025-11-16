@@ -52,6 +52,38 @@ const asyncHandler = fn => (req, res, next) => {
     });
 };
 
+// Middleware de autenticación JWT
+const authenticateToken = asyncHandler(async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+        return res.status(401).json({ message: 'Token de acceso requerido.' });
+    }
+    
+    const token = authHeader.split(' ')[1];
+    
+    try {
+        const payload = jwt.verify(token, JWT_SECRET);
+        
+        // Verificar si el usuario existe según el rol
+        if (payload.role === 'client') {
+            const client = await db.collection('clients').findOne({ id: payload.userId });
+            if (!client) {
+                return res.status(403).json({ message: 'Usuario no encontrado.' });
+            }
+        } else if (payload.role === 'trainer') {
+            const trainer = await db.collection('trainers').findOne({ id: payload.trainerId });
+            if (!trainer) {
+                return res.status(403).json({ message: 'Entrenador no encontrado.' });
+            }
+        }
+        
+        next();
+    } catch (error) {
+        return res.status(403).json({ message: 'Token inválido o expirado.' });
+    }
+});
+
 // --- LÓGICA DE SEEDING DE LA BASE DE DATOS ---
 const seedDatabase = async () => {
     const defaultExercises = [
@@ -246,7 +278,7 @@ app.post('/api/auth/trainer/register', asyncHandler(async (req, res) => {
 }));
 
 // --- Clients ---
-app.get('/api/clients', asyncHandler(async (req, res) => {
+app.get('/api/clients', authenticateToken, asyncHandler(async (req, res) => {
     const { trainerId } = req.query;
     if (!trainerId) {
         return res.status(400).json({ message: 'trainerId es requerido' });
@@ -255,7 +287,7 @@ app.get('/api/clients', asyncHandler(async (req, res) => {
     res.json(clients);
 }));
 
-app.post('/api/clients', asyncHandler(async (req, res) => {
+app.post('/api/clients', authenticateToken, asyncHandler(async (req, res) => {
     const { clientData, trainerId } = req.body;
 
     // Verificar si ya existe un cliente con el mismo nombre de usuario
@@ -289,7 +321,7 @@ app.post('/api/clients', asyncHandler(async (req, res) => {
     res.status(201).json(responseData);
 }));
 
-app.put('/api/clients/:id', asyncHandler(async (req, res) => {
+app.put('/api/clients/:id', authenticateToken, asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { password, _id, ...restOfBody } = req.body;
     
@@ -315,7 +347,7 @@ app.put('/api/clients/:id', asyncHandler(async (req, res) => {
     res.json(responseData);
 }));
 
-app.delete('/api/clients/:id', asyncHandler(async (req, res) => {
+app.delete('/api/clients/:id', authenticateToken, asyncHandler(async (req, res) => {
     const { id } = req.params;
     const result = await db.collection('clients').deleteOne({ id: id });
     if (result.deletedCount > 0) {
@@ -326,12 +358,12 @@ app.delete('/api/clients/:id', asyncHandler(async (req, res) => {
 }));
 
 // --- Exercises ---
-app.get('/api/exercises', asyncHandler(async (req, res) => {
+app.get('/api/exercises', authenticateToken, asyncHandler(async (req, res) => {
     const exerciseDoc = await db.collection('system').findOne({ _id: 'exercises' });
     res.json(exerciseDoc ? exerciseDoc.data : []);
 }));
 
-app.put('/api/exercises', asyncHandler(async (req, res) => {
+app.put('/api/exercises', authenticateToken, asyncHandler(async (req, res) => {
     await db.collection('system').updateOne(
         { _id: 'exercises' },
         { $set: { data: req.body } },
@@ -341,31 +373,73 @@ app.put('/api/exercises', asyncHandler(async (req, res) => {
 }));
 
 // --- Notifications ---
-app.get('/api/notifications', asyncHandler(async (req, res) => {
+app.get('/api/notifications', authenticateToken, asyncHandler(async (req, res) => {
     const notifications = await db.collection('notifications').find().sort({ date: -1 }).toArray();
     res.json(notifications);
 }));
 
-app.post('/api/notifications', asyncHandler(async (req, res) => {
+app.post('/api/notifications/clear', authenticateToken, asyncHandler(async (req, res) => {
+    await db.collection('notifications').updateMany({ read: false }, { $set: { read: true } });
+    res.status(204).send();
+}));
+
+// Ruta manual para eliminar notificaciones antiguas
+app.delete('/api/notifications/cleanup', authenticateToken, asyncHandler(async (req, res) => {
+    const result = await cleanupNotifications();
+    res.json(result);
+}));
+
+// Función de limpieza automática de notificaciones
+const cleanupNotifications = async () => {
+    try {
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+
+        // Eliminar notificaciones NO VISTAS con más de 7 días
+        const unreadResult = await db.collection('notifications').deleteMany({
+            read: false,
+            createdAt: { $lt: sevenDaysAgo }
+        });
+
+        // Eliminar notificaciones VISTAS con más de 4 horas
+        const readResult = await db.collection('notifications').deleteMany({
+            read: true,
+            viewedAt: { $lt: fourHoursAgo }
+        });
+
+        const summary = {
+            unreadDeleted: unreadResult.deletedCount,
+            readDeleted: readResult.deletedCount,
+            timestamp: now.toISOString()
+        };
+
+        console.log(`[Limpieza automática] Notificaciones eliminadas: ${summary.unreadDeleted} no vistas, ${summary.readDeleted} vistas.`);
+        return summary;
+    } catch (error) {
+        console.error('Error en limpieza automática de notificaciones:', error);
+        return { error: error.message };
+    }
+};
+
+// Función auxiliar para agregar timestamps a notificaciones
+app.post('/api/notifications', authenticateToken, asyncHandler(async (req, res) => {
     const { message, type = 'info' } = req.body;
     const newNotification = {
         id: `notif-${crypto.randomUUID()}`,
         message,
         type,
         read: false,
+        createdAt: new Date(),
+        viewedAt: null,
         date: new Date().toISOString()
     };
     await db.collection('notifications').insertOne(newNotification);
     res.status(201).json(newNotification);
 }));
 
-app.post('/api/notifications/clear', asyncHandler(async (req, res) => {
-    await db.collection('notifications').updateMany({ read: false }, { $set: { read: true } });
-    res.status(204).send();
-}));
-
 // --- Workout Logs ---
-app.post('/api/clients/:id/log-workout', asyncHandler(async (req, res) => {
+app.post('/api/clients/:id/log-workout', authenticateToken, asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { durationSeconds } = req.body;
     
@@ -403,6 +477,11 @@ app.get(/^(?!\/api).*/, (req, res) => {
 const startServer = async () => {
     await connectDb(); // Conecta a la base de datos primero
     await seedDatabase(); // Puebla la base de datos con ejercicios
+    
+    // Ejecutar limpieza automática cada hora
+    setInterval(cleanupNotifications, 60 * 60 * 1000); // 1 hora
+    console.log('Tarea de limpieza automática de notificaciones programada (cada 1 hora)');
+    
     app.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
         console.log('Conectado a la base de datos MongoDB.');
