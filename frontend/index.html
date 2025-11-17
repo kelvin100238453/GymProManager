@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- BUILD: v1.1.0-20251117-073416 - NUEVO FORMATO TIEMPO SEPARADO -->
+<!-- BUILD: v1.2.0-20251117-091130 - FORMATO TIEMPO COMPLETAMENTE SINCRONIZADO -->
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="build-version" content="1.1.0-20251117-073416" />
+    <meta name="build-version" content="1.2.0-20251117-091130" />
     <meta name="cache-control" content="no-cache, no-store, must-revalidate" />
     <meta name="pragma" content="no-cache" />
     <meta name="expires" content="0" />
@@ -655,7 +655,7 @@
                                     <div className="text-indigo-400 text-xs sm:text-sm font-semibold">
                                         {ex.sets && <span>{ex.sets} sets</span>}
                                         {ex.reps && <span> x {ex.reps} reps</span>}
-                                        {ex.time && <span>{Math.round(ex.time / 60)} min</span>}
+                                        {ex.time && <span>{ex.time.toFixed(1)} min</span>}
                                         <span className="mx-2">|</span>
                                         <span>{ex.rest} seg descanso</span>
                                     </div>
@@ -834,7 +834,7 @@
                     <div className="text-indigo-400 text-sm font-semibold">
                         {exercise.sets && <span>{exercise.sets} sets</span>}
                         {exercise.reps && <span> x {exercise.reps} reps</span>}
-                        {exercise.time && <span>{Math.round(exercise.time / 60)} min</span>}
+                        {exercise.time && <span>{exercise.time.toFixed(1)} min</span>}
                         <span className="mx-2">|</span>
                         <span>{exercise.rest} seg descanso</span>
                     </div>
@@ -1154,7 +1154,7 @@
                         <div className="text-center">
                             <DumbbellIcon className="w-20 h-20 text-indigo-500 mx-auto" />
                             <h1 className="text-5xl font-extrabold text-white mt-4">GymPro Manager</h1>
-            <p className="text-gray-400 mt-2 text-sm">v1.1.0 - Nuevo Formato de Tiempo</p>
+            <p className="text-gray-400 mt-2 text-sm">v1.2.0 - Formato Tiempo Sincronizado</p>
                             <p className="text-gray-400 mt-2 text-lg">Tu asistente de gimnasio personal.</p>
                         </div>
                         <div className="mt-12 w-full max-w-sm space-y-4">
@@ -1623,7 +1623,7 @@
                                         <div key={ex.instanceId} className="bg-black/40 p-2 rounded-md flex justify-between items-center gap-2">
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-xs sm:text-sm truncate">{ex.name}</p>
-                                                <p className="text-xs text-gray-400">{ex.sets}x{ex.reps || `${ex.time}s`}, {ex.rest}s</p>
+                                                <p className="text-xs text-gray-400">{ex.sets}x{ex.reps > 0 ? ex.reps : (ex.time > 0 ? `${ex.time}s` : 'N/A')}, {ex.rest}s</p>
                                             </div>
                                             <div className="flex gap-1 flex-shrink-0">
                                                 <button onClick={() => { setEditingEx({ ...ex, weekIndex: selectedWeekIndex, day }); setEditExModalOpen(true); }} className="p-1.5 text-gray-400 hover:text-white touch-manipulation">
