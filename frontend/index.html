@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- BUILD: v1.2.0-20251117-091130 - FORMATO TIEMPO COMPLETAMENTE SINCRONIZADO -->
+<!-- BUILD: v1.2.1-20251117-103429 - CORRECCION COLORES Y ESTILOS FORMATO TIEMPO SEPARADO -->
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="build-version" content="1.2.0-20251117-091130" />
+    <meta name="build-version" content="1.2.1-20251117-103429" />
     <meta name="cache-control" content="no-cache, no-store, must-revalidate" />
     <meta name="pragma" content="no-cache" />
     <meta name="expires" content="0" />
@@ -289,57 +289,59 @@
             };
             
             return (
-                <div className="mb-6">
-                    <h4 className="text-purple-800 text-lg font-bold mb-4">{label}</h4>
-                    <div className="flex flex-col sm:flex-row gap-6 sm:gap-8">
-                        {/* Campo Minutos */}
-                        <div className="flex-1">
-                            <label className="block text-purple-800 text-sm font-medium mb-2">Minutos</label>
-                            <div className="relative">
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-white">{label}</label>
+                    <div className="bg-purple-300 rounded-3xl p-6 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Campo Minutos */}
+                            <div className="text-center">
+                                <p className="text-white text-sm font-medium mb-2">Minutos</p>
+                                <div className="relative">
+                                    <input 
+                                        type="number" 
+                                        min="0" 
+                                        value={minutes} 
+                                        onChange={handleMinutesChange}
+                                        className="w-full bg-white rounded-2xl px-4 py-3 text-center text-gray-800 text-2xl font-bold"
+                                        placeholder="0"
+                                    />
+                                    {showSpinner && (
+                                        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex flex-col">
+                                            <button 
+                                                onClick={() => handleMinutesChange({ target: { value: minutes + 1 } })}
+                                                className="bg-gray-200 text-gray-700 w-6 h-4 rounded-t text-xs hover:bg-gray-100 transition-colors"
+                                            >
+                                                ▲
+                                            </button>
+                                            <button 
+                                                onClick={() => handleMinutesChange({ target: { value: Math.max(0, minutes - 1) } })}
+                                                className="bg-gray-200 text-gray-700 w-6 h-4 rounded-b text-xs hover:bg-gray-100 transition-colors"
+                                            >
+                                                ▼
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            
+                            {/* Campo Segundos */}
+                            <div className="text-center">
+                                <p className="text-white text-sm font-medium mb-2">Segundos</p>
                                 <input 
                                     type="number" 
                                     min="0" 
-                                    value={minutes} 
-                                    onChange={handleMinutesChange}
-                                    className="w-full h-16 bg-purple-300 text-purple-800 text-2xl font-bold text-center rounded-3xl border-none outline-none transition-all duration-200 focus:ring-4 focus:ring-purple-400"
+                                    max="59" 
+                                    value={seconds.toString().padStart(2, '0')} 
+                                    onChange={handleSecondsChange}
+                                    className="w-full bg-white rounded-2xl px-4 py-3 text-center text-gray-800 text-2xl font-bold"
                                     placeholder="0"
                                 />
-                                {showSpinner && (
-                                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex flex-col">
-                                        <button 
-                                            onClick={() => handleMinutesChange({ target: { value: minutes + 1 } })}
-                                            className="bg-white text-gray-700 w-6 h-4 rounded-t text-xs hover:bg-gray-100 transition-colors"
-                                        >
-                                            ▲
-                                        </button>
-                                        <button 
-                                            onClick={() => handleMinutesChange({ target: { value: Math.max(0, minutes - 1) } })}
-                                            className="bg-white text-gray-700 w-6 h-4 rounded-b text-xs hover:bg-gray-100 transition-colors"
-                                        >
-                                            ▼
-                                        </button>
-                                    </div>
-                                )}
                             </div>
                         </div>
-                        
-                        {/* Campo Segundos */}
-                        <div className="flex-1">
-                            <label className="block text-purple-800 text-sm font-medium mb-2">Segundos</label>
-                            <input 
-                                type="number" 
-                                min="0" 
-                                max="59" 
-                                value={seconds.toString().padStart(2, '0')} 
-                                onChange={handleSecondsChange}
-                                className="w-full h-16 bg-purple-300 text-purple-800 text-2xl font-bold text-center rounded-3xl border-none outline-none transition-all duration-200 focus:ring-4 focus:ring-purple-400"
-                                placeholder="0"
-                            />
-                        </div>
+                        {subtitle && (
+                            <p className="text-white text-xs text-center">{subtitle}</p>
+                        )}
                     </div>
-                    {subtitle && (
-                        <p className="text-gray-600 text-sm mt-2 ml-1">{subtitle}</p>
-                    )}
                 </div>
             );
         };
