@@ -523,6 +523,26 @@
 
             const formatTime = (seconds) => `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
 
+            // Funciones auxiliares para formato de tiempo separado
+            const formatTimeSeparated = (seconds) => {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return { minutes, seconds: remainingSeconds };
+            };
+
+            const TimeDisplay = ({ seconds, label, showSeconds = true }) => {
+                const { minutes, seconds: sec } = formatTimeSeparated(seconds);
+                return (
+                    <div className="bg-purple-300 rounded-2xl px-3 py-2 inline-block">
+                        <div className="flex items-center gap-2 text-white font-bold">
+                            {minutes > 0 && <span>{minutes}m</span>}
+                            {showSeconds && <span>{sec}s</span>}
+                        </div>
+                        {label && <div className="text-xs text-purple-600 mt-1">{label}</div>}
+                    </div>
+                );
+            };
+
             return (
                 <div className="p-4 bg-gray-900 text-white flex flex-col items-center justify-center h-full">
                     <div className="text-center w-full max-w-md mx-auto">
@@ -652,12 +672,17 @@
                                         {isSkipped && <SkipNextIcon className="w-5 h-5 mr-2 text-yellow-500"/>}
                                         {ex.name}
                                     </h4>
-                                    <div className="text-indigo-400 text-xs sm:text-sm font-semibold">
+                                    <div className="text-indigo-400 text-xs sm:text-sm font-semibold flex flex-wrap items-center gap-3">
                                         {ex.sets && <span>{ex.sets} sets</span>}
+<<<<<<< HEAD
                                         {ex.reps && <span> x {ex.reps} reps</span>}
                                         {ex.time && <span>{ex.time.toFixed(1)} min</span>}
+=======
+                                        {ex.reps && <span>x {ex.reps} reps</span>}
+                                        {ex.time && <TimeDisplay seconds={ex.time} label="Tiempo" />}
+>>>>>>> de8697f27642fa6cb7c71a0948b4146270ced485
                                         <span className="mx-2">|</span>
-                                        <span>{ex.rest} seg descanso</span>
+                                        <TimeDisplay seconds={ex.rest} label="Descanso" />
                                     </div>
                                     {renderMedia(ex)}
                                     <p className="text-gray-300 mt-2 text-xs sm:text-sm">{ex.description}</p>
@@ -831,12 +856,17 @@
             <div className="bg-black bg-opacity-40 rounded-lg overflow-hidden border border-indigo-900/50 shadow-lg flex flex-col justify-between">
                 <div className="p-4">
                     <h4 className="font-bold text-lg text-white">{exercise.name}</h4>
-                    <div className="text-indigo-400 text-sm font-semibold">
+                    <div className="text-indigo-400 text-sm font-semibold flex flex-wrap items-center gap-3">
                         {exercise.sets && <span>{exercise.sets} sets</span>}
+<<<<<<< HEAD
                         {exercise.reps && <span> x {exercise.reps} reps</span>}
                         {exercise.time && <span>{exercise.time.toFixed(1)} min</span>}
+=======
+                        {exercise.reps && <span>x {exercise.reps} reps</span>}
+                        {exercise.time && <TimeDisplay seconds={exercise.time} label="Tiempo" />}
+>>>>>>> de8697f27642fa6cb7c71a0948b4146270ced485
                         <span className="mx-2">|</span>
-                        <span>{exercise.rest} seg descanso</span>
+                        <TimeDisplay seconds={exercise.rest} label="Descanso" />
                     </div>
                     <p className="text-gray-300 mt-2 text-sm h-20 overflow-auto">{exercise.description}</p>
                 </div>
@@ -1154,7 +1184,11 @@
                         <div className="text-center">
                             <DumbbellIcon className="w-20 h-20 text-indigo-500 mx-auto" />
                             <h1 className="text-5xl font-extrabold text-white mt-4">GymPro Manager</h1>
+<<<<<<< HEAD
             <p className="text-gray-400 mt-2 text-sm">v1.2.0 - Formato Tiempo Sincronizado</p>
+=======
+            <p className="text-gray-400 mt-2 text-sm">v1.1.1 - Formato Sincronizado</p>
+>>>>>>> de8697f27642fa6cb7c71a0948b4146270ced485
                             <p className="text-gray-400 mt-2 text-lg">Tu asistente de gimnasio personal.</p>
                         </div>
                         <div className="mt-12 w-full max-w-sm space-y-4">
