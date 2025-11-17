@@ -1,6 +1,82 @@
 {
-  "trainers": [],
-  "clients": [],
-  "exercises": [],
+  "trainers": [
+    {
+      "_id": "trainer_admin_001",
+      "id": "trainer_admin_001",
+      "name": "Administrador",
+      "email": "admin@gympro.com",
+      "password": "$2b$12$WSi7s1ReImmGReKVmCX20.GJsIVal4UJ4GmEzAcgsCdkwqcEwpDrK",
+      "role": "entrenador",
+      "active": true,
+      "createdAt": "2025-11-17T10:21:38.000Z",
+      "updatedAt": "2025-11-17T10:21:38.000Z"
+    },
+    {
+      "_id": "trainer_demo_001",
+      "id": "trainer_demo_001",
+      "name": "Entrenador Demo",
+      "email": "demo@gympro.com",
+      "password": "$2b$12$2mapsxy0gB/1wNE6iuPJv..DUNRqEXrH0tHWSIBl8XjXxE6nrzTjG",
+      "role": "entrenador",
+      "active": true,
+      "createdAt": "2025-11-17T10:21:38.000Z",
+      "updatedAt": "2025-11-17T10:21:38.000Z"
+    }
+  ],
+  "clients": [
+    {
+      "_id": "client_demo_001",
+      "id": "client_demo_001",
+      "name": "Cliente Demo",
+      "email": "cliente@demo.com",
+      "age": 30,
+      "weight": 70,
+      "height": 175,
+      "trainerId": "trainer_demo_001",
+      "active": true,
+      "createdAt": "2025-11-17T10:21:38.000Z"
+    }
+  ],
+  "exercises": [
+    {
+      "_id": "exercise_001",
+      "id": "exercise_001",
+      "name": "Flexiones",
+      "category": "Brazos",
+      "sets": 3,
+      "reps": "10-15",
+      "exerciseTime": "30",
+      "restTime": "60",
+      "description": "Ejercicio básico para fortalecer brazos",
+      "active": true,
+      "createdAt": "2025-11-17T10:21:38.000Z"
+    },
+    {
+      "_id": "exercise_002",
+      "id": "exercise_002",
+      "name": "Sentadillas",
+      "category": "Glúteos",
+      "sets": 3,
+      "reps": "15-20",
+      "exerciseTime": "45",
+      "restTime": "60",
+      "description": "Ejercicio para fortalecer piernas y glúteos",
+      "active": true,
+      "createdAt": "2025-11-17T10:21:38.000Z"
+    },
+    {
+      "_id": "exercise_003",
+      "id": "exercise_003",
+      "name": "Plancha",
+      "category": "Abdomen y Core",
+      "sets": 3,
+      "reps": "30-60 seg",
+      "exerciseTime": "60",
+      "restTime": "30",
+      "description": "Ejercicio para fortalecer core",
+      "active": true,
+      "createdAt": "2025-11-17T10:21:38.000Z"
+    }
+  ],
   "notifications": []
 }
