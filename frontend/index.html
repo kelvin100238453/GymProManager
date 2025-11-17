@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- BUILD: v1.0.10-20251117-034145 - RENDER NODE.JS DEPLOYMENT FIX -->
+<!-- BUILD: v1.0.11-20251117-110124 - FORMATO TIEMPOS COMPACTO - DISPLAY LIMPIO -->
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="build-version" content="1.0.10-20251117-034145" />
+    <meta name="build-version" content="1.0.11-20251117-110124" />
     <meta name="cache-control" content="no-cache, no-store, must-revalidate" />
     <meta name="pragma" content="no-cache" />
     <meta name="expires" content="0" />
@@ -580,7 +580,7 @@
                                         {ex.reps && <span> x {ex.reps} reps</span>}
                                         {ex.time && <span>{Math.round(ex.time / 60)} min</span>}
                                         <span className="mx-2">|</span>
-                                        <span>{ex.rest} seg descanso</span>
+                                        <span>{ex.rest}s</span>
                                     </div>
                                     {renderMedia(ex)}
                                     <p className="text-gray-300 mt-2 text-xs sm:text-sm">{ex.description}</p>
@@ -759,7 +759,7 @@
                         {exercise.reps && <span> x {exercise.reps} reps</span>}
                         {exercise.time && <span>{Math.round(exercise.time / 60)} min</span>}
                         <span className="mx-2">|</span>
-                        <span>{exercise.rest} seg descanso</span>
+                        <span>{exercise.rest}s</span>
                     </div>
                     <p className="text-gray-300 mt-2 text-sm h-20 overflow-auto">{exercise.description}</p>
                 </div>
@@ -929,7 +929,7 @@
                                         {client.customRoutine?.[selectedWeekIndex]?.[selectedDay].exercises.map(ex => (
                                             <div key={ex.instanceId} className="p-2 bg-black/30 rounded">
                                                 <p className="font-semibold text-white">{ex.name}</p>
-                                                <p className="text-sm text-gray-300">{ex.sets}x{ex.reps || `${ex.time}s`}, {ex.rest}s descanso</p>
+                                                <p className="text-sm text-gray-300 font-medium">{ex.sets}×{ex.reps || `${ex.time}s`}, {ex.rest}s</p>
                                             </div>
                                         ))}
                                     </div>
@@ -1521,7 +1521,7 @@
                                         <div key={ex.instanceId} className="bg-black/40 p-2 rounded-md flex justify-between items-center gap-2">
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-xs sm:text-sm truncate">{ex.name}</p>
-                                                <p className="text-xs text-gray-400">{ex.sets}x{ex.reps || `${ex.time}s`}, {ex.rest}s</p>
+                                                <p className="text-xs text-gray-400 font-medium">{ex.sets}×{ex.reps || `${ex.time}s`}, {ex.rest}s</p>
                                             </div>
                                             <div className="flex gap-1 flex-shrink-0">
                                                 <button onClick={() => { setEditingEx({ ...ex, weekIndex: selectedWeekIndex, day }); setEditExModalOpen(true); }} className="p-1.5 text-gray-400 hover:text-white touch-manipulation">
