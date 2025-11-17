@@ -1060,7 +1060,23 @@
                                         {client.customRoutine?.[selectedWeekIndex]?.[selectedDay].exercises.map(ex => (
                                             <div key={ex.instanceId} className="p-2 bg-black/30 rounded">
                                                 <p className="font-semibold text-white">{ex.name}</p>
-                                                <p className="text-sm text-gray-300">{ex.sets}x{ex.reps || `${ex.time}s`}, {ex.rest}s descanso</p>
+                                                <p className="text-sm text-gray-300">
+                                                    {ex.sets}x{ex.reps || (
+                                                        (() => {
+                                                            const totalSeconds = Math.round(ex.time * 60);
+                                                            const minutes = Math.floor(totalSeconds / 60);
+                                                            const seconds = totalSeconds % 60;
+                                                            return minutes > 0 ? `${minutes}m ${seconds.toString().padStart(2, '0')}s` : `${seconds}s`;
+                                                        })()
+                                                    )}, 
+                                                    {(() => {
+                                                        const restSeconds = Math.round(ex.rest * 60);
+                                                        const minutes = Math.floor(restSeconds / 60);
+                                                        const seconds = restSeconds % 60;
+                                                        return minutes > 0 ? `${minutes}m ${seconds.toString().padStart(2, '0')}s` : `${seconds}s`;
+                                                    })()}
+                                                    <span className="text-gray-400"> descanso</span>
+                                                </p>
                                             </div>
                                         ))}
                                     </div>
@@ -1185,7 +1201,7 @@
                             <DumbbellIcon className="w-20 h-20 text-indigo-500 mx-auto" />
                             <h1 className="text-5xl font-extrabold text-white mt-4">GymPro Manager</h1>
 <<<<<<< HEAD
-            <p className="text-gray-400 mt-2 text-sm">v1.2.0 - Formato Tiempo Sincronizado</p>
+            <p className="text-gray-400 mt-2 text-sm">v1.2.1 - Tiempo Sincronizado Total</p>
 =======
             <p className="text-gray-400 mt-2 text-sm">v1.1.1 - Formato Sincronizado</p>
 >>>>>>> de8697f27642fa6cb7c71a0948b4146270ced485
@@ -1657,7 +1673,24 @@
                                         <div key={ex.instanceId} className="bg-black/40 p-2 rounded-md flex justify-between items-center gap-2">
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-semibold text-xs sm:text-sm truncate">{ex.name}</p>
-                                                <p className="text-xs text-gray-400">{ex.sets}x{ex.reps > 0 ? ex.reps : (ex.time > 0 ? `${ex.time}s` : 'N/A')}, {ex.rest}s</p>
+                                                <p className="text-xs text-gray-400">
+                                                    {ex.sets}x{ex.reps > 0 ? ex.reps : (
+                                                        ex.time > 0 ? (
+                                                            (() => {
+                                                                const totalSeconds = Math.round(ex.time * 60);
+                                                                const minutes = Math.floor(totalSeconds / 60);
+                                                                const seconds = totalSeconds % 60;
+                                                                return minutes > 0 ? `${minutes}m ${seconds.toString().padStart(2, '0')}s` : `${seconds}s`;
+                                                            })()
+                                                        ) : 'N/A'
+                                                    )}, 
+                                                    {(() => {
+                                                        const restSeconds = Math.round(ex.rest * 60);
+                                                        const minutes = Math.floor(restSeconds / 60);
+                                                        const seconds = restSeconds % 60;
+                                                        return minutes > 0 ? `${minutes}m ${seconds.toString().padStart(2, '0')}s` : `${seconds}s`;
+                                                    })()}
+                                                </p>
                                             </div>
                                             <div className="flex gap-1 flex-shrink-0">
                                                 <button onClick={() => { setEditingEx({ ...ex, weekIndex: selectedWeekIndex, day }); setEditExModalOpen(true); }} className="p-1.5 text-gray-400 hover:text-white touch-manipulation">
