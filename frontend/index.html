@@ -210,13 +210,75 @@
                 this._subscribers.forEach(callback => callback());
             },
             // --- Métodos públicos que no requieren autenticación ---
-            clientLogin: (credentials) => fetch(`${API_URL}/api/auth/client/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
-            trainerLogin: (credentials) => fetch(`${API_URL}/api/auth/trainer/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
-            trainerRegister: (data) => fetch(`${API_URL}/api/auth/trainer/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
+            clientLogin: (credentials) => {
+                return fetch(`${API_URL}/api/auth/client/login`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(credentials) 
+                }).then(res => {
+                    if (!res.ok) {
+                        return res.json().catch(() => ({ error: 'Error de conexión' }));
+                    }
+                    return res.json();
+                }).catch(err => {
+                    console.error('Error in clientLogin:', err);
+                    throw { error: 'No se pudo conectar al servidor' };
+                });
+            },
+            trainerLogin: (credentials) => {
+                return fetch(`${API_URL}/api/auth/trainer/login`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(credentials) 
+                }).then(res => {
+                    if (!res.ok) {
+                        return res.json().catch(() => ({ error: 'Error de conexión' }));
+                    }
+                    return res.json();
+                }).catch(err => {
+                    console.error('Error in trainerLogin:', err);
+                    throw { error: 'No se pudo conectar al servidor' };
+                });
+            },
+            trainerRegister: (data) => {
+                return fetch(`${API_URL}/api/auth/trainer/register`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(data) 
+                }).then(res => {
+                    if (!res.ok) {
+                        return res.json().catch(() => ({ error: 'Error de conexión' }));
+                    }
+                    return res.json();
+                }).catch(err => {
+                    console.error('Error in trainerRegister:', err);
+                    throw { error: 'No se pudo conectar al servidor' };
+                });
+            },
             
             // --- Métodos que requieren autenticación ---
-            _fetch: (url, options) => authProvider.fetchWithAuth(url, options).then(res => res.ok ? res.json() : Promise.reject(res.json())),
-            _fetch_no_content: (url, options) => authProvider.fetchWithAuth(url, options).then(res => res.ok ? res : Promise.reject(res.json())),
+            _fetch: (url, options) => {
+                return authProvider.fetchWithAuth(url, options).then(res => {
+                    if (!res.ok) {
+                        return res.json().catch(() => ({ error: 'Error de conexión' }));
+                    }
+                    return res.json();
+                }).catch(err => {
+                    console.error(`API Error for ${url}:`, err);
+                    throw { error: 'No se pudo conectar al servidor' };
+                });
+            },
+            _fetch_no_content: (url, options) => {
+                return authProvider.fetchWithAuth(url, options).then(res => {
+                    if (!res.ok) {
+                        return Promise.reject(res.json());
+                    }
+                    return res;
+                }).catch(err => {
+                    console.error(`API Error for ${url}:`, err);
+                    throw { error: 'No se pudo conectar al servidor' };
+                });
+            },
 
             getClients: (trainerId) => api._fetch(`${API_URL}/api/clients?trainerId=${trainerId}`),
             addClient(clientData, trainerId) {
@@ -1660,8 +1722,15 @@
             const [allExercises, setAllExercises] = useState([]);
             const [notifications, setNotifications] = useState([]);
             const [authReady, setAuthReady] = useState(false);
+            const [appError, setAppError] = useState(null);
+            const [loadingTimeout, setLoadingTimeout] = useState(false);
 
             useEffect(() => {
+                // Timeout para evitar carga infinita
+                const timeout = setTimeout(() => {
+                    setLoadingTimeout(true);
+                }, 10000); // 10 segundos timeout
+
                 try {
                     const storedUser = localStorage.getItem('currentUser');
                     const token = authProvider.getAccessToken();
@@ -1671,16 +1740,39 @@
                 } catch (e) {
                     console.error("Failed to parse user from localStorage", e);
                     authProvider.clearTokens();
+                    setAppError("Error al cargar datos del usuario");
                 }
                 setAuthReady(true);
+                
+                return () => clearTimeout(timeout);
             }, []);
 
             useEffect(() => {
                 if (currentUser) {
-                    api.getExercises().then(setAllExercises).catch(console.error);
+                    // Cargar ejercicios con timeout y manejo de errores
+                    const exerciseTimeout = setTimeout(() => {
+                        api.getExercises()
+                            .then(setAllExercises)
+                            .catch(error => {
+                                console.error("Error loading exercises:", error);
+                                setAllExercises([]); // Establecer ejercicios vacíos en caso de error
+                            });
+                    }, 500);
+                    
                     if (currentUser.role === Role.Trainer) {
-                        api.getNotifications().then(setNotifications).catch(console.error);
+                        const notificationTimeout = setTimeout(() => {
+                            api.getNotifications()
+                                .then(setNotifications)
+                                .catch(error => {
+                                    console.error("Error loading notifications:", error);
+                                    setNotifications([]);
+                                });
+                        }, 500);
+                        
+                        return () => clearTimeout(notificationTimeout);
                     }
+                    
+                    return () => clearTimeout(exerciseTimeout);
                 }
             }, [currentUser]);
 
@@ -1732,7 +1824,45 @@
             };
 
             if (!authReady) {
-                return <div className="min-h-screen bg-gray-900 flex justify-center items-center"><LoadingSpinner /></div>;
+                return (
+                    <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center">
+                        <LoadingSpinner />
+                        <p className="text-gray-400 mt-4">Iniciando aplicación...</p>
+                        {loadingTimeout && (
+                            <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-600 rounded-lg">
+                                <p className="text-yellow-400 text-center">
+                                    ⚠️ La aplicación está tardando en cargar. Verifica tu conexión a internet.
+                                </p>
+                                <button 
+                                    onClick={() => window.location.reload()} 
+                                    className="mt-2 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg"
+                                >
+                                    Reintentar
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                );
+            }
+
+            if (appError) {
+                return (
+                    <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center p-4">
+                        <div className="bg-red-900/20 border border-red-600 rounded-lg p-6 max-w-md w-full text-center">
+                            <h2 className="text-red-400 font-bold text-xl mb-2">Error de Carga</h2>
+                            <p className="text-gray-300 mb-4">{appError}</p>
+                            <button 
+                                onClick={() => {
+                                    setAppError(null);
+                                    window.location.reload();
+                                }} 
+                                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                            >
+                                Reintentar
+                            </button>
+                        </div>
+                    </div>
+                );
             }
 
             if (!currentUser) {
