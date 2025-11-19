@@ -1331,7 +1331,7 @@
             );
         };
 
-        // --- FLUJO DE AUTENTICACIÓN ---
+        // --- FLUJO DE AUTENTICACIÓN ULTRA-SIMPLIFICADO ---
         const AuthFlow = ({ onLogin }) => {
             const [screen, setScreen] = useState('initial');
             const [isRegisterMode, setIsRegisterMode] = useState(false);
@@ -1344,33 +1344,26 @@
             const [trainerPassword, setTrainerPassword] = useState('');
             const [trainerConfirmPassword, setTrainerConfirmPassword] = useState('');
             
-            // Debug logging
-            console.log('AuthFlow render with screen:', screen);
-            
-            const resetForms = () => { 
-                setError(''); 
-                setClientUsername(''); 
-                setClientPassword(''); 
-                setTrainerName(''); 
-                setTrainerEmail(''); 
-                setTrainerPassword(''); 
-                setTrainerConfirmPassword(''); 
+            const resetForms = () => {
+                setError('');
+                setClientUsername('');
+                setClientPassword('');
+                setTrainerName('');
+                setTrainerEmail('');
+                setTrainerPassword('');
+                setTrainerConfirmPassword('');
             }
             
             const handleClientLogin = async (e) => {
                 e.preventDefault();
-                console.log('Client login attempt:', clientUsername);
                 setError('');
                 setIsLoading(true);
                 
                 try {
                     const result = await api.clientLogin({ username: clientUsername, password: clientPassword });
-                    console.log('Client login success:', result);
                     onLogin(result);
                 } catch (err) {
-                    console.error('Client login error:', err);
-                    const errorMessage = err?.error || err?.message || 'Error al iniciar sesión.';
-                    setError(errorMessage);
+                    setError(err?.error || err?.message || 'Error al iniciar sesión.');
                 } finally {
                     setIsLoading(false);
                 }
@@ -1378,18 +1371,14 @@
 
             const handleTrainerLogin = async (e) => {
                 e.preventDefault();
-                console.log('Trainer login attempt:', trainerEmail);
                 setError('');
                 setIsLoading(true);
                 
                 try {
                     const result = await api.trainerLogin({ email: trainerEmail, password: trainerPassword });
-                    console.log('Trainer login success:', result);
                     onLogin(result);
                 } catch (err) {
-                    console.error('Trainer login error:', err);
-                    const errorMessage = err?.error || err?.message || 'Error al iniciar sesión.';
-                    setError(errorMessage);
+                    setError(err?.error || err?.message || 'Error al iniciar sesión.');
                 } finally {
                     setIsLoading(false);
                 }
@@ -1397,7 +1386,6 @@
 
             const handleTrainerRegister = async (e) => {
                 e.preventDefault();
-                console.log('Trainer register attempt:', trainerEmail);
                 if (trainerPassword !== trainerConfirmPassword) {
                     setError('Las contraseñas no coinciden.');
                     return;
@@ -1406,187 +1394,256 @@
                 setIsLoading(true);
                 
                 try {
-                    const result = await api.trainerRegister({ name: trainerName, email: trainerEmail, password: trainerPassword });
-                    console.log('Trainer register success:', result);
+                    const result = await api.trainerRegister({ 
+                        name: trainerName, 
+                        email: trainerEmail, 
+                        password: trainerPassword 
+                    });
                     onLogin(result);
                 } catch (err) {
-                    console.error('Trainer register error:', err);
-                    const errorMessage = err?.error || err?.message || 'Error al registrar.';
-                    setError(errorMessage);
+                    setError(err?.error || err?.message || 'Error al registrar.');
                 } finally {
                     setIsLoading(false);
                 }
             };
 
-            const goBack = () => { 
-                console.log('Going back to initial screen');
-                setScreen('initial'); 
-                resetForms(); 
+            const goBack = () => {
+                setScreen('initial');
+                resetForms();
             }
 
-            // Pantalla inicial de bienvenida
-            if (screen === 'initial') { 
-                console.log('Rendering initial screen');
-                return (
-                    <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center p-4">
-                        <div className="text-center">
-                            <div className="w-20 h-20 mx-auto mb-6">
-                                <svg className="w-20 h-20 text-indigo-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M20.57 14.86L22 13.43L20.57 12L17 15.57L8.43 7L12 3.43L10.57 2L9.14 3.43L7.71 2L5.57 4.14L4.14 2.71L2.71 4.14L4.14 5.57L2 7.71L3.43 9.14L2 10.57L3.43 12L7 8.43L15.57 17L12 20.57L13.43 22L14.86 20.57L16.29 22L18.43 19.86L19.86 21.29L21.29 19.86L19.86 18.43L22 16.29L20.57 14.86Z" />
-                                </svg>
-                            </div>
-                            <h1 className="text-5xl font-extrabold text-white mt-4">GymPro Manager</h1>
-                            <p className="text-gray-400 mt-2 text-lg">Tu asistente de gimnasio personal.</p>
-                            <div className="mt-6 p-4 bg-blue-900/20 border border-blue-600 rounded-lg">
-                                <p className="text-blue-400 text-sm font-semibold">Credenciales Demo:</p>
-                                <p className="text-gray-300 text-xs">Email: demo@gympro.com</p>
-                                <p className="text-gray-300 text-xs">Contraseña: demo123</p>
-                            </div>
-                        </div>
-                        <div className="mt-12 w-full max-w-sm space-y-4">
-                            <button 
-                                onClick={() => {
-                                    console.log('Trainer button clicked');
-                                    setScreen('trainer');
-                                }} 
-                                className="w-full text-lg font-bold bg-indigo-600 text-white py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105"
-                            >
-                                Soy Entrenador
-                            </button>
-                            <button 
-                                onClick={() => {
-                                    console.log('Client button clicked');
-                                    setScreen('client');
-                                }} 
-                                className="w-full text-lg font-bold bg-gray-700 text-white py-4 rounded-xl shadow-lg hover:bg-gray-600 transition-transform transform hover:scale-105"
-                            >
-                                Soy Cliente
-                            </button>
-                        </div>
-                    </div>
-                ); 
+            // Pantalla inicial
+            if (screen === 'initial') {
+                return React.createElement('div', {
+                    className: 'min-h-screen bg-gray-900 flex flex-col justify-center items-center p-4'
+                }, [
+                    React.createElement('div', {
+                        key: 'content',
+                        className: 'text-center'
+                    }, [
+                        React.createElement('div', {
+                            key: 'icon',
+                            className: 'w-20 h-20 mx-auto mb-6 bg-indigo-600 rounded-full flex items-center justify-center'
+                        }, [
+                            React.createElement('span', {
+                                key: 'icon-text',
+                                className: 'text-white text-2xl font-bold'
+                            }, '💪')
+                        ]),
+                        React.createElement('h1', {
+                            key: 'title',
+                            className: 'text-5xl font-extrabold text-white mt-4'
+                        }, 'GymPro Manager'),
+                        React.createElement('p', {
+                            key: 'subtitle',
+                            className: 'text-gray-400 mt-2 text-lg'
+                        }, 'Tu asistente de gimnasio personal'),
+                        React.createElement('div', {
+                            key: 'demo-creds',
+                            className: 'mt-6 p-4 bg-blue-900/20 border border-blue-600 rounded-lg'
+                        }, [
+                            React.createElement('p', {
+                                key: 'demo-title',
+                                className: 'text-blue-400 text-sm font-semibold'
+                            }, 'Credenciales Demo:'),
+                            React.createElement('p', {
+                                key: 'demo-email',
+                                className: 'text-gray-300 text-xs'
+                            }, 'Email: demo@gympro.com'),
+                            React.createElement('p', {
+                                key: 'demo-pass',
+                                className: 'text-gray-300 text-xs'
+                            }, 'Contraseña: demo123')
+                        ])
+                    ]),
+                    React.createElement('div', {
+                        key: 'buttons',
+                        className: 'mt-12 w-full max-w-sm space-y-4'
+                    }, [
+                        React.createElement('button', {
+                            key: 'trainer-btn',
+                            onClick: () => setScreen('trainer'),
+                            className: 'w-full text-lg font-bold bg-indigo-600 text-white py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105'
+                        }, 'Soy Entrenador'),
+                        React.createElement('button', {
+                            key: 'client-btn',
+                            onClick: () => setScreen('client'),
+                            className: 'w-full text-lg font-bold bg-gray-700 text-white py-4 rounded-xl shadow-lg hover:bg-gray-600 transition-transform transform hover:scale-105'
+                        }, 'Soy Cliente')
+                    ])
+                ]);
             }
             
             // Pantallas de login
-            return (
-                <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center p-4">
-                    <div className="w-full max-w-sm">
-                        <button 
-                            onClick={goBack} 
-                            className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-6 font-semibold"
-                        >
-                            <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" />
-                            </svg>
-                            Volver
-                        </button>
-                        
-                        {screen === 'client' && (
-                            <div className="bg-gray-800 p-8 rounded-xl space-y-4 shadow-2xl">
-                                <h2 className="text-center text-white text-2xl font-bold">Acceso Cliente</h2>
-                                <form onSubmit={handleClientLogin}>
-                                    <div className="mb-4">
-                                        <label className="block text-indigo-300 text-sm font-bold mb-2">Nombre de Usuario</label>
-                                        <input 
-                                            type="text" 
-                                            value={clientUsername} 
-                                            onChange={(e) => setClientUsername(e.target.value)}
-                                            className="w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                            required 
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-indigo-300 text-sm font-bold mb-2">Contraseña</label>
-                                        <input 
-                                            type="password" 
-                                            value={clientPassword} 
-                                            onChange={(e) => setClientPassword(e.target.value)}
-                                            className="w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                            required 
-                                        />
-                                    </div>
-                                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-                                    <button 
-                                        type="submit" 
-                                        disabled={isLoading}
-                                        className="w-full text-lg font-bold bg-indigo-600 text-white py-3 rounded-xl shadow-lg hover:bg-indigo-700 transition disabled:opacity-50"
-                                    >
-                                        {isLoading ? 'Cargando...' : 'Entrar'}
-                                    </button>
-                                </form>
-                            </div>
-                        )}
-
-                        {screen === 'trainer' && (
-                            <div className="bg-gray-800 p-8 rounded-xl space-y-4 shadow-2xl">
-                                <h2 className="text-center text-white text-2xl font-bold">
-                                    {isRegisterMode ? 'Crear Cuenta de Entrenador' : 'Acceso Entrenador'}
-                                </h2>
-                                <form onSubmit={isRegisterMode ? handleTrainerRegister : handleTrainerLogin}>
-                                    {isRegisterMode && (
-                                        <div className="mb-4">
-                                            <label className="block text-indigo-300 text-sm font-bold mb-2">Nombre Completo</label>
-                                            <input 
-                                                type="text" 
-                                                value={trainerName} 
-                                                onChange={(e) => setTrainerName(e.target.value)}
-                                                className="w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                                required 
-                                            />
-                                        </div>
-                                    )}
-                                    <div className="mb-4">
-                                        <label className="block text-indigo-300 text-sm font-bold mb-2">Correo Electrónico</label>
-                                        <input 
-                                            type="email" 
-                                            value={trainerEmail} 
-                                            onChange={(e) => setTrainerEmail(e.target.value)}
-                                            className="w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                            required 
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="block text-indigo-300 text-sm font-bold mb-2">Contraseña</label>
-                                        <input 
-                                            type="password" 
-                                            value={trainerPassword} 
-                                            onChange={(e) => setTrainerPassword(e.target.value)}
-                                            className="w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                            required 
-                                        />
-                                    </div>
-                                    {isRegisterMode && (
-                                        <div className="mb-4">
-                                            <label className="block text-indigo-300 text-sm font-bold mb-2">Confirmar Contraseña</label>
-                                            <input 
-                                                type="password" 
-                                                value={trainerConfirmPassword} 
-                                                onChange={(e) => setTrainerConfirmPassword(e.target.value)}
-                                                className="w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                                required 
-                                            />
-                                        </div>
-                                    )}
-                                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-                                    <button 
-                                        type="submit" 
-                                        disabled={isLoading}
-                                        className="w-full mt-4 text-lg font-bold bg-indigo-600 text-white py-3 rounded-xl shadow-lg hover:bg-indigo-700 transition disabled:opacity-50"
-                                    >
-                                        {isLoading ? 'Cargando...' : (isRegisterMode ? 'Crear Cuenta' : 'Entrar')}
-                                    </button>
-                                </form>
-                                <button 
-                                    onClick={() => setIsRegisterMode(!isRegisterMode)} 
-                                    className="w-full text-center text-indigo-400 hover:underline mt-4"
-                                >
-                                    {isRegisterMode ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
+            return React.createElement('div', {
+                className: 'min-h-screen bg-gray-900 flex flex-col justify-center items-center p-4'
+            }, [
+                React.createElement('div', {
+                    key: 'form-container',
+                    className: 'w-full max-w-sm'
+                }, [
+                    React.createElement('button', {
+                        key: 'back-btn',
+                        onClick: goBack,
+                        className: 'flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-6 font-semibold'
+                    }, [
+                        React.createElement('span', {
+                            key: 'back-icon'
+                        }, '←'),
+                        'Volver'
+                    ]),
+                    screen === 'client' ? React.createElement('form', {
+                        key: 'client-form',
+                        onSubmit: handleClientLogin,
+                        className: 'bg-gray-800 p-8 rounded-xl space-y-4 shadow-2xl'
+                    }, [
+                        React.createElement('h2', {
+                            key: 'title',
+                            className: 'text-center text-white text-2xl font-bold'
+                        }, 'Acceso Cliente'),
+                        React.createElement('div', {
+                            key: 'username-group',
+                            className: 'mb-4'
+                        }, [
+                            React.createElement('label', {
+                                key: 'username-label',
+                                className: 'block text-indigo-300 text-sm font-bold mb-2'
+                            }, 'Nombre de Usuario'),
+                            React.createElement('input', {
+                                key: 'username-input',
+                                type: 'text',
+                                value: clientUsername,
+                                onChange: (e) => setClientUsername(e.target.value),
+                                className: 'w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                required: true
+                            })
+                        ]),
+                        React.createElement('div', {
+                            key: 'password-group',
+                            className: 'mb-4'
+                        }, [
+                            React.createElement('label', {
+                                key: 'password-label',
+                                className: 'block text-indigo-300 text-sm font-bold mb-2'
+                            }, 'Contraseña'),
+                            React.createElement('input', {
+                                key: 'password-input',
+                                type: 'password',
+                                value: clientPassword,
+                                onChange: (e) => setClientPassword(e.target.value),
+                                className: 'w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                required: true
+                            })
+                        ]),
+                        error && React.createElement('p', {
+                            key: 'error',
+                            className: 'text-red-500 text-sm text-center'
+                        }, error),
+                        React.createElement('button', {
+                            key: 'submit-btn',
+                            type: 'submit',
+                            disabled: isLoading,
+                            className: 'w-full text-lg font-bold bg-indigo-600 text-white py-3 rounded-xl shadow-lg hover:bg-indigo-700 transition disabled:opacity-50'
+                        }, isLoading ? 'Cargando...' : 'Entrar')
+                    ]) : React.createElement('div', {
+                        key: 'trainer-form',
+                        className: 'bg-gray-800 p-8 rounded-xl space-y-4 shadow-2xl'
+                    }, [
+                        React.createElement('h2', {
+                            key: 'title',
+                            className: 'text-center text-white text-2xl font-bold'
+                        }, isRegisterMode ? 'Crear Cuenta de Entrenador' : 'Acceso Entrenador'),
+                        React.createElement('form', {
+                            key: 'form',
+                            onSubmit: isRegisterMode ? handleTrainerRegister : handleTrainerLogin
+                        }, [
+                            isRegisterMode && React.createElement('div', {
+                                key: 'name-group',
+                                className: 'mb-4'
+                            }, [
+                                React.createElement('label', {
+                                    key: 'name-label',
+                                    className: 'block text-indigo-300 text-sm font-bold mb-2'
+                                }, 'Nombre Completo'),
+                                React.createElement('input', {
+                                    key: 'name-input',
+                                    type: 'text',
+                                    value: trainerName,
+                                    onChange: (e) => setTrainerName(e.target.value),
+                                    className: 'w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                    required: true
+                                })
+                            ]),
+                            React.createElement('div', {
+                                key: 'email-group',
+                                className: 'mb-4'
+                            }, [
+                                React.createElement('label', {
+                                    key: 'email-label',
+                                    className: 'block text-indigo-300 text-sm font-bold mb-2'
+                                }, 'Correo Electrónico'),
+                                React.createElement('input', {
+                                    key: 'email-input',
+                                    type: 'email',
+                                    value: trainerEmail,
+                                    onChange: (e) => setTrainerEmail(e.target.value),
+                                    className: 'w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                    required: true
+                                })
+                            ]),
+                            React.createElement('div', {
+                                key: 'password-group',
+                                className: 'mb-4'
+                            }, [
+                                React.createElement('label', {
+                                    key: 'password-label',
+                                    className: 'block text-indigo-300 text-sm font-bold mb-2'
+                                }, 'Contraseña'),
+                                React.createElement('input', {
+                                    key: 'password-input',
+                                    type: 'password',
+                                    value: trainerPassword,
+                                    onChange: (e) => setTrainerPassword(e.target.value),
+                                    className: 'w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                    required: true
+                                })
+                            ]),
+                            isRegisterMode && React.createElement('div', {
+                                key: 'confirm-password-group',
+                                className: 'mb-4'
+                            }, [
+                                React.createElement('label', {
+                                    key: 'confirm-password-label',
+                                    className: 'block text-indigo-300 text-sm font-bold mb-2'
+                                }, 'Confirmar Contraseña'),
+                                React.createElement('input', {
+                                    key: 'confirm-password-input',
+                                    type: 'password',
+                                    value: trainerConfirmPassword,
+                                    onChange: (e) => setTrainerConfirmPassword(e.target.value),
+                                    className: 'w-full bg-gray-700 text-white rounded py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                    required: true
+                                })
+                            ]),
+                            error && React.createElement('p', {
+                                key: 'error',
+                                className: 'text-red-500 text-sm text-center'
+                            }, error),
+                            React.createElement('button', {
+                                key: 'submit-btn',
+                                type: 'submit',
+                                disabled: isLoading,
+                                className: 'w-full mt-4 text-lg font-bold bg-indigo-600 text-white py-3 rounded-xl shadow-lg hover:bg-indigo-700 transition disabled:opacity-50'
+                            }, isLoading ? 'Cargando...' : (isRegisterMode ? 'Crear Cuenta' : 'Entrar'))
+                        ]),
+                        React.createElement('button', {
+                            key: 'toggle-btn',
+                            onClick: () => setIsRegisterMode(!isRegisterMode),
+                            className: 'w-full text-center text-indigo-400 hover:underline mt-4'
+                        }, isRegisterMode ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate')
+                    ])
+                ])
+            ]);
         };
 
         // --- VISTA DE DETALLE DEL CLIENTE ---
