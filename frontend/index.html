@@ -128,216 +128,7 @@
         const API_URL = 'https://gympromanager.onrender.com';
         const DAYS_OF_WEEK = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-        // --- MOCK DATA PARA FUNCIONAMIENTO SIN BACKEND ---
-        const MOCK_DATA = {
-            trainers: [
-                {
-                    id: "trainer_demo_001",
-                    name: "Entrenador Demo",
-                    email: "demo@gympro.com",
-                    password: "demo123",
-                    role: "entrenador",
-                    active: true
-                }
-            ],
-            clients: [
-                {
-                    id: "client_demo_001",
-                    name: "Cliente Demo",
-                    email: "cliente@demo.com",
-                    age: 30,
-                    weight: 70,
-                    height: 175,
-                    level: "Intermedio",
-                    goals: "Perder peso y ganar masa muscular",
-                    trainerId: "trainer_demo_001",
-                    active: true,
-                    customRoutine: [
-                        {
-                            "Lunes": { title: "Tren Superior", exercises: [] },
-                            "Martes": { title: "Tren Inferior", exercises: [] },
-                            "Miércoles": { title: "Descanso", exercises: [] },
-                            "Jueves": { title: "Tren Superior", exercises: [] },
-                            "Viernes": { title: "Tren Inferior", exercises: [] },
-                            "Sábado": { title: "Cardio", exercises: [] },
-                            "Domingo": { title: "Descanso", exercises: [] }
-                        }
-                    ],
-                    measurements: [
-                        {
-                            id: "meas_001",
-                            date: "2025-11-10",
-                            weight: 72,
-                            chest: 95,
-                            waist: 85,
-                            hips: 98,
-                            bicepsL: 32,
-                            bicepsR: 32.5,
-                            thighsL: 58,
-                            calvesL: 38,
-                            thighsR: 58.5,
-                            calvesR: 38.5,
-                            head: 57
-                        },
-                        {
-                            id: "meas_002",
-                            date: "2025-11-19",
-                            weight: 70,
-                            chest: 96,
-                            waist: 83,
-                            hips: 97,
-                            bicepsL: 32.5,
-                            bicepsR: 33,
-                            thighsL: 59,
-                            calvesL: 38.5,
-                            thighsR: 59.5,
-                            calvesR: 39,
-                            head: 57
-                        }
-                    ],
-                    workoutLogs: []
-                }
-            ],
-            exercises: [
-                {
-                    id: "ex-chest-01",
-                    name: "Press de Banca",
-                    category: "Pecho",
-                    description: "Ejercicio principal para desarrollar el pecho",
-                    sets: 4,
-                    reps: 8,
-                    rest: 120,
-                    tags: ["Pecho", "Tríceps", "Hombros"],
-                    active: true
-                },
-                {
-                    id: "ex-chest-02",
-                    name: "Aperturas con Mancuernas",
-                    category: "Pecho",
-                    description: "Ejercicio de aislamiento para el pecho",
-                    sets: 3,
-                    reps: 12,
-                    rest: 90,
-                    tags: ["Pecho", "Aislamiento"],
-                    active: true
-                },
-                {
-                    id: "ex-back-01",
-                    name: "Dominadas",
-                    category: "Espalda",
-                    description: "Ejercicio fundamental para espalda",
-                    sets: 4,
-                    reps: 6,
-                    rest: 150,
-                    tags: ["Espalda", "Bíceps"],
-                    active: true
-                },
-                {
-                    id: "ex-legs-01",
-                    name: "Sentadillas",
-                    category: "Piernas",
-                    description: "Ejercicio completo para piernas",
-                    sets: 4,
-                    reps: 10,
-                    rest: 120,
-                    tags: ["Piernas", "Cuádriceps", "Glúteos"],
-                    active: true
-                },
-                {
-                    id: "ex-shoulders-01",
-                    name: "Press Militar",
-                    category: "Hombros",
-                    description: "Ejercicio para desarrollar los hombros",
-                    sets: 4,
-                    reps: 8,
-                    rest: 120,
-                    tags: ["Hombros", "Tríceps"],
-                    active: true
-                },
-                {
-                    id: "ex-arms-01",
-                    name: "Curl de Bíceps",
-                    category: "Brazos",
-                    description: "Ejercicio de aislamiento para bíceps",
-                    sets: 3,
-                    reps: 12,
-                    rest: 90,
-                    tags: ["Bíceps", "Aislamiento"],
-                    active: true
-                },
-                {
-                    id: "ex-arms-02",
-                    name: "Extensiones de Tríceps",
-                    category: "Brazos",
-                    description: "Ejercicio para tríceps",
-                    sets: 3,
-                    reps: 12,
-                    rest: 90,
-                    tags: ["Tríceps", "Aislamiento"],
-                    active: true
-                },
-                {
-                    id: "ex-glutes-01",
-                    name: "Hip Thrust",
-                    category: "Glúteos",
-                    description: "Ejercicio específico para glúteos",
-                    sets: 4,
-                    reps: 12,
-                    rest: 90,
-                    tags: ["Glúteos"],
-                    active: true
-                },
-                {
-                    id: "ex-core-01",
-                    name: "Plancha",
-                    category: "Abdomen y Core",
-                    description: "Ejercicio para core",
-                    sets: 3,
-                    reps: 30,
-                    rest: 60,
-                    tags: ["Core", "Abs"],
-                    active: true
-                },
-                {
-                    id: "ex-cardio-01",
-                    name: "Correr en Cinta",
-                    category: "Cardio",
-                    description: "Ejercicio cardiovascular",
-                    sets: 1,
-                    reps: 30,
-                    rest: 0,
-                    tags: ["Cardio", "LISS"],
-                    active: true
-                }
-            ],
-            notifications: []
-        };
-
-        // --- GESTIÓN DE DATOS LOCALES ---
-        const localStorage = {
-            getTrainers: () => {
-                const data = JSON.parse(localStorage.getItem('gympro_trainers') || '[]');
-                return data.length > 0 ? data : MOCK_DATA.trainers;
-            },
-            setTrainers: (trainers) => localStorage.setItem('gympro_trainers', JSON.stringify(trainers)),
-            getClients: () => {
-                const data = JSON.parse(localStorage.getItem('gympro_clients') || '[]');
-                return data.length > 0 ? data : MOCK_DATA.clients;
-            },
-            setClients: (clients) => localStorage.setItem('gympro_clients', JSON.stringify(clients)),
-            getExercises: () => {
-                const data = JSON.parse(localStorage.getItem('gympro_exercises') || '[]');
-                return data.length > 0 ? data : MOCK_DATA.exercises;
-            },
-            setExercises: (exercises) => localStorage.setItem('gympro_exercises', JSON.stringify(exercises)),
-            getNotifications: () => {
-                const data = JSON.parse(localStorage.getItem('gympro_notifications') || '[]');
-                return data.length > 0 ? data : MOCK_DATA.notifications;
-            },
-            setNotifications: (notifications) => localStorage.setItem('gympro_notifications', JSON.stringify(notifications))
-        };
-
-        // --- GESTIÓN DE AUTENTICACIÓN LOCAL ---
+        // --- GESTIÓN DE AUTENTICACIÓN Y API ---
         const authProvider = {
             getAccessToken: () => localStorage.getItem('accessToken'),
             getRefreshToken: () => localStorage.getItem('refreshToken'),
@@ -361,10 +152,23 @@
                 if (!currentRefreshToken) {
                     return null;
                 }
-                // Mock refresh token - siempre exitoso en modo demo
-                const accessToken = 'mock_access_token_' + Date.now();
-                authProvider.setTokens(accessToken);
-                return accessToken;
+                try {
+                    const response = await fetch(`${API_URL}/api/auth/client/refresh-token`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ refreshToken: currentRefreshToken }),
+                    });
+                    if (!response.ok) {
+                        throw new Error('Failed to refresh token');
+                    }
+                    const { accessToken } = await response.json();
+                    authProvider.setTokens(accessToken);
+                    return accessToken;
+                } catch (error) {
+                    console.error('Error refreshing token:', error);
+                    authProvider.logout();
+                    return null;
+                }
             },
             fetchWithAuth: async (url, options = {}) => {
                 let accessToken = authProvider.getAccessToken();
@@ -379,16 +183,22 @@
                     'Content-Type': 'application/json',
                 };
 
-                // Mock response para modo offline
-                return {
-                    ok: true,
-                    status: 200,
-                    json: async () => ({ success: true, data: {} })
-                };
+                let response = await fetch(url, options);
+
+                if (response.status === 401) {
+                    const newAccessToken = await authProvider.refreshToken();
+                    if (newAccessToken) {
+                        options.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                        response = await fetch(url, options);
+                    } else {
+                        return Promise.reject(new Error('Unable to refresh token'));
+                    }
+                }
+                return response;
             }
         };
 
-        // --- API MOCK PARA FUNCIONAMIENTO SIN BACKEND ---
+        // --- API REAL CON FETCH USANDO EL WRAPPER DE AUTENTICACIÓN ---
         const api = {
             _subscribers: [],
             subscribe(callback) {
@@ -400,154 +210,39 @@
             notify() {
                 this._subscribers.forEach(callback => callback());
             },
+            // --- Métodos públicos que no requieren autenticación ---
+            clientLogin: (credentials) => fetch(`${API_URL}/api/auth/client/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
+            trainerLogin: (credentials) => fetch(`${API_URL}/api/auth/trainer/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
+            trainerRegister: (data) => fetch(`${API_URL}/api/auth/trainer/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(res => res.ok ? res.json() : Promise.reject(res.json())),
+            
+            // --- Métodos que requieren autenticación ---
+            _fetch: (url, options) => authProvider.fetchWithAuth(url, options).then(res => res.ok ? res.json() : Promise.reject(res.json())),
+            _fetch_no_content: (url, options) => authProvider.fetchWithAuth(url, options).then(res => res.ok ? res : Promise.reject(res.json())),
 
-            // --- Métodos de autenticación ---
-            clientLogin: async (credentials) => {
-                const { username, password } = credentials;
-                const clients = localStorage.getClients();
-                const client = clients.find(c => c.email === username && c.id);
-                
-                if (client && (password === 'demo123' || password === client.id)) {
-                    return {
-                        success: true,
-                        user: client,
-                        accessToken: 'client_token_' + client.id,
-                        refreshToken: 'refresh_' + client.id
-                    };
-                }
-                throw { error: 'Credenciales incorrectas' };
+            getClients: (trainerId) => api._fetch(`${API_URL}/api/clients?trainerId=${trainerId}`),
+            addClient(clientData, trainerId) {
+                return api._fetch(`${API_URL}/api/clients`, { method: 'POST', body: JSON.stringify({ clientData, trainerId }) }).then(data => { this.notify(); return data; });
             },
-
-            trainerLogin: async (credentials) => {
-                const { email, password } = credentials;
-                const trainers = localStorage.getTrainers();
-                const trainer = trainers.find(t => t.email === email);
-                
-                if (trainer && password === 'demo123') {
-                    return {
-                        success: true,
-                        user: trainer,
-                        token: 'trainer_token_' + trainer.id
-                    };
-                }
-                throw { error: 'Credenciales incorrectas' };
+            updateClient(updatedClient) {
+                return api._fetch(`${API_URL}/api/clients/${updatedClient.id}`, { method: 'PUT', body: JSON.stringify(updatedClient) }).then(data => { this.notify(); return data; });
             },
-
-            trainerRegister: async (data) => {
-                const trainers = localStorage.getTrainers();
-                const newTrainer = {
-                    id: 'trainer_' + Date.now(),
-                    name: data.name,
-                    email: data.email,
-                    password: data.password,
-                    role: 'entrenador',
-                    active: true
-                };
-                trainers.push(newTrainer);
-                localStorage.setTrainers(trainers);
-                
-                return {
-                    success: true,
-                    user: newTrainer,
-                    token: 'trainer_token_' + newTrainer.id
-                };
+            deleteClient(clientId) {
+                return authProvider.fetchWithAuth(`${API_URL}/api/clients/${clientId}`, { method: 'DELETE' }).then(() => this.notify());
             },
-
-            // --- Métodos de gestión ---
-            getClients: async (trainerId) => {
-                const clients = localStorage.getClients();
-                return { success: true, data: clients };
+            getExercises: () => api._fetch(`${API_URL}/api/exercises`),
+            setExercises(newExercises) {
+                return api._fetch(`${API_URL}/api/exercises`, { method: 'PUT', body: JSON.stringify(newExercises) }).then(data => { this.notify(); return data; });
             },
-
-            addClient: async (clientData, trainerId) => {
-                const clients = localStorage.getClients();
-                const newClient = {
-                    id: 'client_' + Date.now(),
-                    ...clientData,
-                    trainerId,
-                    active: true,
-                    customRoutine: [],
-                    measurements: [],
-                    workoutLogs: []
-                };
-                clients.push(newClient);
-                localStorage.setClients(clients);
-                this.notify();
-                return { success: true, data: newClient };
+            getNotifications: () => api._fetch(`${API_URL}/api/notifications`),
+            addNotification(message, type = 'info') {
+                 return api._fetch(`${API_URL}/api/notifications`, { method: 'POST', body: JSON.stringify({ message, type }) }).then(data => { this.notify(); return data; });
             },
-
-            updateClient: async (updatedClient) => {
-                const clients = localStorage.getClients();
-                const index = clients.findIndex(c => c.id === updatedClient.id);
-                if (index >= 0) {
-                    clients[index] = updatedClient;
-                    localStorage.setClients(clients);
-                    this.notify();
-                    return { success: true, data: updatedClient };
-                }
-                throw { error: 'Cliente no encontrado' };
+            clearNotifications() {
+                return authProvider.fetchWithAuth(`${API_URL}/api/notifications/clear`, { method: 'POST' }).then(() => this.notify());
             },
-
-            deleteClient: async (clientId) => {
-                const clients = localStorage.getClients();
-                const filteredClients = clients.filter(c => c.id !== clientId);
-                localStorage.setClients(filteredClients);
-                this.notify();
-                return { success: true };
+            logWorkout(clientId, durationSeconds) {
+                return api._fetch(`${API_URL}/api/clients/${clientId}/log-workout`, { method: 'POST', body: JSON.stringify({ durationSeconds }) }).then(data => { this.notify(); return data; });
             },
-
-            getExercises: async () => {
-                const exercises = localStorage.getExercises();
-                return { success: true, data: exercises };
-            },
-
-            setExercises: async (newExercises) => {
-                localStorage.setExercises(newExercises);
-                this.notify();
-                return { success: true, data: newExercises };
-            },
-
-            getNotifications: async () => {
-                const notifications = localStorage.getNotifications();
-                return { success: true, data: notifications };
-            },
-
-            addNotification: async (message, type = 'info') => {
-                const notifications = localStorage.getNotifications();
-                const newNotification = {
-                    id: 'notif_' + Date.now(),
-                    message,
-                    type,
-                    date: new Date().toISOString(),
-                    read: false
-                };
-                notifications.push(newNotification);
-                localStorage.setNotifications(notifications);
-                this.notify();
-                return { success: true, data: newNotification };
-            },
-
-            clearNotifications: async () => {
-                localStorage.setNotifications([]);
-                this.notify();
-                return { success: true };
-            },
-
-            logWorkout: async (clientId, durationSeconds) => {
-                const clients = localStorage.getClients();
-                const client = clients.find(c => c.id === clientId);
-                if (client) {
-                    client.workoutLogs = client.workoutLogs || [];
-                    client.workoutLogs.push({
-                        date: new Date().toISOString(),
-                        duration: durationSeconds / 60 // Convertir a minutos
-                    });
-                    localStorage.setClients(clients);
-                    this.notify();
-                    return { success: true, data: client };
-                }
-                throw { error: 'Cliente no encontrado' };
-            }
         };
 
         // --- ICONOS ---
@@ -1966,15 +1661,8 @@
             const [allExercises, setAllExercises] = useState([]);
             const [notifications, setNotifications] = useState([]);
             const [authReady, setAuthReady] = useState(false);
-            const [appError, setAppError] = useState(null);
-            const [loadingTimeout, setLoadingTimeout] = useState(false);
 
             useEffect(() => {
-                // Timeout para evitar carga infinita
-                const timeout = setTimeout(() => {
-                    setLoadingTimeout(true);
-                }, 10000); // 10 segundos timeout
-
                 try {
                     const storedUser = localStorage.getItem('currentUser');
                     const token = authProvider.getAccessToken();
@@ -1984,39 +1672,16 @@
                 } catch (e) {
                     console.error("Failed to parse user from localStorage", e);
                     authProvider.clearTokens();
-                    setAppError("Error al cargar datos del usuario");
                 }
                 setAuthReady(true);
-                
-                return () => clearTimeout(timeout);
             }, []);
 
             useEffect(() => {
                 if (currentUser) {
-                    // Cargar ejercicios con timeout y manejo de errores
-                    const exerciseTimeout = setTimeout(() => {
-                        api.getExercises()
-                            .then(setAllExercises)
-                            .catch(error => {
-                                console.error("Error loading exercises:", error);
-                                setAllExercises([]); // Establecer ejercicios vacíos en caso de error
-                            });
-                    }, 500);
-                    
+                    api.getExercises().then(setAllExercises).catch(console.error);
                     if (currentUser.role === Role.Trainer) {
-                        const notificationTimeout = setTimeout(() => {
-                            api.getNotifications()
-                                .then(setNotifications)
-                                .catch(error => {
-                                    console.error("Error loading notifications:", error);
-                                    setNotifications([]);
-                                });
-                        }, 500);
-                        
-                        return () => clearTimeout(notificationTimeout);
+                        api.getNotifications().then(setNotifications).catch(console.error);
                     }
-                    
-                    return () => clearTimeout(exerciseTimeout);
                 }
             }, [currentUser]);
 
@@ -2068,45 +1733,7 @@
             };
 
             if (!authReady) {
-                return (
-                    <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center">
-                        <LoadingSpinner />
-                        <p className="text-gray-400 mt-4">Iniciando aplicación...</p>
-                        {loadingTimeout && (
-                            <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-600 rounded-lg">
-                                <p className="text-yellow-400 text-center">
-                                    ⚠️ La aplicación está tardando en cargar. Verifica tu conexión a internet.
-                                </p>
-                                <button 
-                                    onClick={() => window.location.reload()} 
-                                    className="mt-2 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg"
-                                >
-                                    Reintentar
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                );
-            }
-
-            if (appError) {
-                return (
-                    <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center p-4">
-                        <div className="bg-red-900/20 border border-red-600 rounded-lg p-6 max-w-md w-full text-center">
-                            <h2 className="text-red-400 font-bold text-xl mb-2">Error de Carga</h2>
-                            <p className="text-gray-300 mb-4">{appError}</p>
-                            <button 
-                                onClick={() => {
-                                    setAppError(null);
-                                    window.location.reload();
-                                }} 
-                                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
-                            >
-                                Reintentar
-                            </button>
-                        </div>
-                    </div>
-                );
+                return <div className="min-h-screen bg-gray-900 flex justify-center items-center"><LoadingSpinner /></div>;
             }
 
             if (!currentUser) {
