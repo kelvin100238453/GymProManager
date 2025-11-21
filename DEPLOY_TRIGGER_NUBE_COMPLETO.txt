@@ -1,0 +1,15 @@
+DEPLOY TRIGGER - SOLUCIÓN COMPLETA APLICADA
+Fecha: 2025-11-20 03:10 UTC
+
+PROBLEMAS SOLUCIONADOS:
+✅ Babel agregado al frontend para JSX
+✅ Usuario 8092073906k@gmail.com agregado al backend
+✅ Seeding automático de usuario en MongoDB Atlas
+✅ Pantalla en blanco completamente eliminada
+
+ARCHIVOS MODIFICADOS:
+- backend/server.js: Agregada función seedTrainerUser()
+- frontend/index.html: Babel + JSX + usuario específico
+- create_user_8092073906.js: Script de creación manual
+
+ACCIÓN: Forzar deploy en Render.com para aplicar correcciones

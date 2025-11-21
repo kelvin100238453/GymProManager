@@ -1,0 +1,26 @@
+FORCE REBUILD URGENTE v2.0
+Fecha: 2025-11-21 13:11 UTC
+TICKET: CRÍTICO - Aplicación NO carga
+
+PROBLEMA DETECTADO:
+- URL: https://gympromanager.onrender.com
+- Status: ❌ Pantalla en blanco
+- Frontend desplegado: ❌ Versión React antigua  
+- Frontend local: ✅ Versión simplificada lista
+
+TRIGGER DE DEPLOY CRÍTICO:
+Crear timestamp de rebuild para forzar deploy completo
+
+ACCIÓN REQUERIDA:
+1. 🚨 HARD DEPLOY - Rebuild obligatorio
+2. 🔄 CLEAR CACHE - Eliminar cache de Render
+3. 📁 SYNC FRONTEND - Subir index.html simplificado  
+4. ✅ VERIFY - Confirmar versión simplificada activa
+
+SUCCESS CRITERIA:
+- App carga inmediatamente
+- Pantalla inicial visible  
+- Login: 8092073906k@gmail.com / 123
+- Sin pantalla en blanco
+
+PRIORIDAD: MÁXIMA

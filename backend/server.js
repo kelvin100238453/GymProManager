@@ -164,6 +164,52 @@ const seedDatabase = async () => {
     }
 };
 
+// Función para sembrar el usuario específico
+const seedTrainerUser = async () => {
+    try {
+        const trainersCollection = db.collection('trainers');
+        
+        // Datos del usuario específico
+        const trainerData = {
+            id: "trainer_user_001",
+            name: "Entrenador Usuario",
+            email: "8092073906k@gmail.com",
+            password: await bcrypt.hash('123', 10), // Hash de la contraseña '123'
+            role: "entrenador",
+            active: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        // Verificar si ya existe
+        const existingTrainer = await trainersCollection.findOne({ email: trainerData.email });
+        
+        if (existingTrainer) {
+            console.log('El usuario ya existe:', trainerData.email);
+            
+            // Actualizar si existe
+            await trainersCollection.updateOne(
+                { email: trainerData.email },
+                { 
+                    $set: {
+                        password: trainerData.password,
+                        name: trainerData.name,
+                        active: true,
+                        updatedAt: new Date()
+                    }
+                }
+            );
+            console.log('Usuario actualizado correctamente.');
+        } else {
+            // Insertar nuevo usuario
+            await trainersCollection.insertOne(trainerData);
+            console.log('Usuario creado correctamente:', trainerData.email);
+        }
+    } catch (error) {
+        console.error('Error al sembrar el usuario entrenador:', error);
+    }
+};
+
 // --- API ENDPOINTS ---
 
 // --- Auth ---
@@ -537,6 +583,7 @@ app.get(/^(?!\/api).*/, (req, res) => {
 const startServer = async () => {
     await connectDb(); // Conecta a la base de datos primero
     await seedDatabase(); // Puebla la base de datos con ejercicios
+    await seedTrainerUser(); // Sembrar usuario específico
     
     // Ejecutar limpieza automática cada hora
     setInterval(cleanupNotifications, 60 * 60 * 1000); // 1 hora
