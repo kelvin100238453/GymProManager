@@ -316,15 +316,15 @@
             );
         };
         const TimeInput = ({ label, value, onChange, ...props }) => {
-            // Convert decimal minutes to minutes and seconds
-            const totalSeconds = Math.round((value || 0) * 60);
+            // Treat value as total seconds
+            const totalSeconds = parseInt(value || 0);
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
 
             const handleMinutesChange = (e) => {
                 const newMinutes = parseInt(e.target.value) || 0;
                 const newTotalSeconds = newMinutes * 60 + seconds;
-                onChange({ target: { name: props.name, value: newTotalSeconds / 60, type: 'number' } });
+                onChange({ target: { name: props.name, value: newTotalSeconds, type: 'number' } });
             };
 
             const handleSecondsChange = (e) => {
@@ -332,7 +332,7 @@
                 // Ensure seconds are between 0-59
                 newSeconds = Math.min(Math.max(newSeconds, 0), 59);
                 const newTotalSeconds = minutes * 60 + newSeconds;
-                onChange({ target: { name: props.name, value: newTotalSeconds / 60, type: 'number' } });
+                onChange({ target: { name: props.name, value: newTotalSeconds, type: 'number' } });
             };
 
             return (
@@ -626,9 +626,9 @@
                                     <div className="text-indigo-400 text-xs sm:text-sm font-semibold">
                                         {ex.sets && <span>{ex.sets} sets</span>}
                                         {ex.reps && <span> x {ex.reps} reps</span>}
-                                        {ex.time && <span>{Math.round(ex.time / 60)} min</span>}
+                                        {ex.time > 0 && <span>{Math.floor(ex.time / 60)}m {ex.time % 60}s</span>}
                                         <span className="mx-2">|</span>
-                                        <span>{ex.rest}s</span>
+                                        <span>{Math.floor(ex.rest / 60)}m {ex.rest % 60}s</span>
                                     </div>
                                     {renderMedia(ex)}
                                     <p className="text-gray-300 mt-2 text-xs sm:text-sm">{ex.description}</p>
@@ -805,9 +805,9 @@
                     <div className="text-indigo-400 text-sm font-semibold">
                         {exercise.sets && <span>{exercise.sets} sets</span>}
                         {exercise.reps && <span> x {exercise.reps} reps</span>}
-                        {exercise.time && <span>{Math.round(exercise.time / 60)} min</span>}
+                        {exercise.time > 0 && <span>{Math.floor(exercise.time / 60)}m {exercise.time % 60}s</span>}
                         <span className="mx-2">|</span>
-                        <span>{exercise.rest}s</span>
+                        <span>{Math.floor(exercise.rest / 60)}m {exercise.rest % 60}s</span>
                     </div>
                     <p className="text-gray-300 mt-2 text-sm h-20 overflow-auto">{exercise.description}</p>
                 </div>
@@ -984,7 +984,7 @@
                                         {client.customRoutine?.[selectedWeekIndex]?.[selectedDay].exercises.map(ex => (
                                             <div key={ex.instanceId} className="p-2 bg-black/30 rounded">
                                                 <p className="font-semibold text-white">{ex.name}</p>
-                                                <p className="text-sm text-gray-300 font-medium">{ex.sets}×{ex.reps || `${ex.time}s`}, {ex.rest}s</p>
+                                                <p className="text-sm text-gray-300 font-medium">{ex.sets}×{ex.reps || `${Math.floor(ex.time / 60)}m ${ex.time % 60}s`}, {Math.floor(ex.rest / 60)}m {ex.rest % 60}s</p>
                                             </div>
                                         ))}
                                     </div>
