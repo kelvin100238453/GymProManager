@@ -36,7 +36,7 @@ const connectDb = async () => {
         const client = new MongoClient(MONGO_URL);
         await client.connect();
         // La base de datos se especifica en la URL de conexión de Atlas
-        db = client.db(); 
+        db = client.db();
         console.log(`Conectado exitosamente a la base de datos: ${db.databaseName}`);
     } catch (error) {
         console.error('Error al conectar con MongoDB Atlas.', error);
@@ -56,16 +56,16 @@ const asyncHandler = fn => (req, res, next) => {
 // Middleware de autenticación JWT
 const authenticateToken = asyncHandler(async (req, res, next) => {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader) {
         return res.status(401).json({ message: 'Token de acceso requerido.' });
     }
-    
+
     const token = authHeader.split(' ')[1];
-    
+
     try {
         const payload = jwt.verify(token, JWT_SECRET);
-        
+
         // Verificar si el usuario existe según el rol
         if (payload.role === 'client') {
             const client = await db.collection('clients').findOne({ id: payload.userId });
@@ -78,7 +78,7 @@ const authenticateToken = asyncHandler(async (req, res, next) => {
                 return res.status(403).json({ message: 'Entrenador no encontrado.' });
             }
         }
-        
+
         next();
     } catch (error) {
         return res.status(403).json({ message: 'Token inválido o expirado.' });
@@ -168,7 +168,7 @@ const seedDatabase = async () => {
 const seedTrainerUser = async () => {
     try {
         const trainersCollection = db.collection('trainers');
-        
+
         // Datos del usuario específico
         const trainerData = {
             id: "trainer_user_001",
@@ -183,14 +183,14 @@ const seedTrainerUser = async () => {
 
         // Verificar si ya existe
         const existingTrainer = await trainersCollection.findOne({ email: trainerData.email });
-        
+
         if (existingTrainer) {
             console.log('El usuario ya existe:', trainerData.email);
-            
+
             // Actualizar si existe
             await trainersCollection.updateOne(
                 { email: trainerData.email },
-                { 
+                {
                     $set: {
                         password: trainerData.password,
                         name: trainerData.name,
@@ -242,7 +242,7 @@ app.post('/api/auth/client/login', asyncHandler(async (req, res) => {
 
         // ACTUALIZAR SIEMPRE el refreshToken en la BD para clientes existentes
         await db.collection('clients').updateOne(
-            { _id: client._id }, 
+            { _id: client._id },
             { $set: { refreshToken } }
         );
 
@@ -268,7 +268,7 @@ app.post('/api/auth/client/refresh-token', asyncHandler(async (req, res) => {
         // Si el token expiró (solo para clientes), generar tokens nuevos
         if (error.name === 'TokenExpiredError') {
             console.log('Refresh token expirado para cliente, generando tokens nuevos');
-            
+
             try {
                 // Decodificar el payload sin verificar la expiración
                 const decoded = jwt.decode(refreshToken);
@@ -278,13 +278,13 @@ app.post('/api/auth/client/refresh-token', asyncHandler(async (req, res) => {
                         // Cliente válido con refresh token expirado, generar nuevos tokens
                         const newPayload = { userId: client.id, role: 'client' };
                         const { accessToken, refreshToken: newRefreshToken } = generateTokens(newPayload);
-                        
+
                         // Actualizar el refresh token en la BD
                         await db.collection('clients').updateOne(
-                            { _id: client._id }, 
+                            { _id: client._id },
                             { $set: { refreshToken: newRefreshToken } }
                         );
-                        
+
                         return res.json({ accessToken, refreshToken: newRefreshToken });
                     }
                 }
@@ -292,7 +292,7 @@ app.post('/api/auth/client/refresh-token', asyncHandler(async (req, res) => {
                 console.error('Error al decodificar token expirado:', decodeError);
             }
         }
-        
+
         return res.status(403).json({ message: 'Refresh token inválido o expirado.' });
     }
 
@@ -328,7 +328,7 @@ app.post('/api/auth/trainer/login', asyncHandler(async (req, res) => {
         console.log('Login successful for:', email);
         // Generar un token que no expira.
         const token = jwt.sign({ trainerId: trainer.id, role: 'trainer' }, JWT_SECRET);
-        
+
         const { password, ...trainerData } = trainer;
         res.json({ token, user: trainerData });
     } else {
@@ -358,15 +358,15 @@ app.post('/api/auth/trainer/register', asyncHandler(async (req, res) => {
         password: hashedPassword,
         role: 'trainer'
     };
-    
+
     await db.collection('trainers').insertOne(newTrainer);
-    
+
     // Después de registrar, también iniciamos sesión generando un token
     const token = jwt.sign({ trainerId: newTrainer.id, role: 'trainer' }, JWT_SECRET);
 
     // No enviar la contraseña hasheada al cliente
     const { password: _, ...trainerData } = newTrainer;
-    
+
     // Enviar el token y los datos del usuario, igual que en el login
     res.status(201).json({ token, user: trainerData });
 }));
@@ -394,7 +394,7 @@ app.post('/api/clients', authenticateToken, asyncHandler(async (req, res) => {
     if (!clientData.password || clientData.password.trim() === '') {
         return res.status(400).json({ message: 'La contraseña es un campo obligatorio.' });
     }
-    
+
     const newClient = {
         id: `client-${crypto.randomUUID()}`,
         ...clientData,
@@ -410,7 +410,7 @@ app.post('/api/clients', authenticateToken, asyncHandler(async (req, res) => {
     newClient.password = await bcrypt.hash(clientData.password, salt);
 
     await db.collection('clients').insertOne(newClient);
-    
+
     const { password, ...responseData } = newClient;
     res.status(201).json(responseData);
 }));
@@ -418,9 +418,9 @@ app.post('/api/clients', authenticateToken, asyncHandler(async (req, res) => {
 app.put('/api/clients/:id', authenticateToken, asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { password, _id, ...restOfBody } = req.body;
-    
+
     const updateData = { ...restOfBody };
-    
+
     // Si se está actualizando la contraseña, hashearla
     if (password && typeof password === 'string' && password.trim() !== '') {
         const salt = await bcrypt.genSalt(10);
@@ -435,7 +435,7 @@ app.put('/api/clients/:id', authenticateToken, asyncHandler(async (req, res) => 
     if (result.matchedCount === 0) {
         return res.status(404).json({ message: 'Cliente no encontrado' });
     }
-    
+
     const updatedClient = await db.collection('clients').findOne({ id: id });
     const { password: _, ...responseData } = updatedClient;
     res.json(responseData);
@@ -536,13 +536,13 @@ app.post('/api/notifications', authenticateToken, asyncHandler(async (req, res) 
 app.post('/api/clients/:id/log-workout', authenticateToken, asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { durationSeconds } = req.body;
-    
+
     const client = await db.collection('clients').findOne({ id: id });
 
     if (client) {
         const today = new Date().toISOString().split('T')[0];
         const durationMinutes = Math.round(durationSeconds / 60);
-        
+
         const workoutLogs = client.workoutLogs || [];
         const todayLogIndex = workoutLogs.findIndex(log => log.date === today);
 
@@ -553,7 +553,7 @@ app.post('/api/clients/:id/log-workout', authenticateToken, asyncHandler(async (
         }
 
         await db.collection('clients').updateOne({ id: id }, { $set: { workoutLogs: workoutLogs } });
-        
+
         const updatedClient = await db.collection('clients').findOne({ id: id });
         res.status(200).json(updatedClient);
     } else {
@@ -562,8 +562,11 @@ app.post('/api/clients/:id/log-workout', authenticateToken, asyncHandler(async (
 }));
 
 // --- SERVIR ARCHIVOS ESTÁTICOS DEL FRONTEND ---
-// Deshabilitar cache para index.html
-app.use(express.static(path.join(__dirname, '..', 'frontend'), {
+// Usar path.resolve para asegurar rutas absolutas correctas
+const frontendPath = path.resolve(__dirname, '..', 'frontend');
+console.log('Sirviendo frontend desde:', frontendPath);
+
+app.use(express.static(frontendPath, {
     setHeaders: (res, filepath) => {
         if (filepath.endsWith('index.html')) {
             res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -572,11 +575,19 @@ app.use(express.static(path.join(__dirname, '..', 'frontend'), {
         }
     }
 }));
+
 app.get(/^(?!\/api).*/, (req, res) => {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
-    res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
+    const indexPath = path.join(frontendPath, 'index.html');
+    console.log('Enviando index.html desde:', indexPath);
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+            console.error('Error enviando index.html:', err);
+            res.status(500).send('Error loading application');
+        }
+    });
 });
 
 // --- INICIAR SERVIDOR ---
@@ -584,11 +595,11 @@ const startServer = async () => {
     await connectDb(); // Conecta a la base de datos primero
     await seedDatabase(); // Puebla la base de datos con ejercicios
     await seedTrainerUser(); // Sembrar usuario específico
-    
+
     // Ejecutar limpieza automática cada hora
     setInterval(cleanupNotifications, 60 * 60 * 1000); // 1 hora
     console.log('Tarea de limpieza automática de notificaciones programada (cada 1 hora)');
-    
+
     app.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
         console.log('Conectado a la base de datos MongoDB.');

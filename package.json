@@ -1,0 +1,12 @@
+{
+  "name": "gympromanager-root",
+  "version": "1.0.0",
+  "description": "Root package for GymProManager deployment",
+  "scripts": {
+    "install-backend": "cd backend && npm install",
+    "start": "cd backend && node server.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
