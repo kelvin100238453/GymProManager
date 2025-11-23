@@ -88,70 +88,152 @@ const authenticateToken = asyncHandler(async (req, res, next) => {
 // --- LÓGICA DE SEEDING DE LA BASE DE DATOS ---
 const seedDatabase = async () => {
     const defaultExercises = [
-        // Glúteos
+        // ========== GLÚTEOS (10 ejercicios) ==========
         { id: 'ex-glute-01', name: 'Hip Thrust con Barra', category: 'Glúteos', tags: ['Glúteos'], description: 'Ejercicio clave para la fuerza y el tamaño de los glúteos.', sets: 4, reps: 12, rest: 90 },
         { id: 'ex-glute-02', name: 'Sentadilla Búlgara con Mancuernas', category: 'Glúteos', tags: ['Glúteos', 'Piernas'], description: 'Excelente para el glúteo y cuádriceps, trabaja de forma unilateral.', sets: 3, reps: 10, rest: 60 },
         { id: 'ex-glute-03', name: 'Patada de Glúteo en Polea', category: 'Glúteos', tags: ['Glúteos'], description: 'Aísla el glúteo mayor para una máxima contracción.', sets: 3, reps: 15, rest: 45 },
         { id: 'ex-glute-04', name: 'Abducción de Cadera en Máquina', category: 'Glúteos', tags: ['Glúteos'], description: 'Fortalece el glúteo medio y menor, mejorando la estabilidad de la cadera.', sets: 3, reps: 20, rest: 45 },
         { id: 'ex-glute-05', name: 'Peso Muerto Rumano con Mancuernas', category: 'Glúteos', tags: ['Glúteos', 'Femorales'], description: 'Enfatiza el trabajo en los isquiotibiales y glúteos.', sets: 4, reps: 12, rest: 90 },
         { id: 'ex-glute-06', name: 'Puente de Glúteo con Banda', category: 'Glúteos', tags: ['Glúteos'], description: 'Ejercicio de activación que se puede usar para calentar o como finisher.', sets: 3, reps: 20, rest: 30 },
+        { id: 'ex-glute-07', name: 'Peso Muerto Sumo', category: 'Glúteos', tags: ['Glúteos', 'Fuerza'], description: 'Variante de peso muerto que enfatiza glúteos y aductores.', sets: 4, reps: 8, rest: 90 },
+        { id: 'ex-glute-08', name: 'Step Ups con Mancuernas', category: 'Glúteos', tags: ['Glúteos', 'Piernas'], description: 'Ejercicio unilateral funcional.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-glute-09', name: 'Elevación de Cadera en Banco', category: 'Glúteos', tags: ['Glúteos'], description: 'Hiperextensión de cadera para aislar glúteos.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-glute-10', name: 'Clamshells con Banda', category: 'Glúteos', tags: ['Glúteos'], description: 'Activación de glúteo medio.', sets: 3, reps: 20, rest: 30 },
 
-        // Piernas (Cuádriceps y Femorales)
+        // ========== PIERNAS (20 ejercicios) ==========
         { id: 'ex-legs-01', name: 'Sentadilla Goblet', category: 'Piernas', tags: ['Piernas', 'Cuádriceps'], description: 'Variación de sentadilla que ayuda a mantener una postura correcta.', sets: 4, reps: 12, rest: 90 },
         { id: 'ex-legs-02', name: 'Prensa de Piernas', category: 'Piernas', tags: ['Piernas', 'Cuádriceps', 'Glúteos'], description: 'Permite mover cargas pesadas con gran seguridad para las piernas.', sets: 4, reps: 15, rest: 90 },
         { id: 'ex-legs-03', name: 'Extensiones de Cuádriceps', category: 'Piernas', tags: ['Piernas', 'Cuádriceps'], description: 'Aísla los cuádriceps para definirlos y fortalecerlos.', sets: 3, reps: 15, rest: 60 },
         { id: 'ex-legs-04', name: 'Curl Femoral Tumbado', category: 'Piernas', tags: ['Piernas', 'Femorales'], description: 'Aísla los isquiotibiales.', sets: 3, reps: 15, rest: 60 },
         { id: 'ex-legs-05', name: 'Zancadas Caminando', category: 'Piernas', tags: ['Piernas', 'Cuádriceps', 'Glúteos'], description: 'Ejercicio funcional que trabaja piernas y glúteos de forma dinámica.', sets: 3, reps: 12, rest: 60 },
         { id: 'ex-legs-06', name: 'Sentadilla Sumo con Pesa Rusa', category: 'Piernas', tags: ['Piernas', 'Aductores', 'Glúteos'], description: 'Enfatiza el trabajo en los aductores y glúteos.', sets: 3, reps: 12, rest: 90 },
-        { id: 'ex-legs-07', name: 'Elevación de Talones (Gemelos)', category: 'Piernas', tags: ['Piernas', 'Gemelos'], description: 'Fortalecimiento de pantorrillas.', sets: 4, reps: 15, rest: 45 },
+        { id: 'ex-legs-07', name: 'Elevación de Talones de Pie', category: 'Piernas', tags: ['Piernas', 'Gemelos'], description: 'Fortalecimiento de pantorrillas - gastrocnemio.', sets: 4, reps: 15, rest: 45 },
         { id: 'ex-legs-08', name: 'Sentadilla Frontal', category: 'Piernas', tags: ['Piernas', 'Cuádriceps', 'Core'], description: 'Enfatiza cuádriceps y requiere mayor estabilidad del core.', sets: 4, reps: 10, rest: 90 },
         { id: 'ex-legs-09', name: 'Elevación de Gemelos Sentado', category: 'Piernas', tags: ['Piernas', 'Gemelos'], description: 'Enfatiza el sóleo.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-legs-10', name: 'Sentadilla con Barra', category: 'Piernas', tags: ['Piernas', 'Fuerza'], description: 'El rey de los ejercicios para piernas.', sets: 5, reps: 8, rest: 90 },
+        { id: 'ex-legs-11', name: 'Zancadas Estáticas', category: 'Piernas', tags: ['Piernas', 'Cuádriceps'], description: 'Zancadas en posición fija.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-legs-12', name: 'Curl Femoral Sentado', category: 'Piernas', tags: ['Piernas', 'Femorales'], description: 'Variante del curl femoral.', sets: 3, reps: 15, rest: 60 },
+        { id: 'ex-legs-13', name: 'Hack Squat', category: 'Piernas', tags: ['Piernas', 'Cuádriceps'], description: 'Sentadilla en máquina para aislamiento de cuádriceps.', sets: 4, reps: 12, rest: 90 },
+        { id: 'ex-legs-14', name: 'Peso Muerto Pierna Rígida', category: 'Piernas', tags: ['Piernas', 'Femorales'], description: 'Enfatiza isquiotibiales y espalda baja.', sets: 4, reps: 10, rest: 90 },
+        { id: 'ex-legs-15', name: 'Aducciones en Máquina', category: 'Piernas', tags: ['Piernas', 'Aductores'], description: 'Fortalece la cara interna del muslo.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-legs-16', name: 'Sentadilla Pistol (Asistida)', category: 'Piernas', tags: ['Piernas', 'Unilateral'], description: 'Sentadilla a una pierna para fuerza unilateral.', sets: 3, reps: 8, rest: 90 },
+        { id: 'ex-legs-17', name: 'Buenos Días (Good Mornings)', category: 'Piernas', tags: ['Piernas', 'Femorales'], description: 'Bisagra de cadera para femorales y lumbares.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-legs-18', name: 'Zancadas Laterales', category: 'Piernas', tags: ['Piernas', 'Aductores'], description: 'Movimiento lateral para aductores y abductores.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-legs-19', name: 'Leg Press Unilateral', category: 'Piernas', tags: ['Piernas', 'Unilateral'], description: 'Prensa de pierna a una pierna.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-legs-20', name: 'Wall Sit (Sentadilla Isométrica)', category: 'Piernas', tags: ['Piernas', 'Isométrico'], description: 'Resistencia isométrica de cuádriceps.', sets: 3, time: 60, rest: 60 },
 
-        // Espalda
+        // ========== ESPA LDA (15 ejercicios) ==========
         { id: 'ex-back-01', name: 'Jalón al Pecho (Polea Alta)', category: 'Espalda', tags: ['Espalda', 'Dorsales'], description: 'Desarrolla la amplitud de la espalda (dorsales).', sets: 4, reps: 12, rest: 60 },
         { id: 'ex-back-02', name: 'Remo Sentado en Polea', category: 'Espalda', tags: ['Espalda'], description: 'Trabaja la densidad y grosor de la espalda media.', sets: 4, reps: 12, rest: 60 },
-        { id: 'ex-back-03', name: 'Dominadas Asistidas', category: 'Espalda', tags: ['Espalda', 'Dorsales'], description: 'Versión accesible de las dominadas para construir fuerza.', sets: 3, reps: 8, rest: 90 },
+        { id: 'ex-back-03', name: 'Dominadas', category: 'Espalda', tags: ['Espalda', 'Dorsales'], description: 'El ejercicio rey para la espalda.', sets: 3, reps: 8, rest: 90 },
         { id: 'ex-back-04', name: 'Pull-over con Mancuerna', category: 'Espalda', tags: ['Espalda', 'Dorsales', 'Pecho'], description: 'Trabaja el dorsal y el serrato, expandiendo la caja torácica.', sets: 3, reps: 15, rest: 60 },
         { id: 'ex-back-05', name: 'Hiperextensiones (Lumbares)', category: 'Espalda', tags: ['Espalda', 'Lumbares'], description: 'Fortalece la espalda baja y cadena posterior.', sets: 3, reps: 15, rest: 60 },
         { id: 'ex-back-06', name: 'Remo con Barra', category: 'Espalda', tags: ['Espalda', 'Fuerza'], description: 'Ejercicio compuesto fundamental para grosor de espalda.', sets: 4, reps: 10, rest: 90 },
+        { id: 'ex-back-07', name: 'Jalón con Agarre Cerrado', category: 'Espalda', tags: ['Espalda', 'Dorsales'], description: 'Variante que enfatiza el grosor del dorsal.', sets: 4, reps: 12, rest: 60 },
+        { id: 'ex-back-08', name: 'Remo con Mancuerna a Una Mano', category: 'Espalda', tags: ['Espalda', 'Unilateral'], description: 'Trabajo unilateral de espalda.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-back-09', name: 'Peso Muerto Convencional', category: 'Espalda', tags: ['Espalda', 'Fuerza'], description: 'Ejercicio fundamental de fuerza total.', sets: 5, reps: 5, rest: 90 },
+        { id: 'ex-back-10', name: 'Jalón tras Nuca', category: 'Espalda', tags: ['Espalda', 'Dorsales'], description: 'Variante del jalón (no recomendado para todos).', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-back-11', name: 'Remo en T', category: 'Espalda', tags: ['Espalda'], description: 'Remo con barra en T para grosor.', sets: 4, reps: 10, rest: 90 },
+        { id: 'ex-back-12', name: 'Pulldown con Cuerda', category: 'Espalda', tags: ['Espalda', 'Dorsales'], description: 'Variante con cuerda para mayor activación.', sets: 3, reps: 15, rest: 60 },
+        { id: 'ex-back-13', name: 'Shrugs con Barra', category: 'Espalda', tags: ['Espalda', 'Trapecios'], description: 'Encogimientos para trapecio superior.', sets: 4, reps: 15, rest: 60 },
+        { id: 'ex-back-14', name: 'Superman (Espalda Baja)', category: 'Espalda', tags: ['Espalda', 'Lumbares'], description: 'Ejercicio de peso corporal para lumbares.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-back-15', name: 'Remo Invertido (Australian Pull-up)', category: 'Espalda', tags: ['Espalda'], description: 'Remo con peso corporal.', sets: 3, reps: 12, rest: 60 },
 
-        // Hombros
+        // ========== HOMBROS (12 ejercicios) ==========
         { id: 'ex-shoulders-01', name: 'Press Militar con Mancuernas', category: 'Hombros', tags: ['Hombros'], description: 'Ejercicio fundamental para la fuerza y tamaño de los hombros.', sets: 4, reps: 10, rest: 90 },
         { id: 'ex-shoulders-02', name: 'Elevaciones Laterales con Mancuernas', category: 'Hombros', tags: ['Hombros'], description: 'Aísla la cabeza media del deltoides, dando amplitud a los hombros.', sets: 3, reps: 15, rest: 45 },
         { id: 'ex-shoulders-03', name: 'Pájaros (Elevaciones Posteriores)', category: 'Hombros', tags: ['Hombros'], description: 'Enfocado en el deltoides posterior, clave para una buena postura.', sets: 3, reps: 15, rest: 45 },
         { id: 'ex-shoulders-04', name: 'Face Pulls en Polea', category: 'Hombros', tags: ['Hombros', 'Espalda'], description: 'Mejora la salud del hombro y la postura, trabajando el deltoides posterior y manguito rotador.', sets: 3, reps: 20, rest: 45 },
         { id: 'ex-shoulders-05', name: 'Encogimientos con Mancuernas', category: 'Hombros', tags: ['Hombros', 'Trapecios'], description: 'Desarrollo de trapecios superiores.', sets: 4, reps: 15, rest: 60 },
+        { id: 'ex-shoulders-06', name: 'Press Militar con Barra', category: 'Hombros', tags: ['Hombros', 'Fuerza'], description: 'Versión con barra del press militar.', sets: 4, reps: 8, rest: 90 },
+        { id: 'ex-shoulders-07', name: 'Elevaciones Frontales', category: 'Hombros', tags: ['Hombros'], description: 'Trabaja el deltoides anterior.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-shoulders-08', name: 'Arnold Press', category: 'Hombros', tags: ['Hombros'], description: 'Variante del press que trabaja todo el deltoides.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-shoulders-09', name: 'Elevaciones Laterales en Polea', category: 'Hombros', tags: ['Hombros'], description: 'Tensión constante para deltoides medio.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-shoulders-10', name: 'Press Bradford', category: 'Hombros', tags: ['Hombros'], description: 'Press alternando adelante y atrás.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-shoulders -11', name: 'Elevaciones en Y', category: 'Hombros', tags: ['Hombros'], description: 'Trabaja manguito rotador y deltoides.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-shoulders-12', name: 'Pájaros en Máquina Pec Deck', category: 'Hombros', tags: ['Hombros'], description: 'Deltoides posterior con máquina.', sets: 3, reps: 15, rest: 45 },
 
-        // Pecho
+        // ========== PECHO (12 ejercicios) ==========
         { id: 'ex-chest-01', name: 'Press de Banca con Mancuernas', category: 'Pecho', tags: ['Pecho'], description: 'Permite un mayor rango de movimiento que la barra, beneficiando el desarrollo pectoral.', sets: 4, reps: 12, rest: 90 },
         { id: 'ex-chest-02', name: 'Aperturas con Mancuernas (Banco Inclinado)', category: 'Pecho', tags: ['Pecho'], description: 'Enfocado en la parte superior del pectoral.', sets: 3, reps: 15, rest: 60 },
         { id: 'ex-chest-03', name: 'Flexiones (Push-ups)', category: 'Pecho', tags: ['Pecho', 'Hombros', 'Tríceps'], description: 'Ejercicio de peso corporal fundamental para el tren superior.', sets: 3, reps: 15, rest: 60 },
         { id: 'ex-chest-04', name: 'Press Inclinado con Mancuernas', category: 'Pecho', tags: ['Pecho', 'Superior'], description: 'Enfatiza la porción clavicular (superior) del pectoral.', sets: 4, reps: 10, rest: 90 },
+        { id: 'ex-chest-05', name: 'Press de Banca con Barra', category: 'Pecho', tags: ['Pecho', 'Fuerza'], description: 'El ejercicio clásico para desarrollar pecho.', sets: 4, reps: 8, rest: 90 },
+        { id: 'ex-chest-06', name: 'Aperturas en Polea (Cable Crossover)', category: 'Pecho', tags: ['Pecho'], description: 'Tensión constante en el pectoral.', sets: 3, reps: 15, rest: 60 },
+        { id: 'ex-chest-07', name: 'Press Declinado con Mancuernas', category: 'Pecho', tags: ['Pecho', 'Inferior'], description: 'Trabaja la parte inferior del pecho.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-chest-08', name: 'Flexiones Declinadas', category: 'Pecho', tags: ['Pecho'], description: 'Pies elevados para enfatizar pecho superior.', sets: 3, reps: 15, rest: 60 },
+        { id: 'ex-chest-09', name: 'Press en Máquina', category: 'Pecho', tags: ['Pecho'], description: 'Press de pecho en máquina.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-chest-10', name: 'Pec Deck (Mariposa)', category: 'Pecho', tags: ['Pecho'], description: 'Aislamiento de pectoral en máquina.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-chest-11', name: 'Flexiones Diamante', category: 'Pecho', tags: ['Pecho', 'Tríceps'], description: 'Flexiones con manos juntas.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-chest-12', name: 'Fondos en Paralelas (Pecho)', category: 'Pecho', tags: ['Pecho', 'Tríceps'], description: 'Inclinado hacia adelante para enfatizar pecho.', sets: 3, reps: 10, rest: 90 },
 
-        // Brazos (Bíceps y Tríceps)
+        // ========== BRAZOS (16 ejercicios) ==========
         { id: 'ex-arms-01', name: 'Curl de Bíceps con Barra Z', category: 'Brazos', tags: ['Brazos', 'Bíceps'], description: 'Reduce la tensión en las muñecas mientras se trabaja el bíceps.', sets: 3, reps: 12, rest: 60 },
         { id: 'ex-arms-02', name: 'Extensiones de Tríceps en Polea Alta', category: 'Brazos', tags: ['Brazos', 'Tríceps'], description: 'Aísla el tríceps para un desarrollo completo.', sets: 3, reps: 15, rest: 45 },
         { id: 'ex-arms-03', name: 'Fondos en Banco', category: 'Brazos', tags: ['Brazos', 'Tríceps'], description: 'Excelente ejercicio de peso corporal para tríceps.', sets: 3, reps: 12, rest: 60 },
         { id: 'ex-arms-04', name: 'Curl Martillo con Mancuernas', category: 'Brazos', tags: ['Brazos', 'Bíceps', 'Antebrazo'], description: 'Trabaja el braquial y el antebrazo además del bíceps.', sets: 3, reps: 12, rest: 45 },
+        { id: 'ex-arms-05', name: 'Curl de Bíceps con Barra Recta', category: 'Brazos', tags: ['Brazos', 'Bíceps'], description: 'Curl clásico con barra recta.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-arms-06', name: 'Press Francés (Extensión de Tríceps Tumbado)', category: 'Brazos', tags: ['Brazos', 'Tríceps'], description: 'Trabajo intenso de tríceps.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-arms-07', name: 'Curl Concentrado', category: 'Brazos', tags: ['Brazos', 'Bíceps'], description: 'Aislamiento total del bíceps.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-arms-08', name: 'Patada de Tríceps con Mancuerna', category: 'Brazos', tags: ['Brazos', 'Tríceps'], description: 'Aislamiento de tríceps.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-arms-09', name: 'Curl en Predicador', category: 'Brazos', tags: ['Brazos', 'Bíceps'], description: 'Curl en banco Scott.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-arms-10', name: 'Extensión de Tríceps sobre Cabeza con Mancuerna', category: 'Brazos', tags: ['Brazos', 'Tríceps'], description: 'Trabaja la cabeza larga del tríceps.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-arms-11', name: 'Curl de Cable', category: 'Brazos', tags: ['Brazos', 'Bíceps'], description: 'Tensión constante en bíceps.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-arms-12', name: 'Extensión de Tríceps con Cuerda', category: 'Brazos', tags: ['Brazos', 'Tríceps'], description: 'Mayor rango de movimiento.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-arms-13', name: 'Curl 21s', category: 'Brazos', tags: ['Brazos', 'Bíceps'], description: 'Técnica avanzada de bíceps (7+7+7).', sets: 3, reps: 21, rest: 60 },
+        { id: 'ex-arms-14', name: 'Curl Inverso', category: 'Brazos', tags: ['Brazos', 'Antebrazo'], description: 'Trabaja braquiorradial y antebrazos.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-arms-15', name: 'Extensión de Muñeca', category: 'Brazos', tags: ['Brazos', 'Antebrazo'], description: 'Fortalece extensores de muñeca.', sets: 3, reps: 20, rest: 30 },
+        { id: 'ex-arms-16', name: 'Flexión de Muñeca', category: 'Brazos', tags: ['Brazos', 'Antebrazo'], description: 'Fortalece flexores de muñeca.', sets: 3, reps: 20, rest: 30 },
 
-        // Abdomen y Core
+        // ========== ABDOMEN Y CORE (14 ejercicios) ==========
         { id: 'ex-core-01', name: 'Plancha (Plank)', category: 'Abdomen y Core', tags: ['Core', 'Abdomen'], description: 'Ejercicio isométrico para la estabilidad de todo el core.', sets: 3, time: 60, rest: 45 },
         { id: 'ex-core-02', name: 'Elevación de Piernas Colgado', category: 'Abdomen y Core', tags: ['Core', 'Abdomen'], description: 'Intenso ejercicio para la parte inferior del abdomen.', sets: 3, reps: 15, rest: 45 },
         { id: 'ex-core-03', name: 'Crunch Abdominal en Polea Alta', category: 'Abdomen y Core', tags: ['Core', 'Abdomen'], description: 'Permite añadir resistencia al crunch para mayor hipertrofia.', sets: 3, reps: 20, rest: 45 },
         { id: 'ex-core-04', name: 'Rueda Abdominal (Ab Wheel)', category: 'Abdomen y Core', tags: ['Core', 'Abdomen', 'Espalda'], description: 'Ejercicio avanzado para una fuerza abdominal y de core superior.', sets: 3, reps: 12, rest: 60 },
         { id: 'ex-core-05', name: 'Russian Twists', category: 'Abdomen y Core', tags: ['Core', 'Oblicuos'], description: 'Trabajo rotacional para oblicuos.', sets: 3, reps: 20, rest: 45 },
         { id: 'ex-core-06', name: 'Elevación de Piernas Tumbado', category: 'Abdomen y Core', tags: ['Core', 'Abdomen'], description: 'Control abdominal inferior.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-core-07', name: 'Plancha Lateral', category: 'Abdomen y Core', tags: ['Core', 'Oblicuos'], description: 'Isométrico para oblicuos y estabilizadores laterales.', sets: 3, time: 45, rest: 45 },
+        { id: 'ex-core-08', name: 'Mountain Climbers', category: 'Abdomen y Core', tags: ['Core', 'Cardio'], description: 'Ejercicio dinámico de core y cardio.', sets: 3, time: 60, rest: 60 },
+        { id: 'ex-core-09', name: 'Dead Bug', category: 'Abdomen y Core', tags: ['Core', 'Abdomen'], description: 'Coordinación y estabilidad de core.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-core-10', name: 'Bicicleta Abdominal', category: 'Abdomen y Core', tags: ['Core', 'Oblicuos'], description: 'Trabaja todo el core.', sets: 3, reps: 20, rest: 45 },
+        { id: 'ex-core-11', name: 'Pallof Press', category: 'Abdomen y Core', tags: ['Core'], description: 'Anti-rotación de core.', sets: 3, reps: 15, rest: 45 },
+        { id: 'ex-core-12', name: 'Plancha con Toque de Hombro', category: 'Abdomen y Core', tags: ['Core'], description: 'Plancha dinámica para estabilidad.', sets: 3, reps: 20, rest: 45 },
+        { id: 'ex-core-13', name: 'V-Ups', category: 'Abdomen y Core', tags: ['Core', 'Abdomen'], description: 'Ejercicio completo de abdomen.', sets: 3, reps: 15, rest: 60 },
+        { id: 'ex-core-14', name: 'Hollow Hold', category: 'Abdomen y Core', tags: ['Core'], description: 'Isométrico avanzado de gimnasia.', sets: 3, time: 45, rest: 60 },
 
-        // Cardio
+        // ========== CARDIO (10 ejercicios) ==========
         { id: 'ex-cardio-01', name: 'Caminadora (Cinta)', category: 'Cardio', tags: ['Cardio', 'Resistencia'], description: 'Caminata o trote suave para calentamiento o quema de calorías.', sets: 1, time: 1200, rest: 0 },
         { id: 'ex-cardio-02', name: 'Bicicleta Estática', category: 'Cardio', tags: ['Cardio', 'Piernas'], description: 'Cardio de bajo impacto.', sets: 1, time: 1200, rest: 0 },
         { id: 'ex-cardio-03', name: 'Elíptica', category: 'Cardio', tags: ['Cardio', 'Full Body'], description: 'Cardio de bajo impacto que involucra brazos y piernas.', sets: 1, time: 1200, rest: 0 },
         { id: 'ex-cardio-04', name: 'Salto a la Cuerda', category: 'Cardio', tags: ['Cardio', 'Coordinación'], description: 'Cardio intenso para coordinación y agilidad.', sets: 3, time: 180, rest: 60 },
         { id: 'ex-cardio-05', name: 'Remo (Rowing Machine)', category: 'Cardio', tags: ['Cardio', 'Full Body'], description: 'Cardio de cuerpo completo de bajo impacto.', sets: 1, time: 1200, rest: 0 },
         { id: 'ex-cardio-06', name: 'Escaladora (Stair Climber)', category: 'Cardio', tags: ['Cardio', 'Piernas'], description: 'Excelente para glúteos y resistencia cardiovascular.', sets: 1, time: 900, rest: 0 },
+        { id: 'ex-cardio-07', name: 'Sprints en Cinta', category: 'Cardio', tags: ['Cardio', 'HIIT'], description: 'Intervalos de alta intensidad.', sets: 8, time: 30, rest: 90 },
+        { id: 'ex-cardio-08', name: 'Natación', category: 'Cardio', tags: ['Cardio', 'Full Body'], description: 'Cardio de muy bajo impacto.', sets: 1, time: 1800, rest: 0 },
+        { id: 'ex-cardio-09', name: 'Assault Bike (Airdyne)', category: 'Cardio', tags: ['Cardio', 'HIIT'], description: 'Bici de brazos y piernas para HIIT.', sets: 5, time: 60, rest: 120 },
+        { id: 'ex-cardio-10', name: 'Battle Ropes', category: 'Cardio', tags: ['Cardio', 'Brazos'], description: 'Cuerdas para cardio y brazos.', sets: 4, time: 45, rest: 60 },
 
-        // Full Body
-        { id: 'ex-full-01', name: 'Burpees', category: 'Full Body', tags: ['Cardio', 'Fuerza'], description: 'Ejercicio metabólico completo.', sets: 3, reps: 15, rest: 90 }
+        // ========== FULL BODY & FUNCIONAL (10 ejercicios) ==========
+        { id: 'ex-full-01', name: 'Burpees', category: 'Full Body', tags: ['Cardio', 'Fuerza'], description: 'Ejercicio metabólico completo.', sets: 3, reps: 15, rest: 90 },
+        { id: 'ex-full-02', name: 'Thrusters (Sentadilla + Press)', category: 'Full Body', tags: ['Full Body', 'Fuerza'], description: 'Movimiento compuesto completo.', sets: 4, reps: 12, rest: 90 },
+        { id: 'ex-full-03', name: 'Clean and Press', category: 'Full Body', tags: ['Full Body', 'Fuerza'], description: 'Levantamiento olímpico modificado.', sets: 4, reps: 8, rest: 90 },
+        { id: 'ex-full-04', name: 'Swing con Pesa Rusa (Kettlebell)', category: 'Full Body', tags: ['Full Body', 'Potencia'], description: 'Explosivo para cadena posterior.', sets: 4, reps: 20, rest: 60 },
+        { id: 'ex-full-05', name: 'Turkish Get-Up', category: 'Full Body', tags: ['Full Body', 'Core'], description: 'Movimiento funcional completo.', sets: 3, reps: 5, rest: 90 },
+        { id: 'ex-full-06', name: 'Man Makers', category: 'Full Body', tags: ['Full Body', 'Cardio'], description: 'Burpee + remo + press.', sets: 3, reps: 10, rest: 90 },
+        { id: 'ex-full-07', name: 'Wall Balls', category: 'Full Body', tags: ['Full Body', 'Potencia'], description: 'Sentadilla + lanzamiento de balón.', sets: 4, reps: 15, rest: 60 },
+        { id: 'ex-full-08', name: 'Devil Press', category: 'Full Body', tags: ['Full Body', 'Cardio'], description: 'Burpee con mancuernas + press.', sets: 3, reps: 10, rest: 90 },
+        { id: 'ex-full-09', name: 'Farmer Walk (Caminata del Granjero)', category: 'Full Body', tags: ['Full Body', 'Agarre'], description: 'Carga pesada para agarre y core.', sets: 3, time: 60, rest: 90 },
+        { id: 'ex-full-10', name: 'Bear Crawl', category: 'Full Body', tags: ['Full Body', 'Core'], description: 'Movimiento animal para core y coordinación.', sets: 3, time: 60, rest: 60 },
+
+        // ========== MOVILIDAD & ESTIRAMIENTO (8 ejercicios) ==========
+        { id: 'ex-mobility-01', name: 'Cat-Cow (Gato-Vaca)', category: 'Movilidad', tags: ['Movilidad', 'Espalda'], description: 'Movilidad de columna vertebral.', sets: 2, reps: 15, rest: 30 },
+        { id: 'ex-mobility-02', name: 'World\'s Greatest Stretch', category: 'Movilidad', tags: ['Movilidad', 'Caderas'], description: 'Estiramiento completo de cadera.', sets: 2, reps: 10, rest: 30 },
+        { id: 'ex-mobility-03', name: 'Estiramiento de Isquiotibiales', category: 'Movilidad', tags: ['Movilidad', 'Piernas'], description: 'Flexibilidad de femorales.', sets: 2, time: 60, rest: 30 },
+        { id: 'ex-mobility-04', name: 'Estiramiento de Cuádriceps', category: 'Movilidad', tags: ['Movilidad', 'Piernas'], description: 'Flexibilidad de cuádriceps.', sets: 2, time: 60, rest: 30 },
+        { id: 'ex-mobility-05', name: 'Rotaciones de Hombro', category: 'Movilidad', tags: ['Movilidad', 'Hombros'], description: 'Movilidad de cápsula del hombro.', sets: 2, reps: 15, rest: 30 },
+        { id: 'ex-mobility-06', name: '90/90 Hip Stretch', category: 'Movilidad', tags: ['Movilidad', 'Caderas'], description: 'Movilidad de cadera.', sets: 2, time: 60, rest: 30 },
+        { id: 'ex-mobility-07', name: 'Thoracic Rotation', category: 'Movilidad', tags: ['Movilidad', 'Espalda'], description: 'Rotación de columna torácica.', sets: 2, reps: 15, rest: 30 },
+        { id: 'ex-mobility-08', name: 'Cobra Stretch', category: 'Movilidad', tags: ['Movilidad', 'Core'], description: 'Extensión de columna.', sets: 2, time: 45, rest: 30 }
     ];
 
     try {
