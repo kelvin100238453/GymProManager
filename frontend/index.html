@@ -705,7 +705,7 @@
             );
         };
 
-        const ClientDashboard = ({ user, allExercises, onLogout, onNotify, onLogWorkout }) => {
+        const ClientDashboard = ({ user, allExercises, onLogout, onNotify, onLogWorkout, darkMode, toggleDarkMode }) => {
             const [selectedDay, setSelectedDay] = useState(new Date().toLocaleDateString('es-ES', { weekday: 'long' }).replace(/^\w/, c => c.toUpperCase()));
             const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
             const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -1060,7 +1060,7 @@
             );
         };
 
-        const TrainerDashboard = ({ user, onLogout, onViewClient, allExercises, notifications }) => {
+        const TrainerDashboard = ({ user, onLogout, onViewClient, allExercises, notifications, darkMode, toggleDarkMode }) => {
             const [activeTab, setActiveTab] = useState('clients');
             const [clients, setClients] = useState([]);
 
@@ -1862,6 +1862,8 @@
                     onViewClient={setViewingClient}
                     allExercises={allExercises}
                     notifications={notifications}
+                    darkMode={darkMode}
+                    toggleDarkMode={toggleDarkMode}
                 />;
             }
 
@@ -1870,8 +1872,10 @@
                     user={currentUser}
                     allExercises={allExercises}
                     onLogout={handleLogout}
-                    onNotify={api.addNotification}
-                    onLogWorkout={api.logWorkout}
+                    onNotify={handleNotifyTrainer}
+                    onLogWorkout={handleLogWorkout}
+                    darkMode={darkMode}
+                    toggleDarkMode={toggleDarkMode}
                 />;
             }
 
