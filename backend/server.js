@@ -104,6 +104,8 @@ const seedDatabase = async () => {
         { id: 'ex-legs-05', name: 'Zancadas Caminando', category: 'Piernas', tags: ['Piernas', 'Cuádriceps', 'Glúteos'], description: 'Ejercicio funcional que trabaja piernas y glúteos de forma dinámica.', sets: 3, reps: 12, rest: 60 },
         { id: 'ex-legs-06', name: 'Sentadilla Sumo con Pesa Rusa', category: 'Piernas', tags: ['Piernas', 'Aductores', 'Glúteos'], description: 'Enfatiza el trabajo en los aductores y glúteos.', sets: 3, reps: 12, rest: 90 },
         { id: 'ex-legs-07', name: 'Elevación de Talones (Gemelos)', category: 'Piernas', tags: ['Piernas', 'Gemelos'], description: 'Fortalecimiento de pantorrillas.', sets: 4, reps: 15, rest: 45 },
+        { id: 'ex-legs-08', name: 'Sentadilla Frontal', category: 'Piernas', tags: ['Piernas', 'Cuádriceps', 'Core'], description: 'Enfatiza cuádriceps y requiere mayor estabilidad del core.', sets: 4, reps: 10, rest: 90 },
+        { id: 'ex-legs-09', name: 'Elevación de Gemelos Sentado', category: 'Piernas', tags: ['Piernas', 'Gemelos'], description: 'Enfatiza el sóleo.', sets: 3, reps: 15, rest: 45 },
 
         // Espalda
         { id: 'ex-back-01', name: 'Jalón al Pecho (Polea Alta)', category: 'Espalda', tags: ['Espalda', 'Dorsales'], description: 'Desarrolla la amplitud de la espalda (dorsales).', sets: 4, reps: 12, rest: 60 },
@@ -111,6 +113,7 @@ const seedDatabase = async () => {
         { id: 'ex-back-03', name: 'Dominadas Asistidas', category: 'Espalda', tags: ['Espalda', 'Dorsales'], description: 'Versión accesible de las dominadas para construir fuerza.', sets: 3, reps: 8, rest: 90 },
         { id: 'ex-back-04', name: 'Pull-over con Mancuerna', category: 'Espalda', tags: ['Espalda', 'Dorsales', 'Pecho'], description: 'Trabaja el dorsal y el serrato, expandiendo la caja torácica.', sets: 3, reps: 15, rest: 60 },
         { id: 'ex-back-05', name: 'Hiperextensiones (Lumbares)', category: 'Espalda', tags: ['Espalda', 'Lumbares'], description: 'Fortalece la espalda baja y cadena posterior.', sets: 3, reps: 15, rest: 60 },
+        { id: 'ex-back-06', name: 'Remo con Barra', category: 'Espalda', tags: ['Espalda', 'Fuerza'], description: 'Ejercicio compuesto fundamental para grosor de espalda.', sets: 4, reps: 10, rest: 90 },
 
         // Hombros
         { id: 'ex-shoulders-01', name: 'Press Militar con Mancuernas', category: 'Hombros', tags: ['Hombros'], description: 'Ejercicio fundamental para la fuerza y tamaño de los hombros.', sets: 4, reps: 10, rest: 90 },
@@ -123,6 +126,7 @@ const seedDatabase = async () => {
         { id: 'ex-chest-01', name: 'Press de Banca con Mancuernas', category: 'Pecho', tags: ['Pecho'], description: 'Permite un mayor rango de movimiento que la barra, beneficiando el desarrollo pectoral.', sets: 4, reps: 12, rest: 90 },
         { id: 'ex-chest-02', name: 'Aperturas con Mancuernas (Banco Inclinado)', category: 'Pecho', tags: ['Pecho'], description: 'Enfocado en la parte superior del pectoral.', sets: 3, reps: 15, rest: 60 },
         { id: 'ex-chest-03', name: 'Flexiones (Push-ups)', category: 'Pecho', tags: ['Pecho', 'Hombros', 'Tríceps'], description: 'Ejercicio de peso corporal fundamental para el tren superior.', sets: 3, reps: 15, rest: 60 },
+        { id: 'ex-chest-04', name: 'Press Inclinado con Mancuernas', category: 'Pecho', tags: ['Pecho', 'Superior'], description: 'Enfatiza la porción clavicular (superior) del pectoral.', sets: 4, reps: 10, rest: 90 },
 
         // Brazos (Bíceps y Tríceps)
         { id: 'ex-arms-01', name: 'Curl de Bíceps con Barra Z', category: 'Brazos', tags: ['Brazos', 'Bíceps'], description: 'Reduce la tensión en las muñecas mientras se trabaja el bíceps.', sets: 3, reps: 12, rest: 60 },
@@ -135,12 +139,16 @@ const seedDatabase = async () => {
         { id: 'ex-core-02', name: 'Elevación de Piernas Colgado', category: 'Abdomen y Core', tags: ['Core', 'Abdomen'], description: 'Intenso ejercicio para la parte inferior del abdomen.', sets: 3, reps: 15, rest: 45 },
         { id: 'ex-core-03', name: 'Crunch Abdominal en Polea Alta', category: 'Abdomen y Core', tags: ['Core', 'Abdomen'], description: 'Permite añadir resistencia al crunch para mayor hipertrofia.', sets: 3, reps: 20, rest: 45 },
         { id: 'ex-core-04', name: 'Rueda Abdominal (Ab Wheel)', category: 'Abdomen y Core', tags: ['Core', 'Abdomen', 'Espalda'], description: 'Ejercicio avanzado para una fuerza abdominal y de core superior.', sets: 3, reps: 12, rest: 60 },
+        { id: 'ex-core-05', name: 'Russian Twists', category: 'Abdomen y Core', tags: ['Core', 'Oblicuos'], description: 'Trabajo rotacional para oblicuos.', sets: 3, reps: 20, rest: 45 },
+        { id: 'ex-core-06', name: 'Elevación de Piernas Tumbado', category: 'Abdomen y Core', tags: ['Core', 'Abdomen'], description: 'Control abdominal inferior.', sets: 3, reps: 15, rest: 45 },
 
         // Cardio
         { id: 'ex-cardio-01', name: 'Caminadora (Cinta)', category: 'Cardio', tags: ['Cardio', 'Resistencia'], description: 'Caminata o trote suave para calentamiento o quema de calorías.', sets: 1, time: 1200, rest: 0 },
         { id: 'ex-cardio-02', name: 'Bicicleta Estática', category: 'Cardio', tags: ['Cardio', 'Piernas'], description: 'Cardio de bajo impacto.', sets: 1, time: 1200, rest: 0 },
         { id: 'ex-cardio-03', name: 'Elíptica', category: 'Cardio', tags: ['Cardio', 'Full Body'], description: 'Cardio de bajo impacto que involucra brazos y piernas.', sets: 1, time: 1200, rest: 0 },
-        { id: 'ex-cardio-04', name: 'Salto a la Cuerda', category: 'Cardio', tags: ['Cardio', 'Coordinación'], description: 'Cardio intenso para coordinación y agilidad.', sets: 3, time: 60, rest: 60 },
+        { id: 'ex-cardio-04', name: 'Salto a la Cuerda', category: 'Cardio', tags: ['Cardio', 'Coordinación'], description: 'Cardio intenso para coordinación y agilidad.', sets: 3, time: 180, rest: 60 },
+        { id: 'ex-cardio-05', name: 'Remo (Rowing Machine)', category: 'Cardio', tags: ['Cardio', 'Full Body'], description: 'Cardio de cuerpo completo de bajo impacto.', sets: 1, time: 1200, rest: 0 },
+        { id: 'ex-cardio-06', name: 'Escaladora (Stair Climber)', category: 'Cardio', tags: ['Cardio', 'Piernas'], description: 'Excelente para glúteos y resistencia cardiovascular.', sets: 1, time: 900, rest: 0 },
 
         // Full Body
         { id: 'ex-full-01', name: 'Burpees', category: 'Full Body', tags: ['Cardio', 'Fuerza'], description: 'Ejercicio metabólico completo.', sets: 3, reps: 15, rest: 90 }
