@@ -1872,8 +1872,8 @@
                     user={currentUser}
                     allExercises={allExercises}
                     onLogout={handleLogout}
-                    onNotify={handleNotifyTrainer}
-                    onLogWorkout={handleLogWorkout}
+                    onNotify={api.addNotification}
+                    onLogWorkout={api.logWorkout}
                     darkMode={darkMode}
                     toggleDarkMode={toggleDarkMode}
                 />;
