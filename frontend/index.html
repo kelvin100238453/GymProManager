@@ -1168,17 +1168,18 @@
 
             if (screen === 'initial') {
                 return (
-                    <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center p-4">
+                    <div className="min-h-screen flex flex-col justify-center items-center p-4" style={{ backgroundColor: '#0f172a' }}>
                         <div className="text-center">
-                            <DumbbellIcon className="w-20 h-20 text-indigo-500 mx-auto" />
-                            <h1 className="text-5xl font-extrabold text-white mt-4">GymPro Manager</h1>
-                            <p className="text-gray-400 mt-2 text-lg">Tu asistente de gimnasio personal.</p>
+                            <DumbbellIcon className="w-24 h-24 text-blue-400 mx-auto mb-6" />
+                            <h1 className="text-5xl font-extrabold text-white">GymPro</h1>
+                            <h1 className="text-5xl font-extrabold text-white">Manager</h1>
+                            <p className="text-gray-400 mt-4 text-base">Tu asistente de gimnasio personal.</p>
                         </div>
-                        <div className="mt-12 w-full max-w-sm space-y-4">
-                            <button onClick={() => setScreen('trainer')} className="w-full text-lg font-bold bg-indigo-600 text-white py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105">
+                        <div className="mt-16 w-full max-w-md space-y-4">
+                            <button onClick={() => setScreen('trainer')} className="w-full text-lg font-semibold bg-blue-500 text-white py-4 rounded-xl shadow-lg hover:bg-blue-600 transition-all">
                                 Soy Entrenador
                             </button>
-                            <button onClick={() => setScreen('client')} className="w-full text-lg font-bold bg-gray-700 text-white py-4 rounded-xl shadow-lg hover:bg-gray-600 transition-transform transform hover:scale-105">
+                            <button onClick={() => setScreen('client')} className="w-full text-lg font-semibold bg-gray-700 text-white py-4 rounded-xl shadow-lg hover:bg-gray-600 transition-all">
                                 Soy Cliente
                             </button>
                         </div>
