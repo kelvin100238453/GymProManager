@@ -509,6 +509,40 @@ app.post('/api/admin/cleanup-trainers', asyncHandler(async (req, res) => {
     });
 }));
 
+// ENDPOINT TEMPORAL - REGENERAR TOKENS DE TODOS LOS CLIENTES
+app.post('/api/admin/regenerate-client-tokens', asyncHandler(async (req, res) => {
+    const clients = await db.collection('clients').find({}).toArray();
+
+    let updated = 0;
+    const results = [];
+
+    for (const client of clients) {
+        // Generar nuevos tokens con 40 días
+        const payload = { userId: client.id, role: 'client' };
+        const { accessToken, refreshToken } = generateTokens(payload);
+
+        // Actualizar en la BD
+        await db.collection('clients').updateOne(
+            { _id: client._id },
+            { $set: { refreshToken } }
+        );
+
+        updated++;
+        results.push({
+            username: client.username,
+            name: client.name,
+            tokenUpdated: true
+        });
+    }
+
+    res.json({
+        message: 'Tokens regenerados exitosamente',
+        totalClients: clients.length,
+        tokensUpdated: updated,
+        clients: results
+    });
+}));
+
 // --- Clients ---
 app.get('/api/clients', authenticateToken, asyncHandler(async (req, res) => {
     const { trainerId } = req.query;
