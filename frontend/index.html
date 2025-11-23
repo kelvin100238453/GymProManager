@@ -454,14 +454,20 @@
             const { sets = 1, reps = 0, time = 0, rest } = exercise;
             const [currentSet, setCurrentSet] = useState(1);
             const [isResting, setIsResting] = useState(startWithRest);
-            const [timerValue, setTimerValue] = useState(rest);
+            const [restTimerValue, setRestTimerValue] = useState(rest);
+
+            // Estado para el temporizador de ejercicio
+            const [exerciseTimerValue, setExerciseTimerValue] = useState(time);
+            const [isExerciseTimerRunning, setIsExerciseTimerRunning] = useState(false);
+
             const [startTime] = useState(Date.now());
 
+            // Efecto para el temporizador de DESCANSO
             useEffect(() => {
                 if (!isResting) return;
-                setTimerValue(rest);
+                setRestTimerValue(rest);
                 const interval = setInterval(() => {
-                    setTimerValue(prev => {
+                    setRestTimerValue(prev => {
                         if (prev <= 1) {
                             clearInterval(interval);
                             setIsResting(false);
@@ -473,10 +479,30 @@
                 return () => clearInterval(interval);
             }, [isResting, rest]);
 
+            // Efecto para el temporizador de EJERCICIO
+            useEffect(() => {
+                if (isResting || !isExerciseTimerRunning || time === 0) return;
+
+                const interval = setInterval(() => {
+                    setExerciseTimerValue(prev => {
+                        if (prev <= 1) {
+                            clearInterval(interval);
+                            setIsExerciseTimerRunning(false);
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
+                return () => clearInterval(interval);
+            }, [isExerciseTimerRunning, isResting, time]);
+
             const handleSetComplete = () => {
                 if (currentSet < sets) {
                     setCurrentSet(s => s + 1);
                     setIsResting(true);
+                    // Resetear temporizador de ejercicio para el siguiente set
+                    setExerciseTimerValue(time);
+                    setIsExerciseTimerRunning(false);
                 } else {
                     handleFinish();
                 }
@@ -501,18 +527,30 @@
                         {isResting ? (
                             <div className="my-8">
                                 <p className="text-4xl font-bold text-gray-300">Descanso</p>
-                                <p className="text-8xl font-mono text-indigo-300 my-4">{formatTime(timerValue)}</p>
+                                <p className="text-8xl font-mono text-indigo-300 my-4">{formatTime(restTimerValue)}</p>
                                 <p className="text-xl text-gray-400">Próxima serie: {currentSet} / {sets}</p>
                                 <button onClick={() => setIsResting(false)} className="mt-4 text-red-500 hover:text-red-400 font-semibold underline">Saltar Descanso</button>
                             </div>
                         ) : (
                             <div className="my-8">
                                 <p className="text-4xl font-bold text-gray-300">Serie {currentSet} / {sets}</p>
-                                <p className="text-8xl font-mono text-white my-4">{reps > 0 ? reps : time > 0 ? formatTime(time) : 'N/A'}</p>
-                                <p className="text-xl text-gray-400">{reps > 0 ? 'repeticiones' : 'segundos'}</p>
+                                <p className="text-8xl font-mono text-white my-4">
+                                    {reps > 0 ? reps : (time > 0 ? formatTime(exerciseTimerValue) : 'N/A')}
+                                </p>
+                                <p className="text-xl text-gray-400">
+                                    {reps > 0 ? 'repeticiones' : 'Tiempo de Ejercicio'}
+                                </p>
+                                {time > 0 && !isExerciseTimerRunning && exerciseTimerValue > 0 && (
+                                    <button
+                                        onClick={() => setIsExerciseTimerRunning(true)}
+                                        className="mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition transform hover:scale-105"
+                                    >
+                                        Iniciar Tiempo
+                                    </button>
+                                )}
                             </div>
                         )}
-                        <button onClick={handleSetComplete} disabled={isResting} className="w-full text-2xl font-bold bg-indigo-600 text-white py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition disabled:bg-gray-600 disabled:cursor-not-allowed">
+                        <button onClick={handleSetComplete} disabled={isResting} className="w-full text-2xl font-bold bg-indigo-600 text-white py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition disabled:bg-gray-600 disabled:cursor-not-allowed mt-4">
                             {currentSet < sets ? 'Set Completado' : 'Finalizar Ejercicio'}
                         </button>
                         <div className="flex justify-center gap-6 mt-4">
