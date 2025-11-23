@@ -190,14 +190,22 @@
                         body: JSON.stringify({ refreshToken: currentRefreshToken }),
                     });
                     if (!response.ok) {
-                        throw new Error('Failed to refresh token');
+                        // Solo hacer logout si es un error de autenticación (401/403)
+                        // NO hacer logout en errores de red (500, timeout, etc.)
+                        if (response.status === 401 || response.status === 403) {
+                            console.error('Refresh token inválido o expirado. Cerrando sesión.');
+                            authProvider.logout();
+                        } else {
+                            console.error('Error temporal al refrescar token. Status:', response.status);
+                        }
+                        return null;
                     }
                     const { accessToken } = await response.json();
                     authProvider.setTokens(accessToken);
                     return accessToken;
                 } catch (error) {
-                    console.error('Error refreshing token:', error);
-                    authProvider.logout();
+                    // Error de red u otro error técnico - NO hacer logout
+                    console.error('Error de red al refrescar token:', error.message);
                     return null;
                 }
             },
