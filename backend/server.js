@@ -625,51 +625,80 @@ app.get(/^(?!\/api).*/, (req, res) => {
 
 // --- SANEAMIENTO DE DATOS ---
 const sanitizeAllData = async () => {
-    console.log('Iniciando saneamiento de datos...');
+    console.log('--- INICIANDO SANEAMIENTO DE DATOS (V2) ---');
     try {
         const clients = await db.collection('clients').find({}).toArray();
         let updatedCount = 0;
 
         for (const client of clients) {
             let modified = false;
-            if (client.customRoutine) {
+            // Normalizar estructura: algunos clientes pueden tener 'routine' en lugar de 'customRoutine' o ambos
+            const routinesToCheck = [];
+            if (client.customRoutine) routinesToCheck.push(client.customRoutine);
+            if (client.routine && Array.isArray(client.routine)) routinesToCheck.push(client.routine);
+
+            routinesToCheck.forEach(routine => {
                 // Iterar sobre semanas
-                client.customRoutine.forEach(week => {
+                routine.forEach((week, weekIndex) => {
                     if (!week) return;
-                    // Iterar sobre días
+                    // Iterar sobre claves (días)
                     Object.keys(week).forEach(dayKey => {
                         const day = week[dayKey];
+                        // Verificar que parece un día con ejercicios
                         if (day && day.exercises && Array.isArray(day.exercises)) {
-                            day.exercises.forEach(ex => {
-                                // Regla 1: Tiempos de descanso muy bajos (<= 5) son probablemente minutos
-                                if (ex.rest > 0 && ex.rest <= 5) {
-                                    ex.rest = Math.round(ex.rest * 60);
-                                    modified = true;
+                            day.exercises.forEach((ex, exIndex) => {
+                                const originalRest = ex.rest;
+                                const originalTime = ex.time;
+                                let newRest = parseFloat(originalRest);
+                                let newTime = parseFloat(originalTime);
+
+                                // Regla 1: Tiempos de descanso <= 10 se asumen como MINUTOS -> convertir a segundos
+                                // (Cubre el caso de "1.5" -> 90s y "7" -> 420s)
+                                if (newRest > 0 && newRest <= 10) {
+                                    newRest = Math.round(newRest * 60);
                                 }
+
                                 // Regla 2: Tiempos de descanso excesivos (> 300s / 5 min) se capan a 90s
-                                if (ex.rest > 300) {
-                                    ex.rest = 90;
+                                // (Cubre el caso de "7 minutos" convertidos a 420s, o "420" directos)
+                                if (newRest > 300) {
+                                    newRest = 90;
+                                }
+
+                                // Regla 3: Tiempos de ejercicio <= 5 se asumen como MINUTOS -> convertir a segundos
+                                if (newTime > 0 && newTime <= 5) {
+                                    newTime = Math.round(newTime * 60);
+                                }
+
+                                // Aplicar cambios si hubo modificación
+                                if (newRest !== originalRest) {
+                                    console.log(`[Cliente ${client.name}] Corrigiendo Rest: ${originalRest} -> ${newRest} (Semana ${weekIndex + 1}, ${dayKey}, Ejercicio ${ex.name})`);
+                                    ex.rest = newRest;
                                     modified = true;
                                 }
-                                // Regla 3: Tiempos de ejercicio (si existen) muy bajos (<= 5) son minutos
-                                if (ex.time > 0 && ex.time <= 5) {
-                                    ex.time = Math.round(ex.time * 60);
+                                if (newTime !== originalTime) {
+                                    console.log(`[Cliente ${client.name}] Corrigiendo Time: ${originalTime} -> ${newTime} (Semana ${weekIndex + 1}, ${dayKey}, Ejercicio ${ex.name})`);
+                                    ex.time = newTime;
                                     modified = true;
                                 }
                             });
                         }
                     });
                 });
-            }
+            });
 
             if (modified) {
-                await db.collection('clients').updateOne({ _id: client._id }, { $set: { customRoutine: client.customRoutine } });
+                // Actualizar ambos campos si existen para mantener consistencia
+                const updateFields = {};
+                if (client.customRoutine) updateFields.customRoutine = client.customRoutine;
+                if (client.routine) updateFields.routine = client.routine; // Por si acaso se usa este campo
+
+                await db.collection('clients').updateOne({ _id: client._id }, { $set: updateFields });
                 updatedCount++;
             }
         }
-        console.log(`Saneamiento completado. ${updatedCount} clientes actualizados.`);
+        console.log(`--- SANEAMIENTO COMPLETADO: ${updatedCount} clientes actualizados ---`);
     } catch (error) {
-        console.error('Error durante el saneamiento de datos:', error);
+        console.error('FATAL: Error durante el saneamiento de datos:', error);
     }
 };
 
