@@ -156,41 +156,15 @@ const seedDatabase = async () => {
 
     try {
         const collection = db.collection('system');
-        const exerciseDoc = await collection.findOne({ _id: 'exercises' });
 
-        if (!exerciseDoc || !exerciseDoc.data) {
-            // Si no hay documento, insertar todo
-            await collection.updateOne(
-                { _id: 'exercises' },
-                { $set: { data: defaultExercises } },
-                { upsert: true }
-            );
-            console.log('Base de datos de ejercicios creada con éxito.');
-        } else {
-            // Si ya existen, fusionar: actualizar existentes y añadir nuevos
-            const existingExercises = exerciseDoc.data;
-            const existingIds = new Set(existingExercises.map(e => e.id));
-
-            // Actualizar ejercicios existentes con los nuevos valores por defecto (tiempos, descripciones)
-            // y añadir los nuevos que no existan
-            const mergedExercises = existingExercises.map(ex => {
-                const defaultEx = defaultExercises.find(d => d.id === ex.id);
-                return defaultEx ? { ...ex, ...defaultEx } : ex;
-            });
-
-            // Añadir los que son completamente nuevos
-            defaultExercises.forEach(defEx => {
-                if (!existingIds.has(defEx.id)) {
-                    mergedExercises.push(defEx);
-                }
-            });
-
-            await collection.updateOne(
-                { _id: 'exercises' },
-                { $set: { data: mergedExercises } }
-            );
-            console.log('Base de datos de ejercicios actualizada y sincronizada.');
-        }
+        // FORZAR actualización completa de ejercicios default
+        // Esto sobrescribe TODOS los valores para asegurar consistencia
+        await collection.updateOne(
+            { _id: 'exercises' },
+            { $set: { data: defaultExercises } },
+            { upsert: true }
+        );
+        console.log('✓ Biblioteca de ejercicios FORZADA a valores correctos (reemplazo completo).');
 
     } catch (error) {
         console.error('Error al sembrar la base de datos de ejercicios:', error);
@@ -246,19 +220,24 @@ const seedTrainerUser = async () => {
 // --- API ENDPOINTS ---
 
 // --- Auth ---
+// Función para generar tokens JWT
+// POLÍTICA DE SESIONES:
+// - CLIENTES: Tokens permanentes (sin expiración) para mejorar retención
+// - TRAINERS: Tokens con expiración (1h/7d) por seguridad
 const generateTokens = (payload) => {
-    // Para clientes: Tokens sin expiración (acceso permanente)
     if (payload.role === 'client') {
-        const accessToken = jwt.sign(payload, JWT_SECRET); // Sin expiresIn para acceso permanente
-        const refreshToken = jwt.sign(payload, JWT_SECRET); // Sin expiresIn para acceso permanente
+        // Sesiones permanentes para clientes
+        const accessToken = jwt.sign(payload, JWT_SECRET);
+        const refreshToken = jwt.sign(payload, JWT_SECRET);
         return { accessToken, refreshToken };
     } else {
-        // Para entrenadores: Tokens con expiración por seguridad
+        // Sesiones con expiración para trainers
         const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
         const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
         return { accessToken, refreshToken };
     }
 };
+
 app.post('/api/auth/client/login', asyncHandler(async (req, res) => {
     const { username, password } = req.body;
     const client = await db.collection('clients').findOne({ username });
