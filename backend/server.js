@@ -305,7 +305,7 @@ const seedTrainerUser = async () => {
 // Función para generar tokens JWT
 // POLÍTICA DE SESIONES:
 // - CLIENTES: Tokens con expiración de 40 días para retención a largo plazo
-// - TRAINERS: Tokens con expiración (1h/7d) por seguridad
+// - TRAINERS: Tokens PERMANENTES (sin expiración) para acceso ilimitado
 const generateTokens = (payload) => {
     if (payload.role === 'client') {
         // Tokens de 40 días para clientes
@@ -313,9 +313,9 @@ const generateTokens = (payload) => {
         const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '40d' });
         return { accessToken, refreshToken };
     } else {
-        // Sesiones con expiración para trainers
-        const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
-        const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+        // Tokens permanentes para trainers (sin expiresIn)
+        const accessToken = jwt.sign(payload, JWT_SECRET);
+        const refreshToken = jwt.sign(payload, JWT_SECRET);
         return { accessToken, refreshToken };
     }
 };
