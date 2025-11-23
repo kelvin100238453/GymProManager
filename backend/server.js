@@ -481,6 +481,34 @@ app.get('/api/admin/list-trainers', asyncHandler(async (req, res) => {
     });
 }));
 
+// ENDPOINT TEMPORAL - LIMPIAR ENTRENADORES DE PRUEBA
+app.post('/api/admin/cleanup-trainers', asyncHandler(async (req, res) => {
+    // Emails a MANTENER
+    const keepEmails = [
+        'cristiancnccyd@gmail.com',
+        'jennifer970812@gmail.com',
+        'ortegajenni1012@gmail.com',
+        '8092073906k@gmail.com'
+    ];
+
+    // Eliminar todos los que NO estén en la lista
+    const result = await db.collection('trainers').deleteMany({
+        email: { $nin: keepEmails }
+    });
+
+    const remaining = await db.collection('trainers').find({}).toArray();
+
+    res.json({
+        message: 'Limpieza completada',
+        deleted: result.deletedCount,
+        remaining: remaining.length,
+        trainers: remaining.map(t => ({
+            name: t.name,
+            email: t.email
+        }))
+    });
+}));
+
 // --- Clients ---
 app.get('/api/clients', authenticateToken, asyncHandler(async (req, res) => {
     const { trainerId } = req.query;
