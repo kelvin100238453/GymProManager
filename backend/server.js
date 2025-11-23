@@ -462,7 +462,23 @@ app.post('/api/auth/trainer/register', asyncHandler(async (req, res) => {
     const { password: _, ...trainerData } = newTrainer;
 
     // Enviar el token y los datos del usuario, igual que en el login
-    res.status(201).json({ token, user: trainerData });
+    res.json({ message: 'Entrenador registrado con éxito.', token, user: { ...newTrainer, password: undefined } });
+}));
+
+// ENDPOINT TEMPORAL - LISTAR ENTRENADORES (SOLO PARA DEBUG)
+app.get('/api/admin/list-trainers', asyncHandler(async (req, res) => {
+    const trainers = await db.collection('trainers').find({}).toArray();
+    const trainerList = trainers.map(t => ({
+        id: t.id,
+        name: t.name,
+        email: t.email,
+        createdAt: t.createdAt,
+        totalClients: 0 // Podrías contar clientes si quieres
+    }));
+    res.json({
+        total: trainers.length,
+        trainers: trainerList
+    });
 }));
 
 // --- Clients ---
