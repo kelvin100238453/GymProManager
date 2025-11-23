@@ -623,10 +623,61 @@ app.get(/^(?!\/api).*/, (req, res) => {
     });
 });
 
+// --- SANEAMIENTO DE DATOS ---
+const sanitizeAllData = async () => {
+    console.log('Iniciando saneamiento de datos...');
+    try {
+        const clients = await db.collection('clients').find({}).toArray();
+        let updatedCount = 0;
+
+        for (const client of clients) {
+            let modified = false;
+            if (client.customRoutine) {
+                // Iterar sobre semanas
+                client.customRoutine.forEach(week => {
+                    if (!week) return;
+                    // Iterar sobre días
+                    Object.keys(week).forEach(dayKey => {
+                        const day = week[dayKey];
+                        if (day && day.exercises && Array.isArray(day.exercises)) {
+                            day.exercises.forEach(ex => {
+                                // Regla 1: Tiempos de descanso muy bajos (<= 5) son probablemente minutos
+                                if (ex.rest > 0 && ex.rest <= 5) {
+                                    ex.rest = Math.round(ex.rest * 60);
+                                    modified = true;
+                                }
+                                // Regla 2: Tiempos de descanso excesivos (> 300s / 5 min) se capan a 90s
+                                if (ex.rest > 300) {
+                                    ex.rest = 90;
+                                    modified = true;
+                                }
+                                // Regla 3: Tiempos de ejercicio (si existen) muy bajos (<= 5) son minutos
+                                if (ex.time > 0 && ex.time <= 5) {
+                                    ex.time = Math.round(ex.time * 60);
+                                    modified = true;
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            if (modified) {
+                await db.collection('clients').updateOne({ _id: client._id }, { $set: { customRoutine: client.customRoutine } });
+                updatedCount++;
+            }
+        }
+        console.log(`Saneamiento completado. ${updatedCount} clientes actualizados.`);
+    } catch (error) {
+        console.error('Error durante el saneamiento de datos:', error);
+    }
+};
+
 // --- INICIAR SERVIDOR ---
 const startServer = async () => {
     await connectDb(); // Conecta a la base de datos primero
     await seedDatabase(); // Puebla la base de datos con ejercicios
+    await sanitizeAllData(); // Sanea datos inconsistentes en clientes
     await seedTrainerUser(); // Sembrar usuario específico
 
     // Ejecutar limpieza automática cada hora
