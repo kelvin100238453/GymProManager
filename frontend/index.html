@@ -1500,6 +1500,45 @@
             const [selectedWeekIndex, setSelectedWeekIndex] = useState(0);
             const [newMeasurement, setNewMeasurement] = useState({ weight: '', waist: '', chest: '', hips: '', bicepsR: '', bicepsL: '', thighsR: '', thighsL: '', calvesR: '', calvesL: '' });
 
+            // Inicializar Semana 1 automáticamente si no existe rutina
+            useEffect(() => {
+                if (!client.customRoutine || client.customRoutine.length === 0) {
+                    const newWeek = DAYS_OF_WEEK.reduce((acc, day) => ({ ...acc, [day]: { title: 'Día de Descanso', exercises: [] } }), {});
+                    onUpdateClient({ ...client, customRoutine: [newWeek] });
+                }
+            }, []);
+
+            // Función para detectar el grupo muscular principal de los ejercicios
+            const getMuscleGroupFromExercises = (exercises) => {
+                if (!exercises || exercises.length === 0) return '';
+
+                const muscleGroups = {
+                    'Brazos': ['Bíceps', 'Tríceps', 'Antebrazo'],
+                    'Pecho': ['Pecho'],
+                    'Espalda': ['Espalda', 'Dorsal'],
+                    'Hombros': ['Hombros', 'Deltoides'],
+                    'Piernas': ['Piernas', 'Cuádriceps', 'Femorales', 'Pantorrillas'],
+                    'Glúteos': ['Glúteos'],
+                    'Core': ['Core', 'Abdominales'],
+                    'Cardio': ['Cardio'],
+                    'Full Body': ['Full Body']
+                };
+
+                const categories = exercises.map(ex => ex.category || '');
+                const categoryCounts = {};
+
+                categories.forEach(cat => {
+                    for (const [group, keywords] of Object.entries(muscleGroups)) {
+                        if (keywords.some(keyword => cat.includes(keyword))) {
+                            categoryCounts[group] = (categoryCounts[group] || 0) + 1;
+                        }
+                    }
+                });
+
+                const mainGroup = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0];
+                return mainGroup ? mainGroup[0] : '';
+            };
+
             const handleMeasurementChange = (e) => {
                 setNewMeasurement({ ...newMeasurement, [e.target.name]: e.target.value });
             };
@@ -1534,8 +1573,16 @@
 
                 const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
                 newRoutine[weekIndex][day].exercises.push(...newCustomExercises);
+
+                // Auto-generar título basado en grupo muscular
+                const muscleGroup = getMuscleGroupFromExercises(newRoutine[weekIndex][day].exercises);
+                if (muscleGroup) {
+                    newRoutine[weekIndex][day].title = muscleGroup;
+                }
+
                 handleRoutineChange(newRoutine);
                 setAddExModalOpen(false);
+                setAddingToDay(null);
             };
 
             const handleSaveCustomExercise = (updatedEx) => {
@@ -1544,13 +1591,30 @@
                 const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
                 const exIndex = newRoutine[weekIndex][day].exercises.findIndex(e => e.instanceId === instanceId);
                 if (exIndex > -1) newRoutine[weekIndex][day].exercises[exIndex] = { ...newRoutine[weekIndex][day].exercises[exIndex], ...updatedEx };
+
+                // Auto-actualizar título basado en grupo muscular
+                const muscleGroup = getMuscleGroupFromExercises(newRoutine[weekIndex][day].exercises);
+                if (muscleGroup) {
+                    newRoutine[weekIndex][day].title = muscleGroup;
+                }
+
                 handleRoutineChange(newRoutine);
                 setEditExModalOpen(false);
+                setEditingEx(null);
             };
 
             const handleDeleteExercise = (weekIndex, day, instanceId) => {
                 const newRoutine = JSON.parse(JSON.stringify(client.customRoutine));
                 newRoutine[weekIndex][day].exercises = newRoutine[weekIndex][day].exercises.filter(e => e.instanceId !== instanceId);
+
+                // Auto-actualizar título basado en grupo muscular después de eliminar
+                const muscleGroup = getMuscleGroupFromExercises(newRoutine[weekIndex][day].exercises);
+                if (muscleGroup) {
+                    newRoutine[weekIndex][day].title = muscleGroup;
+                } else if (newRoutine[weekIndex][day].exercises.length === 0) {
+                    newRoutine[weekIndex][day].title = 'Día de Descanso'; // O un título por defecto si no hay ejercicios
+                }
+
                 handleRoutineChange(newRoutine);
             };
 
