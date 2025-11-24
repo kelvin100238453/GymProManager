@@ -567,13 +567,16 @@ app.post('/api/clients', authenticateToken, asyncHandler(async (req, res) => {
         return res.status(400).json({ message: 'La contraseña es un campo obligatorio.' });
     }
 
+    const DAYS_OF_WEEK = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const week1 = DAYS_OF_WEEK.reduce((acc, day) => ({ ...acc, [day]: { title: 'Día de Descanso', exercises: [] } }), {});
+
     const newClient = {
         id: `client-${crypto.randomUUID()}`,
         ...clientData,
         trainerId,
         role: 'client',
         measurements: [],
-        customRoutine: [],
+        customRoutine: [week1], // Semana 1 disponible por defecto
         workoutLogs: []
     };
 
