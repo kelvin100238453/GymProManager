@@ -1,0 +1,10 @@
+DEPLOYMENT FIX - Forzar actualización en Render
+
+Cambios incluidos:
+- Tokens de 40 días para clientes
+- Tokens permanentes para entrenadores
+- Semana 1 por defecto al crear cliente
+- Título automático con categoría de ejercicio
+- Logout selectivo (solo errores 401/403)
+
+Este commit fuerza un rebuild en Render para aplicar todos los cambios pendientes.
