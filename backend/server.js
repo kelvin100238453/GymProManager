@@ -543,6 +543,36 @@ app.post('/api/admin/regenerate-client-tokens', asyncHandler(async (req, res) =>
     });
 }));
 
+// ENDPOINT TEMPORAL - DEBUG LOGIN DE CLIENTE
+app.post('/api/admin/debug-client-login', asyncHandler(async (req, res) => {
+    const { username, password } = req.body;
+
+    const client = await db.collection('clients').findOne({ username });
+
+    if (!client) {
+        // Verificar si existe como entrenador
+        const trainer = await db.collection('trainers').findOne({ email: username });
+        return res.json({
+            exists: false,
+            message: 'Cliente no encontrado en BD',
+            existsAsTrainer: !!trainer,
+            trainerData: trainer ? { name: trainer.name, email: trainer.email } : null
+        });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, client.password);
+
+    res.json({
+        exists: true,
+        username: client.username,
+        name: client.name,
+        hasPassword: !!client.password,
+        passwordHash: client.password ? client.password.substring(0, 30) + '...' : null,
+        passwordValid: isPasswordValid,
+        trainerId: client.trainerId
+    });
+}));
+
 // --- Clients ---
 app.get('/api/clients', authenticateToken, asyncHandler(async (req, res) => {
     const { trainerId } = req.query;
